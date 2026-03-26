@@ -1,0 +1,1375 @@
+#!/usr/bin/env python3
+"""
+MNG Printer Bridge — Odoo Cloud-to-Local Printer
+==================================================
+A desktop application that polls an Odoo instance for PDF attachments
+in a "PRINT QUEUE" note and sends them to a local printer.
+
+Usage:
+    MNG_Printer_Bridge.exe        # Just double-click the .exe!
+    python printer_bridge.py      # Or run with Python directly
+
+Requirements (only if running from source):
+    - Python 3.8+
+    - Odoo Community with the Notes app installed
+"""
+
+import xmlrpc.client
+import configparser
+import subprocess
+import base64
+import os
+import sys
+import time
+import logging
+import signal
+import argparse
+import threading
+import queue
+import shutil
+import socket
+from pathlib import Path
+from datetime import datetime, timedelta
+
+# ──────────────────────────────────────────────────────────────────────
+# PyInstaller / Path helpers
+# ──────────────────────────────────────────────────────────────────────
+
+def _is_frozen():
+    """Are we running as a PyInstaller bundle?"""
+    return getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS')
+
+def resource_path(filename):
+    """Get path to a bundled resource file (icon, SumatraPDF, etc.)."""
+    if _is_frozen():
+        return os.path.join(sys._MEIPASS, filename)
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)
+
+def app_dir():
+    """Get the directory where the .exe lives (for config, logs, etc.).
+    When frozen, this is the folder containing the .exe.
+    When running from source, this is the script's directory."""
+    if _is_frozen():
+        return os.path.dirname(sys.executable)
+    return os.path.dirname(os.path.abspath(__file__))
+
+# ──────────────────────────────────────────────────────────────────────
+# Constants
+# ──────────────────────────────────────────────────────────────────────
+
+APP_NAME = "MNG Printer Bridge"
+APP_VERSION = "1.0.0"
+CONFIG_FILE = os.path.join(app_dir(), "config.ini")
+LOG_FILE = os.path.join(app_dir(), "printer_bridge.log")
+ICON_FILE = "icon.png"  # resolved via resource_path()
+AUTOSTART_REG_KEY = r"Software\Microsoft\Windows\CurrentVersion\Run"
+AUTOSTART_REG_NAME = "MNGPrinterBridge"
+
+# Brand colors (MNG logo palette)
+COLOR_BG = "#1a1a2e"
+COLOR_BG_LIGHT = "#16213e"
+COLOR_BG_CARD = "#1f2b47"
+COLOR_ACCENT = "#0ea5e9"
+COLOR_ACCENT_HOVER = "#38bdf8"
+COLOR_PURPLE = "#9b59b6"
+COLOR_TEXT = "#e2e8f0"
+COLOR_TEXT_DIM = "#94a3b8"
+COLOR_SUCCESS = "#22c55e"
+COLOR_ERROR = "#ef4444"
+COLOR_WARNING = "#f59e0b"
+COLOR_INPUT_BG = "#0f172a"
+COLOR_BORDER = "#334155"
+
+# ──────────────────────────────────────────────────────────────────────
+# Logging
+# ──────────────────────────────────────────────────────────────────────
+
+def setup_logging():
+    fmt = "%(asctime)s [%(levelname)s] %(message)s"
+    datefmt = "%Y-%m-%d %H:%M:%S"
+    logger = logging.getLogger("PrinterBridge")
+    logger.setLevel(logging.DEBUG)
+
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(logging.INFO)
+    ch.setFormatter(logging.Formatter(fmt, datefmt))
+    logger.addHandler(ch)
+
+    fh = logging.FileHandler(LOG_FILE, encoding="utf-8")
+    fh.setLevel(logging.DEBUG)
+    fh.setFormatter(logging.Formatter(fmt, datefmt))
+    logger.addHandler(fh)
+
+    return logger
+
+log = setup_logging()
+
+# ──────────────────────────────────────────────────────────────────────
+# Printer Discovery — auto-detect ALL installed printers
+# ──────────────────────────────────────────────────────────────────────
+
+def _get_bundled_sumatra():
+    """Find SumatraPDF — bundled inside the .exe or in the app directory."""
+    # Check if bundled (PyInstaller)
+    bundled = resource_path("SumatraPDF.exe")
+    if os.path.exists(bundled):
+        return bundled
+    # Check app directory
+    local = os.path.join(app_dir(), "SumatraPDF.exe")
+    if os.path.exists(local):
+        return local
+    # Check common install locations
+    for p in [
+        r"C:\Program Files\SumatraPDF\SumatraPDF.exe",
+        r"C:\Program Files (x86)\SumatraPDF\SumatraPDF.exe",
+        os.path.expanduser(r"~\AppData\Local\SumatraPDF\SumatraPDF.exe"),
+    ]:
+        if os.path.exists(p):
+            return p
+    return None
+
+
+def discover_printers():
+    """
+    Detect all installed printers on the system.
+    Returns a list of dicts: [{"name": "...", "default": bool}, ...]
+    Works on Windows, Linux, and Wine.
+    """
+    printers = []
+
+    # ── Method 1: Windows — wmic (works on Win7+, Wine) ──
+    try:
+        result = subprocess.run(
+            ["wmic", "printer", "get", "Name,Default,PortName", "/format:csv"],
+            capture_output=True, text=True, timeout=10,
+            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+        )
+        if result.returncode == 0 and result.stdout.strip():
+            lines = [l.strip() for l in result.stdout.strip().split("\n") if l.strip()]
+            # CSV format: Node,Default,Name,PortName
+            for line in lines[1:]:  # skip header
+                parts = line.split(",")
+                if len(parts) >= 3:
+                    is_default = parts[1].strip().upper() == "TRUE"
+                    name = parts[2].strip()
+                    port = parts[3].strip() if len(parts) > 3 else ""
+                    if name:
+                        printers.append({
+                            "name": name,
+                            "default": is_default,
+                            "port": port,
+                        })
+            if printers:
+                log.info(f"Discovered {len(printers)} printer(s) via wmic")
+                return printers
+    except (FileNotFoundError, subprocess.TimeoutExpired, OSError):
+        pass
+
+    # ── Method 2: Windows — PowerShell (Win10+) ──
+    try:
+        result = subprocess.run(
+            ["powershell", "-Command",
+             "Get-Printer | Select-Object Name,Type,PortName,Default | ConvertTo-Csv -NoTypeInformation"],
+            capture_output=True, text=True, timeout=10,
+            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+        )
+        if result.returncode == 0 and result.stdout.strip():
+            lines = [l.strip().strip('"') for l in result.stdout.strip().split("\n") if l.strip()]
+            for line in lines[1:]:
+                parts = [p.strip().strip('"') for p in line.split('","')]
+                if parts and parts[0]:
+                    is_default = parts[3].upper() == "TRUE" if len(parts) > 3 else False
+                    port = parts[2] if len(parts) > 2 else ""
+                    printers.append({
+                        "name": parts[0],
+                        "default": is_default,
+                        "port": port,
+                    })
+            if printers:
+                log.info(f"Discovered {len(printers)} printer(s) via PowerShell")
+                return printers
+    except (FileNotFoundError, subprocess.TimeoutExpired, OSError):
+        pass
+
+    # ── Method 3: Windows — registry query (backup) ──
+    try:
+        result = subprocess.run(
+            ["reg", "query",
+             r"HKEY_CURRENT_USER\Software\Microsoft\Windows NT\CurrentVersion\Devices"],
+            capture_output=True, text=True, timeout=10,
+        )
+        if result.returncode == 0 and result.stdout.strip():
+            for line in result.stdout.strip().split("\n"):
+                line = line.strip()
+                if line and "REG_SZ" in line:
+                    name = line.split("    REG_SZ")[0].strip()
+                    if name and not name.startswith("HKEY"):
+                        printers.append({
+                            "name": name,
+                            "default": False,
+                            "port": "",
+                        })
+            if printers:
+                # Try to find default
+                try:
+                    def_result = subprocess.run(
+                        ["reg", "query",
+                         r"HKEY_CURRENT_USER\Software\Microsoft\Windows NT\CurrentVersion\Windows",
+                         "/v", "Device"],
+                        capture_output=True, text=True, timeout=5,
+                    )
+                    if def_result.returncode == 0:
+                        for line in def_result.stdout.split("\n"):
+                            if "Device" in line and "REG_SZ" in line:
+                                default_name = line.split("REG_SZ")[1].strip().split(",")[0]
+                                for p in printers:
+                                    if p["name"] == default_name:
+                                        p["default"] = True
+                except Exception:
+                    pass
+                log.info(f"Discovered {len(printers)} printer(s) via registry")
+                return printers
+    except (FileNotFoundError, subprocess.TimeoutExpired, OSError):
+        pass
+
+    # ── Method 4: Linux / macOS — CUPS (lpstat) ──
+    try:
+        result = subprocess.run(
+            ["lpstat", "-p", "-d"],
+            capture_output=True, text=True, timeout=10,
+        )
+        if result.returncode == 0 and result.stdout.strip():
+            default_printer = ""
+            for line in result.stdout.strip().split("\n"):
+                if line.startswith("system default destination:"):
+                    default_printer = line.split(":")[1].strip()
+                elif line.startswith("printer "):
+                    name = line.split()[1]
+                    printers.append({
+                        "name": name,
+                        "default": name == default_printer,
+                        "port": "",
+                    })
+            if printers:
+                log.info(f"Discovered {len(printers)} printer(s) via CUPS/lpstat")
+                return printers
+    except (FileNotFoundError, subprocess.TimeoutExpired, OSError):
+        pass
+
+    log.warning("No printers discovered on this system.")
+    return printers
+
+# ──────────────────────────────────────────────────────────────────────
+# Configuration
+# ──────────────────────────────────────────────────────────────────────
+
+def load_config(config_path=CONFIG_FILE):
+    config = configparser.ConfigParser()
+    if not os.path.exists(config_path):
+        return None
+    config.read(config_path, encoding="utf-8")
+    return config
+
+def save_config(config_path, odoo_url, database, username, password,
+                sumatra_path, printer_name, poll_interval):
+    config = configparser.ConfigParser()
+    config["odoo"] = {
+        "url": odoo_url, "database": database,
+        "username": username, "password": password,
+    }
+    config["printer"] = {
+        "sumatra_path": sumatra_path, "printer_name": printer_name,
+    }
+    config["settings"] = {
+        "poll_interval": str(poll_interval),
+        "temp_folder": "temp_prints",
+    }
+    with open(config_path, "w", encoding="utf-8") as f:
+        config.write(f)
+    log.info(f"Configuration saved to {config_path}")
+
+# ──────────────────────────────────────────────────────────────────────
+# Windows Auto-Start
+# ──────────────────────────────────────────────────────────────────────
+
+def get_autostart_enabled():
+    """Check if this app is set to auto-start with Windows."""
+    if sys.platform != "win32":
+        return False
+    try:
+        import winreg
+        key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, AUTOSTART_REG_KEY, 0, winreg.KEY_READ)
+        val, _ = winreg.QueryValueEx(key, AUTOSTART_REG_NAME)
+        winreg.CloseKey(key)
+        return bool(val)
+    except (FileNotFoundError, OSError):
+        return False
+
+def set_autostart_enabled(enable):
+    """Enable or disable auto-start on Windows boot."""
+    if sys.platform != "win32":
+        return
+    try:
+        import winreg
+        key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, AUTOSTART_REG_KEY, 0,
+                             winreg.KEY_SET_VALUE)
+        if enable:
+            exe_path = sys.executable if _is_frozen() else f'python "{os.path.abspath(__file__)}"'
+            # Add --minimized flag so it starts in tray
+            winreg.SetValueEx(key, AUTOSTART_REG_NAME, 0, winreg.REG_SZ,
+                              f'"{exe_path}" --minimized')
+            log.info("Auto-start enabled")
+        else:
+            try:
+                winreg.DeleteValue(key, AUTOSTART_REG_NAME)
+            except FileNotFoundError:
+                pass
+            log.info("Auto-start disabled")
+        winreg.CloseKey(key)
+    except Exception as e:
+        log.error(f"Failed to set auto-start: {e}")
+
+# ──────────────────────────────────────────────────────────────────────
+# Odoo XML-RPC Connection
+# ──────────────────────────────────────────────────────────────────────
+
+class OdooConnection:
+    def __init__(self, url, database, username, password):
+        self.url = url.rstrip("/")
+        self.database = database
+        self.username = username
+        self.password = password
+        self.uid = None
+        self.models = None
+        self.server_version = "unknown"
+
+    def connect(self):
+        log.info(f"Connecting to Odoo at {self.url} ...")
+        try:
+            common = xmlrpc.client.ServerProxy(f"{self.url}/xmlrpc/2/common", allow_none=True)
+            version = common.version()
+            self.server_version = version.get("server_version", "unknown")
+            log.info(f"Odoo server version: {self.server_version}")
+
+            self.uid = common.authenticate(self.database, self.username, self.password, {})
+            if not self.uid:
+                log.error("Authentication failed!")
+                return False
+
+            log.info(f"Authenticated as UID: {self.uid}")
+            self.models = xmlrpc.client.ServerProxy(f"{self.url}/xmlrpc/2/object", allow_none=True)
+            return True
+        except ConnectionRefusedError:
+            log.error(f"Connection refused at {self.url}")
+            return False
+        except Exception as e:
+            log.error(f"Connection error: {e}")
+            return False
+
+    def execute(self, model, method, *args, **kwargs):
+        return self.models.execute_kw(
+            self.database, self.uid, self.password,
+            model, method, list(args), kwargs if kwargs else {},
+        )
+
+    def get_pending_jobs(self):
+        """Get all pending print jobs from mng.print.queue."""
+        ids = self.execute("mng.print.queue", "search",
+                           [["state", "=", "pending"]])
+        if not ids:
+            return []
+        return self.execute("mng.print.queue", "read", ids,
+                            fields=["id", "name", "pdf_data", "pdf_filename",
+                                    "copies", "printer_id", "create_date"])
+
+    def register_printers(self, printers):
+        """Register local printers with Odoo so users can choose them."""
+        try:
+            client_name = socket.gethostname()
+            result = self.execute("mng.printer.device", "register_printers",
+                                  client_name, printers)
+            log.info(f"Registered {len(result)} printer(s) with Odoo")
+            return result
+        except Exception as e:
+            log.error(f"Failed to register printers: {e}")
+            return []
+
+    def mark_printed(self, job_id):
+        """Mark a job as printed."""
+        try:
+            now = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+            self.execute("mng.print.queue", "write", [job_id],
+                         vals={"state": "printed", "printed_at": now})
+            return True
+        except Exception as e:
+            log.error(f"Failed to mark job {job_id} as printed: {e}")
+            return False
+
+    def mark_failed(self, job_id, error=""):
+        """Mark a job as failed."""
+        try:
+            self.execute("mng.print.queue", "write", [job_id],
+                         vals={"state": "failed", "error_message": error})
+        except Exception as e:
+            log.error(f"Failed to mark job {job_id}: {e}")
+
+# ──────────────────────────────────────────────────────────────────────
+# Printer
+# ──────────────────────────────────────────────────────────────────────
+
+class Printer:
+    def __init__(self, sumatra_path="", printer_name="", temp_folder="temp_prints"):
+        self.printer_name = printer_name.strip()
+        self.temp_folder = os.path.join(app_dir(), temp_folder)
+        os.makedirs(self.temp_folder, exist_ok=True)
+
+        # Resolve SumatraPDF: user-specified > bundled > system
+        sp = sumatra_path.strip()
+        if sp and os.path.exists(sp):
+            self.sumatra_path = sp
+        else:
+            self.sumatra_path = _get_bundled_sumatra() or sp
+
+    def print_pdf(self, pdf_data_b64, filename):
+        try:
+            pdf_bytes = base64.b64decode(pdf_data_b64)
+        except Exception as e:
+            log.error(f"Failed to decode PDF: {e}")
+            return False
+
+        safe_name = "".join(c for c in filename if c.isalnum() or c in "._- ").strip()
+        if not safe_name:
+            safe_name = f"print_job_{int(time.time())}.pdf"
+        file_path = os.path.join(self.temp_folder, safe_name)
+
+        try:
+            with open(file_path, "wb") as f:
+                f.write(pdf_bytes)
+            log.info(f"Saved: {file_path} ({len(pdf_bytes):,} bytes)")
+        except Exception as e:
+            log.error(f"Failed to save PDF: {e}")
+            return False
+
+        success = self._send_to_printer(file_path)
+        try:
+            if os.path.exists(file_path):
+                os.remove(file_path)
+        except Exception:
+            pass
+        return success
+
+    def _send_to_printer(self, path):
+        if self.sumatra_path and os.path.exists(self.sumatra_path):
+            return self._print_sumatra(path)
+        if sys.platform == "win32":
+            return self._print_shell(path)
+        # Linux — try lp/lpr
+        return self._print_cups(path)
+
+    def _print_sumatra(self, path):
+        try:
+            cmd = [self.sumatra_path]
+            if self.printer_name:
+                cmd += ["-print-to", self.printer_name]
+            else:
+                cmd += ["-print-to-default"]
+            cmd += ["-silent", path]
+            log.info(f"Printing: {os.path.basename(path)}")
+            r = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+            if r.returncode == 0:
+                log.info(f"✓ Printed: {os.path.basename(path)}")
+                return True
+            log.error(f"SumatraPDF error: {r.stderr}")
+            return False
+        except subprocess.TimeoutExpired:
+            log.error("Print timeout (60s)")
+            return False
+        except Exception as e:
+            log.error(f"Print error: {e}")
+            return False
+
+    def _print_shell(self, path):
+        try:
+            log.info(f"Printing via shell: {os.path.basename(path)}")
+            os.startfile(path, "print")
+            time.sleep(5)
+            log.info(f"✓ Sent: {os.path.basename(path)}")
+            return True
+        except Exception as e:
+            log.error(f"Shell print error: {e}")
+            return False
+
+    def _print_cups(self, path):
+        """Print via CUPS (Linux/macOS)."""
+        try:
+            cmd = ["lp"]
+            if self.printer_name:
+                cmd += ["-d", self.printer_name]
+            cmd.append(path)
+            log.info(f"Printing via CUPS: {os.path.basename(path)}")
+            r = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+            if r.returncode == 0:
+                log.info(f"✓ Printed: {os.path.basename(path)}")
+                return True
+            log.error(f"CUPS error: {r.stderr}")
+            return False
+        except Exception as e:
+            log.error(f"CUPS print error: {e}")
+            return False
+
+# ──────────────────────────────────────────────────────────────────────
+# Bridge Engine
+# ──────────────────────────────────────────────────────────────────────
+
+class BridgeEngine:
+    def __init__(self, odoo_url, database, username, password,
+                 sumatra_path, printer_name, poll_interval,
+                 message_queue):
+        self.odoo = OdooConnection(odoo_url, database, username, password)
+        self.default_printer = Printer(sumatra_path, printer_name)
+        self.sumatra_path = sumatra_path
+        self.poll_interval = poll_interval
+        self.msg = message_queue
+        self.running = False
+        self.jobs_printed = 0
+        self.start_time = None
+        self._thread = None
+
+    def _emit(self, t, d):
+        self.msg.put((t, d))
+
+    def test_connection(self):
+        if not self.odoo.connect():
+            return False, "Connection failed. Check URL, database, and credentials."
+        try:
+            jobs = self.odoo.get_pending_jobs()
+            return True, (
+                f"Connected to Odoo {self.odoo.server_version}\n"
+                f"MNG Print Bridge module detected ✓\n"
+                f"Pending jobs in queue: {len(jobs)}"
+            )
+        except xmlrpc.client.Fault as e:
+            if "mng.print.queue" in str(e):
+                return False, (
+                    "Connected to Odoo but the MNG Print Bridge module\n"
+                    "is NOT installed on the server.\n\n"
+                    "Install it: Apps → Update Apps List → search 'MNG Print Bridge'"
+                )
+            return False, f"Odoo API error: {e.faultString}"
+        except Exception as e:
+            return False, f"Error: {e}"
+
+    def start(self):
+        if self._thread and self._thread.is_alive():
+            return
+        self.running = True
+        self._thread = threading.Thread(target=self._run, daemon=True)
+        self._thread.start()
+
+    def stop(self):
+        self.running = False
+
+    def _run(self):
+        self.start_time = datetime.now()
+        self._emit("status", "connecting")
+
+        if not self.odoo.connect():
+            self._emit("error", "Failed to connect to Odoo. Check settings.")
+            self._emit("status", "disconnected")
+            self._emit("engine_stopped", None)
+            return
+
+        self._emit("log", f"Connected to Odoo {self.odoo.server_version}")
+
+        try:
+            self.odoo.get_pending_jobs()
+            self._emit("log", "MNG Print Bridge module detected ✓")
+        except Exception:
+            self._emit("error", "MNG Print Bridge module not installed on Odoo!")
+            self._emit("status", "disconnected")
+            self._emit("engine_stopped", None)
+            return
+
+        # Register local printers with Odoo
+        try:
+            printers = discover_printers()
+            if printers:
+                registered = self.odoo.register_printers(printers)
+                self._emit("log", f"Registered {len(registered)} printer(s) with Odoo")
+            else:
+                self._emit("warning", "No local printers found to register")
+        except Exception as e:
+            self._emit("warning", f"Could not register printers: {e}")
+
+        self._emit("status", "polling")
+        self._emit("log", f"Polling every {self.poll_interval}s ...")
+
+        while self.running:
+            try:
+                self._check_for_jobs()
+            except xmlrpc.client.Fault as e:
+                self._emit("error", f"Odoo API error: {e.faultString}")
+            except (ConnectionError, OSError) as e:
+                self._emit("warning", f"Connection lost: {e}")
+                self._emit("status", "reconnecting")
+            except Exception as e:
+                self._emit("error", f"Error: {e}")
+
+            for _ in range(self.poll_interval * 2):
+                if not self.running:
+                    break
+                time.sleep(0.5)
+
+        self._emit("status", "stopped")
+        self._emit("log", f"Stopped. Total printed: {self.jobs_printed}")
+        self._emit("engine_stopped", None)
+
+    def _get_printer_for_job(self, job):
+        """Get a Printer instance for this job — uses the Odoo-selected printer or fallback."""
+        printer_id = job.get("printer_id")
+        if printer_id and isinstance(printer_id, (list, tuple)) and len(printer_id) >= 2:
+            # printer_id is [id, "Printer Name (computer)"] from Odoo Many2one
+            # Extract just the printer name (before the parentheses)
+            selected_name = printer_id[1].split(" (")[0].strip()
+            if selected_name and selected_name != "★":
+                return Printer(self.sumatra_path, selected_name)
+        return self.default_printer
+
+    def _check_for_jobs(self):
+        jobs = self.odoo.get_pending_jobs()
+        if not jobs:
+            self._emit("status", "polling")
+            return
+
+        self._emit("log", f"Found {len(jobs)} job(s)!")
+        for job in jobs:
+            if not self.running:
+                break
+            job_id = job["id"]
+            name = job.get("pdf_filename") or job.get("name", "unknown.pdf")
+            self._emit("status", "printing")
+            self._emit("log", f"Printing: {name}")
+
+            data = job.get("pdf_data")
+            if not data:
+                self._emit("warning", f"{name} has no data")
+                self.odoo.mark_failed(job_id, "No PDF data")
+                continue
+
+            printer = self._get_printer_for_job(job)
+            if printer.printer_name:
+                self._emit("log", f"→ Using printer: {printer.printer_name}")
+
+            if printer.print_pdf(data, name):
+                if self.odoo.mark_printed(job_id):
+                    self.jobs_printed += 1
+                    self._emit("success", f"✓ Printed: {name}")
+                    self._emit("jobs_count", self.jobs_printed)
+                else:
+                    self._emit("warning", f"Printed but status update failed: {name}")
+            else:
+                self._emit("error", f"✗ Failed: {name}")
+                self.odoo.mark_failed(job_id, "Print command failed")
+        self._emit("status", "polling")
+
+# ──────────────────────────────────────────────────────────────────────
+# GUI Application
+# ──────────────────────────────────────────────────────────────────────
+
+def run_gui(start_minimized=False):
+    import tkinter as tk
+    from tkinter import ttk, messagebox, filedialog
+
+    # ── Resolve paths (works both from source and as .exe) ──
+    icon_path = resource_path(ICON_FILE)
+    config_path = CONFIG_FILE  # already resolved to app_dir()
+
+    # ── Window ──
+    root = tk.Tk()
+    root.title(APP_NAME)
+    root.geometry("760x750")
+    root.minsize(680, 650)
+    root.configure(bg=COLOR_BG)
+
+    # Prevent the console window from appearing on Windows
+    if sys.platform == "win32":
+        try:
+            import ctypes
+            ctypes.windll.kernel32.FreeConsole()
+        except Exception:
+            pass
+
+    # Icon
+    try:
+        if os.path.exists(icon_path):
+            _icon = tk.PhotoImage(file=icon_path)
+            root.iconphoto(True, _icon)
+    except Exception:
+        pass
+
+    # ── Scrollable main area ──
+    main_canvas = tk.Canvas(root, bg=COLOR_BG, highlightthickness=0)
+    scrollbar = ttk.Scrollbar(root, orient="vertical", command=main_canvas.yview)
+    scroll_frame = tk.Frame(main_canvas, bg=COLOR_BG)
+
+    scroll_frame.bind("<Configure>",
+                      lambda e: main_canvas.configure(scrollregion=main_canvas.bbox("all")))
+    main_canvas.create_window((0, 0), window=scroll_frame, anchor="nw")
+    main_canvas.configure(yscrollcommand=scrollbar.set)
+
+    # Mouse wheel scrolling
+    def _on_mousewheel(event):
+        main_canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+    def _on_mousewheel_linux(event):
+        if event.num == 4:
+            main_canvas.yview_scroll(-1, "units")
+        elif event.num == 5:
+            main_canvas.yview_scroll(1, "units")
+
+    main_canvas.bind_all("<MouseWheel>", _on_mousewheel)
+    main_canvas.bind_all("<Button-4>", _on_mousewheel_linux)
+    main_canvas.bind_all("<Button-5>", _on_mousewheel_linux)
+
+    scrollbar.pack(side="right", fill="y")
+    main_canvas.pack(side="left", fill="both", expand=True)
+
+    # Make scroll_frame expand to canvas width
+    def _configure_frame_width(event):
+        main_canvas.itemconfig(main_canvas.find_all()[0], width=event.width)
+    main_canvas.bind("<Configure>", _configure_frame_width)
+
+    # ── Shared state ──
+    msg_queue = queue.Queue()
+    engine_ref = [None]
+    config = load_config(config_path)
+    discovered_printers = []
+
+    # ── Helper: create styled entry ──
+    def make_entry(parent, var, show=None, **kw):
+        e = tk.Entry(parent, textvariable=var, font=("Segoe UI", 10),
+                     bg=COLOR_INPUT_BG, fg=COLOR_TEXT, insertbackground=COLOR_TEXT,
+                     relief="flat", highlightthickness=1,
+                     highlightbackground=COLOR_BORDER, highlightcolor=COLOR_ACCENT,
+                     disabledbackground="#1e293b", disabledforeground=COLOR_TEXT_DIM,
+                     **kw)
+        if show:
+            e.config(show=show)
+        return e
+
+    def make_label(parent, text, **kw):
+        return tk.Label(parent, text=text, bg=COLOR_BG_CARD, fg=COLOR_TEXT,
+                        font=("Segoe UI", 10), **kw)
+
+    def make_card(parent):
+        card = tk.Frame(parent, bg=COLOR_BG_CARD,
+                        highlightbackground=COLOR_BORDER, highlightthickness=1, bd=0)
+        card.pack(fill="x", padx=20, pady=(0, 10))
+        inner = tk.Frame(card, bg=COLOR_BG_CARD)
+        inner.pack(fill="x", padx=16, pady=12)
+        return card, inner
+
+    def make_card_title(parent, icon, text):
+        tk.Label(parent, text=f"{icon}  {text}", bg=COLOR_BG_CARD,
+                 fg=COLOR_ACCENT, font=("Segoe UI", 11, "bold")).grid(
+            row=0, column=0, columnspan=4, sticky="w", pady=(0, 8))
+
+    # ════════════════════════════════════════════════════════════════════
+    # HEADER
+    # ════════════════════════════════════════════════════════════════════
+    header = tk.Frame(scroll_frame, bg=COLOR_BG)
+    header.pack(fill="x", padx=20, pady=(15, 5))
+
+    header_logo = None
+    try:
+        if os.path.exists(icon_path):
+            _raw = tk.PhotoImage(file=icon_path)
+            factor = max(1, _raw.width() // 36)
+            header_logo = _raw.subsample(factor, factor)
+    except Exception:
+        pass
+
+    if header_logo:
+        lbl = tk.Label(header, image=header_logo, bg=COLOR_BG)
+        lbl.image = header_logo
+        lbl.pack(side="left", padx=(0, 10))
+
+    tk.Label(header, text=APP_NAME, bg=COLOR_BG, fg=COLOR_TEXT,
+             font=("Segoe UI", 18, "bold")).pack(side="left")
+    tk.Label(header, text=f"v{APP_VERSION}", bg=COLOR_BG, fg=COLOR_TEXT_DIM,
+             font=("Segoe UI", 9)).pack(side="left", padx=(8, 0), pady=(6, 0))
+
+    tk.Frame(scroll_frame, height=1, bg=COLOR_BORDER).pack(fill="x", padx=20, pady=(8, 12))
+
+    # ════════════════════════════════════════════════════════════════════
+    # ODOO CONNECTION CARD
+    # ════════════════════════════════════════════════════════════════════
+    _, odoo_inner = make_card(scroll_frame)
+    make_card_title(odoo_inner, "⚡", "Odoo Connection")
+
+    _cv = lambda s, k, fb="": config.get(s, k, fallback=fb) if config else fb
+
+    make_label(odoo_inner, "Server URL:").grid(row=1, column=0, sticky="w", pady=3)
+    url_var = tk.StringVar(value=_cv("odoo", "url", "https://"))
+    url_entry = make_entry(odoo_inner, url_var)
+    url_entry.grid(row=1, column=1, columnspan=3, sticky="ew", pady=3, padx=(8, 0))
+
+    make_label(odoo_inner, "Database:").grid(row=2, column=0, sticky="w", pady=3)
+    db_var = tk.StringVar(value=_cv("odoo", "database"))
+    db_entry = make_entry(odoo_inner, db_var)
+    db_entry.grid(row=2, column=1, columnspan=3, sticky="ew", pady=3, padx=(8, 0))
+
+    make_label(odoo_inner, "Username:").grid(row=3, column=0, sticky="w", pady=3)
+    user_var = tk.StringVar(value=_cv("odoo", "username"))
+    user_entry = make_entry(odoo_inner, user_var)
+    user_entry.grid(row=3, column=1, columnspan=3, sticky="ew", pady=3, padx=(8, 0))
+
+    make_label(odoo_inner, "Password:").grid(row=4, column=0, sticky="w", pady=3)
+    pass_var = tk.StringVar(value=_cv("odoo", "password"))
+    pass_entry = make_entry(odoo_inner, pass_var, show="•")
+    pass_entry.grid(row=4, column=1, columnspan=3, sticky="ew", pady=3, padx=(8, 0))
+
+    odoo_inner.columnconfigure(1, weight=1)
+
+    # ════════════════════════════════════════════════════════════════════
+    # PRINTER SETTINGS CARD
+    # ════════════════════════════════════════════════════════════════════
+    _, pr_inner = make_card(scroll_frame)
+    make_card_title(pr_inner, "🖨️", "Printer Selection")
+
+    # ── Printer dropdown ──
+    make_label(pr_inner, "Printer:").grid(row=1, column=0, sticky="w", pady=3)
+
+    printer_var = tk.StringVar(value=_cv("printer", "printer_name"))
+    printer_combo = ttk.Combobox(pr_inner, textvariable=printer_var,
+                                  font=("Segoe UI", 10), state="readonly")
+    printer_combo.grid(row=1, column=1, sticky="ew", pady=3, padx=(8, 4))
+
+    # Style the combobox for dark theme
+    root.option_add("*TCombobox*Listbox*Background", COLOR_INPUT_BG)
+    root.option_add("*TCombobox*Listbox*Foreground", COLOR_TEXT)
+    root.option_add("*TCombobox*Listbox*selectBackground", COLOR_ACCENT)
+    root.option_add("*TCombobox*Listbox*selectForeground", "#ffffff")
+    root.option_add("*TCombobox*Listbox*Font", ("Segoe UI", 10))
+
+    style = ttk.Style()
+    style.theme_use("clam")
+    style.configure("TCombobox",
+                     fieldbackground=COLOR_INPUT_BG, background=COLOR_BG_LIGHT,
+                     foreground=COLOR_TEXT, selectbackground=COLOR_ACCENT,
+                     selectforeground="#ffffff", arrowcolor=COLOR_ACCENT)
+    style.map("TCombobox",
+              fieldbackground=[("readonly", COLOR_INPUT_BG)],
+              foreground=[("readonly", COLOR_TEXT)])
+
+    # Printer info label
+    printer_info_var = tk.StringVar(value="")
+    printer_info = tk.Label(pr_inner, textvariable=printer_info_var,
+                             bg=COLOR_BG_CARD, fg=COLOR_TEXT_DIM,
+                             font=("Segoe UI", 8), anchor="w")
+    printer_info.grid(row=2, column=1, columnspan=2, sticky="w", padx=(8, 0))
+
+    def refresh_printers():
+        """Scan for available printers and populate dropdown."""
+        nonlocal discovered_printers
+        refresh_btn.config(state="disabled", text="Scanning...")
+        root.update()
+
+        def _scan():
+            printers = discover_printers()
+            msg_queue.put(("printers_found", printers))
+
+        threading.Thread(target=_scan, daemon=True).start()
+
+    def _populate_printer_list(printers):
+        nonlocal discovered_printers
+        discovered_printers = printers
+
+        saved_name = printer_var.get()
+        names = []
+        default_name = ""
+
+        for p in printers:
+            display = p["name"]
+            if p.get("default"):
+                display += "  ★ default"
+                default_name = p["name"]
+            if p.get("port"):
+                display += f"  ({p['port']})"
+            names.append(display)
+
+        # Add "System Default" option at top
+        choices = ["(System Default Printer)"] + names
+        printer_combo["values"] = choices
+
+        # Select saved printer or default
+        if saved_name:
+            for i, p in enumerate(printers):
+                if p["name"] == saved_name:
+                    printer_combo.current(i + 1)
+                    break
+            else:
+                printer_combo.current(0)
+        else:
+            printer_combo.current(0)
+
+        count = len(printers)
+        printer_info_var.set(
+            f"{count} printer(s) found" + (f" — default: {default_name}" if default_name else "")
+        )
+        refresh_btn.config(state="normal", text="🔄 Refresh")
+
+    def on_printer_select(event=None):
+        """When user picks a printer from dropdown, store the raw name."""
+        idx = printer_combo.current()
+        if idx <= 0:
+            printer_var.set("")  # System default
+        else:
+            printer_var.set(discovered_printers[idx - 1]["name"])
+
+    printer_combo.bind("<<ComboboxSelected>>", on_printer_select)
+
+    refresh_btn = tk.Button(pr_inner, text="🔄 Refresh", command=refresh_printers,
+                             bg=COLOR_BG_LIGHT, fg=COLOR_TEXT, relief="flat",
+                             font=("Segoe UI", 9), cursor="hand2",
+                             activebackground=COLOR_ACCENT, activeforeground="white",
+                             padx=8, pady=2)
+    refresh_btn.grid(row=1, column=2, pady=3, padx=(0, 0))
+
+    # ── SumatraPDF path ──
+    make_label(pr_inner, "SumatraPDF:").grid(row=3, column=0, sticky="w", pady=3)
+    sumatra_var = tk.StringVar(value=_cv("printer", "sumatra_path"))
+    sumatra_entry = make_entry(pr_inner, sumatra_var)
+    sumatra_entry.grid(row=3, column=1, sticky="ew", pady=3, padx=(8, 4))
+
+    def browse_sumatra():
+        p = filedialog.askopenfilename(
+            title="Select SumatraPDF.exe",
+            filetypes=[("Executable", "*.exe"), ("All Files", "*.*")])
+        if p:
+            sumatra_var.set(p)
+
+    browse_btn = tk.Button(pr_inner, text="📂", command=browse_sumatra,
+                            bg=COLOR_BG_LIGHT, fg=COLOR_TEXT, relief="flat",
+                            font=("Segoe UI", 10), cursor="hand2",
+                            activebackground=COLOR_ACCENT)
+    browse_btn.grid(row=3, column=2, pady=3)
+
+    tk.Label(pr_inner, text="For silent printing (no window flash). Leave blank to use OS default.",
+             bg=COLOR_BG_CARD, fg=COLOR_TEXT_DIM,
+             font=("Segoe UI", 8)).grid(row=4, column=1, columnspan=2, sticky="w", padx=(8, 0))
+
+    # ── Poll interval ──
+    make_label(pr_inner, "Poll Interval:").grid(row=5, column=0, sticky="w", pady=3)
+    poll_frame = tk.Frame(pr_inner, bg=COLOR_BG_CARD)
+    poll_frame.grid(row=5, column=1, columnspan=2, sticky="w", pady=3, padx=(8, 0))
+
+    poll_var = tk.StringVar(value=_cv("settings", "poll_interval", "10"))
+    poll_entry = make_entry(poll_frame, poll_var, width=6)
+    poll_entry.pack(side="left")
+    tk.Label(poll_frame, text="seconds", bg=COLOR_BG_CARD, fg=COLOR_TEXT_DIM,
+             font=("Segoe UI", 9)).pack(side="left", padx=(6, 0))
+
+    pr_inner.columnconfigure(1, weight=1)
+
+    # ════════════════════════════════════════════════════════════════════
+    # BACKGROUND SERVICE CARD
+    # ════════════════════════════════════════════════════════════════════
+    _, svc_inner = make_card(scroll_frame)
+    make_card_title(svc_inner, "⚙️", "Background Service")
+
+    # ── Auto-start on Windows boot ──
+    autostart_var = tk.BooleanVar(value=get_autostart_enabled())
+    autostart_chk = tk.Checkbutton(
+        svc_inner, text="Start automatically when PC turns on",
+        variable=autostart_var, bg=COLOR_BG_CARD, fg=COLOR_TEXT,
+        activebackground=COLOR_BG_CARD, activeforeground=COLOR_TEXT,
+        selectcolor=COLOR_INPUT_BG, font=("Segoe UI", 10),
+        command=lambda: set_autostart_enabled(autostart_var.get()),
+    )
+    autostart_chk.grid(row=1, column=0, columnspan=4, sticky="w", pady=3)
+
+    # ── Minimize to tray on close ──
+    tray_var = tk.BooleanVar(value=True)
+    tray_chk = tk.Checkbutton(
+        svc_inner, text="Minimize to system tray when window is closed",
+        variable=tray_var, bg=COLOR_BG_CARD, fg=COLOR_TEXT,
+        activebackground=COLOR_BG_CARD, activeforeground=COLOR_TEXT,
+        selectcolor=COLOR_INPUT_BG, font=("Segoe UI", 10),
+    )
+    tray_chk.grid(row=2, column=0, columnspan=4, sticky="w", pady=3)
+
+    tk.Label(svc_inner,
+             text="When enabled, closing the window keeps the printer bridge running in the background.",
+             bg=COLOR_BG_CARD, fg=COLOR_TEXT_DIM,
+             font=("Segoe UI", 8), wraplength=500, justify="left",
+    ).grid(row=3, column=0, columnspan=4, sticky="w", pady=(0, 4))
+
+    # ════════════════════════════════════════════════════════════════════
+    # CONTROLS
+    # ════════════════════════════════════════════════════════════════════
+    ctrl_frame = tk.Frame(scroll_frame, bg=COLOR_BG)
+    ctrl_frame.pack(fill="x", padx=20, pady=(2, 6))
+
+    status_var = tk.StringVar(value="● Idle")
+    status_lbl = tk.Label(ctrl_frame, textvariable=status_var,
+                           bg=COLOR_BG, fg=COLOR_TEXT_DIM,
+                           font=("Segoe UI", 10, "bold"))
+    status_lbl.pack(side="left")
+
+    jobs_var = tk.StringVar(value="Jobs: 0")
+    tk.Label(ctrl_frame, textvariable=jobs_var, bg=COLOR_BG, fg=COLOR_ACCENT,
+             font=("Segoe UI", 10, "bold")).pack(side="right")
+
+    uptime_var = tk.StringVar(value="")
+    tk.Label(ctrl_frame, textvariable=uptime_var, bg=COLOR_BG, fg=COLOR_TEXT_DIM,
+             font=("Segoe UI", 9)).pack(side="right", padx=(0, 16))
+
+    btn_frame = tk.Frame(scroll_frame, bg=COLOR_BG)
+    btn_frame.pack(fill="x", padx=20, pady=(0, 10))
+
+    # All widgets that should be locked when running
+    form_widgets = []  # populated after all widgets are created
+
+    def _get_printer_name():
+        """Get the actual printer name from the combo selection."""
+        idx = printer_combo.current()
+        if idx <= 0 or not discovered_printers:
+            return ""
+        return discovered_printers[idx - 1]["name"]
+
+    def _save():
+        try:
+            poll = int(poll_var.get())
+        except ValueError:
+            poll = 10
+        pname = _get_printer_name()
+        save_config(config_path,
+                     url_var.get(), db_var.get(), user_var.get(), pass_var.get(),
+                     sumatra_var.get(), pname, poll)
+        append_log("Settings saved ✓", "success")
+
+    def on_test():
+        _save()
+        test_btn.config(state="disabled", text="Testing...")
+        root.update()
+        def _t():
+            odoo = OdooConnection(url_var.get(), db_var.get(), user_var.get(), pass_var.get())
+            try:
+                if not odoo.connect():
+                    msg_queue.put(("test_result", (False, "Connection failed.")))
+                    return
+                try:
+                    jobs = odoo.get_pending_jobs()
+                    msg_queue.put(("test_result", (True,
+                        f"Connected to Odoo {odoo.server_version}\n"
+                        f"MNG Print Bridge module detected ✓\n"
+                        f"Pending jobs: {len(jobs)}")))
+                except xmlrpc.client.Fault as ef:
+                    if "mng.print.queue" in str(ef):
+                        msg_queue.put(("test_result", (False,
+                            "Connected but MNG Print Bridge module\n"
+                            "is NOT installed on the server.")))
+                    else:
+                        msg_queue.put(("test_result", (False, str(ef))))
+            except Exception as e:
+                msg_queue.put(("test_result", (False, str(e))))
+        threading.Thread(target=_t, daemon=True).start()
+
+    def on_start():
+        _save()
+        if not url_var.get().strip() or not db_var.get().strip():
+            messagebox.showwarning("Missing Info", "Please fill in the Odoo connection details.")
+            return
+        if not user_var.get().strip() or not pass_var.get().strip():
+            messagebox.showwarning("Missing Info", "Please enter username and password.")
+            return
+
+        try:
+            poll = int(poll_var.get())
+        except ValueError:
+            poll = 10
+
+        pname = _get_printer_name()
+        engine_ref[0] = BridgeEngine(
+            url_var.get(), db_var.get(), user_var.get(), pass_var.get(),
+            sumatra_var.get(), pname, poll, msg_queue,
+        )
+        engine_ref[0].start()
+
+        for w in form_widgets:
+            try:
+                w.config(state="disabled")
+            except Exception:
+                pass
+        start_btn.pack_forget()
+        stop_btn.pack(side="right", padx=(8, 0))
+        test_btn.config(state="disabled")
+
+    def on_stop():
+        if engine_ref[0]:
+            engine_ref[0].stop()
+        for w in form_widgets:
+            try:
+                w.config(state="normal")
+            except Exception:
+                w.config(state="readonly")
+        stop_btn.pack_forget()
+        start_btn.pack(side="right", padx=(8, 0))
+        test_btn.config(state="normal")
+        status_var.set("● Idle")
+        status_lbl.config(fg=COLOR_TEXT_DIM)
+
+    def make_btn(parent, text, cmd, bg_color, fg="white", bold=False, **kw):
+        f = ("Segoe UI", 10, "bold") if bold else ("Segoe UI", 10)
+        return tk.Button(parent, text=text, command=cmd,
+                          bg=bg_color, fg=fg, relief="flat", font=f,
+                          cursor="hand2", activebackground=bg_color,
+                          activeforeground=fg, padx=14, pady=6, **kw)
+
+    test_btn = make_btn(btn_frame, "🔍 Test Connection", on_test, COLOR_PURPLE)
+    test_btn.pack(side="left")
+
+    start_btn = make_btn(btn_frame, "▶  Start Printing", on_start, COLOR_SUCCESS, bold=True)
+    start_btn.pack(side="right", padx=(8, 0))
+
+    stop_btn = make_btn(btn_frame, "■  Stop", on_stop, COLOR_ERROR, bold=True)
+    # hidden initially
+
+    save_btn = make_btn(btn_frame, "💾 Save", _save, COLOR_BG_LIGHT, COLOR_TEXT)
+    save_btn.pack(side="right", padx=(8, 0))
+
+    # Collect form widgets for locking
+    form_widgets = [url_entry, db_entry, user_entry, pass_entry,
+                    sumatra_entry, poll_entry, browse_btn, refresh_btn,
+                    printer_combo]
+
+    # ════════════════════════════════════════════════════════════════════
+    # ACTIVITY LOG CARD
+    # ════════════════════════════════════════════════════════════════════
+    log_card = tk.Frame(scroll_frame, bg=COLOR_BG_CARD,
+                         highlightbackground=COLOR_BORDER, highlightthickness=1, bd=0)
+    log_card.pack(fill="both", expand=True, padx=20, pady=(0, 15))
+
+    log_hdr = tk.Frame(log_card, bg=COLOR_BG_CARD)
+    log_hdr.pack(fill="x", padx=16, pady=(12, 4))
+
+    tk.Label(log_hdr, text="📋  Activity Log", bg=COLOR_BG_CARD,
+             fg=COLOR_ACCENT, font=("Segoe UI", 11, "bold")).pack(side="left")
+
+    def clear_log():
+        log_text.config(state="normal")
+        log_text.delete("1.0", "end")
+        log_text.config(state="disabled")
+
+    tk.Button(log_hdr, text="Clear", command=clear_log,
+              bg=COLOR_BG_LIGHT, fg=COLOR_TEXT_DIM, relief="flat",
+              font=("Segoe UI", 8), cursor="hand2",
+              activebackground=COLOR_BORDER).pack(side="right")
+
+    log_text = tk.Text(log_card, height=12, bg=COLOR_INPUT_BG, fg=COLOR_TEXT,
+                        font=("Consolas", 9), relief="flat", wrap="word",
+                        insertbackground=COLOR_TEXT, state="disabled",
+                        selectbackground=COLOR_ACCENT, selectforeground="white",
+                        padx=8, pady=8)
+    log_text.pack(fill="both", expand=True, padx=16, pady=(0, 12))
+
+    for tag, color in [("success", COLOR_SUCCESS), ("error", COLOR_ERROR),
+                        ("warning", COLOR_WARNING), ("info", COLOR_TEXT),
+                        ("dim", COLOR_TEXT_DIM), ("timestamp", COLOR_TEXT_DIM)]:
+        log_text.tag_configure(tag, foreground=color)
+
+    def append_log(message, tag="info"):
+        log_text.config(state="normal")
+        ts = datetime.now().strftime("%H:%M:%S")
+        log_text.insert("end", f"[{ts}] ", "timestamp")
+        log_text.insert("end", f"{message}\n", tag)
+        log_text.see("end")
+        log_text.config(state="disabled")
+
+    append_log(f"{APP_NAME} v{APP_VERSION}", "dim")
+    append_log("Scanning for printers...", "dim")
+
+    # ════════════════════════════════════════════════════════════════════
+    # MESSAGE PROCESSING LOOP (GUI thread)
+    # ════════════════════════════════════════════════════════════════════
+
+    STATUS_DISPLAY = {
+        "connecting":   ("● Connecting...", COLOR_WARNING),
+        "polling":      ("● Connected — Polling", COLOR_SUCCESS),
+        "printing":     ("● Printing...", COLOR_ACCENT),
+        "reconnecting": ("● Reconnecting...", COLOR_WARNING),
+        "stopped":      ("● Stopped", COLOR_TEXT_DIM),
+        "disconnected": ("● Disconnected", COLOR_ERROR),
+    }
+
+    def tick():
+        try:
+            while True:
+                t, d = msg_queue.get_nowait()
+                if t == "log":
+                    append_log(d, "info")
+                elif t == "success":
+                    append_log(d, "success")
+                elif t == "error":
+                    append_log(d, "error")
+                elif t == "warning":
+                    append_log(d, "warning")
+                elif t == "status":
+                    disp = STATUS_DISPLAY.get(d, (f"● {d}", COLOR_TEXT_DIM))
+                    status_var.set(disp[0])
+                    status_lbl.config(fg=disp[1])
+                elif t == "jobs_count":
+                    jobs_var.set(f"Jobs: {d}")
+                elif t == "test_result":
+                    ok, msg = d
+                    test_btn.config(state="normal", text="🔍 Test Connection")
+                    if ok:
+                        messagebox.showinfo("Connection Test", f"✅ Success!\n\n{msg}")
+                        append_log("Connection test passed ✓", "success")
+                    else:
+                        messagebox.showerror("Connection Test", f"❌ Failed\n\n{msg}")
+                        append_log(f"Test failed: {msg}", "error")
+                elif t == "printers_found":
+                    _populate_printer_list(d)
+                    if d:
+                        append_log(f"Found {len(d)} printer(s)", "success")
+                    else:
+                        append_log("No printers found", "warning")
+                elif t == "engine_stopped":
+                    on_stop()
+        except queue.Empty:
+            pass
+
+        if engine_ref[0] and engine_ref[0].running and engine_ref[0].start_time:
+            e = datetime.now() - engine_ref[0].start_time
+            h, rem = divmod(int(e.total_seconds()), 3600)
+            m, s = divmod(rem, 60)
+            uptime_var.set(f"Uptime: {h:02d}:{m:02d}:{s:02d}")
+
+        root.after(200, tick)
+
+    tick()
+
+    # Auto-scan printers on startup
+    refresh_printers()
+
+    # ── Window close ──
+    def _minimize_to_tray():
+        """Hide window — it keeps running in the background."""
+        root.withdraw()
+        append_log("Minimized to background. Still printing!", "dim")
+
+    def _show_from_tray():
+        """Restore window from tray."""
+        root.deiconify()
+        root.lift()
+        root.focus_force()
+
+    def on_close():
+        is_running = engine_ref[0] and engine_ref[0].running
+        if is_running and tray_var.get():
+            # Minimize to tray instead of quitting
+            _minimize_to_tray()
+        elif is_running:
+            if messagebox.askyesno("Quit", "Printer bridge is running.\nStop and exit?"):
+                engine_ref[0].stop()
+                time.sleep(0.5)
+                root.destroy()
+        else:
+            root.destroy()
+
+    root.protocol("WM_DELETE_WINDOW", on_close)
+
+    # Center window on screen
+    root.update_idletasks()
+    w, h = root.winfo_width(), root.winfo_height()
+    x = (root.winfo_screenwidth() // 2) - (w // 2)
+    y = (root.winfo_screenheight() // 2) - (h // 2)
+    root.geometry(f"+{x}+{y}")
+
+    # ── Auto-start if launched with --minimized (e.g. on boot) ──
+    if start_minimized and config:
+        # Auto-fill is already done. Auto-start printing.
+        root.after(1500, lambda: (on_start(), _minimize_to_tray()))
+
+    root.mainloop()
+
+
+# ──────────────────────────────────────────────────────────────────────
+# Headless / Test modes
+# ──────────────────────────────────────────────────────────────────────
+
+def run_headless(config_path):
+    config = load_config(config_path)
+    if not config:
+        log.error(f"Config not found: {config_path}")
+        sys.exit(1)
+
+    mq = queue.Queue()
+    eng = BridgeEngine(
+        config.get("odoo", "url"), config.get("odoo", "database"),
+        config.get("odoo", "username"), config.get("odoo", "password"),
+        config.get("printer", "sumatra_path", fallback=""),
+        config.get("printer", "printer_name", fallback=""),
+        config.getint("settings", "poll_interval", fallback=10),
+        mq,
+    )
+    signal.signal(signal.SIGINT, lambda s, f: eng.stop())
+    signal.signal(signal.SIGTERM, lambda s, f: eng.stop())
+
+    print(f"\n{'='*56}\n  🖨️  {APP_NAME} (headless)\n{'='*56}\n  Ctrl+C to stop\n")
+    eng.start()
+    try:
+        while eng.running or not mq.empty():
+            try:
+                t, d = mq.get(timeout=1)
+                if t in ("success", "error", "warning", "log", "status"):
+                    print(f"  [{t.upper():7s}] {d}")
+            except queue.Empty:
+                pass
+    except KeyboardInterrupt:
+        eng.stop()
+        time.sleep(1)
+    print(f"\n  Total printed: {eng.jobs_printed}\n")
+
+
+def run_test(config_path):
+    config = load_config(config_path)
+    if not config:
+        log.error(f"Config not found: {config_path}")
+        sys.exit(1)
+    mq = queue.Queue()
+    eng = BridgeEngine(
+        config.get("odoo", "url"), config.get("odoo", "database"),
+        config.get("odoo", "username"), config.get("odoo", "password"),
+        "", "", 10, mq,
+    )
+    print("\n🔍 Testing connection ...\n")
+    ok, msg = eng.test_connection()
+    print(f"{'✅' if ok else '❌'} {msg}\n")
+    if not ok:
+        sys.exit(1)
+
+
+# ──────────────────────────────────────────────────────────────────────
+# Entry Point
+# ──────────────────────────────────────────────────────────────────────
+
+def main():
+    parser = argparse.ArgumentParser(description=f"{APP_NAME} — Odoo Printer Client")
+    parser.add_argument("--config", "-c", default=CONFIG_FILE)
+    parser.add_argument("--test", "-t", action="store_true", help="Test connection")
+    parser.add_argument("--headless", action="store_true", help="No GUI")
+    parser.add_argument("--minimized", action="store_true",
+                        help="Start minimized to tray (used for auto-start on boot)")
+    args = parser.parse_args()
+
+    if args.test:
+        run_test(args.config)
+    elif args.headless:
+        run_headless(args.config)
+    else:
+        run_gui(start_minimized=args.minimized)
+
+if __name__ == "__main__":
+    main()

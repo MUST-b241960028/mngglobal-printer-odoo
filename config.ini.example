@@ -1,0 +1,29 @@
+[odoo]
+# Your Odoo cloud instance URL (no trailing slash)
+url = https://your-odoo-instance.com
+# Database name (check Odoo > Settings > Database Name)
+database = your_database_name
+# Odoo user login (email)
+username = admin@example.com
+# Odoo user password or API key
+password = your_password
+
+[printer]
+# Path to SumatraPDF for silent printing (recommended, free download: https://www.sumatrapdfreader.org)
+# Leave blank to use Windows default PDF handler (may show a window flash)
+sumatra_path = C:\Program Files\SumatraPDF\SumatraPDF.exe
+
+# Specific printer name (optional). Leave blank to use Windows default printer.
+# To find your printer name: open Windows Settings > Printers & Scanners
+# Examples:
+#   printer_name = HP LaserJet MFP 137fnw
+#   printer_name = EPSON L210 Series
+printer_name =
+
+[settings]
+# How often to check for new print jobs (seconds)
+poll_interval = 10
+# Exact name of the Odoo note that acts as the print queue
+queue_note_name = PRINT QUEUE
+# Folder to temporarily store downloaded PDFs before printing
+temp_folder = temp_prints

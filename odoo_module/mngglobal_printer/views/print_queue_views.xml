@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!-- ХЭВЛЭХ ДАРААЛАЛ — Маягтын харагдац (байршуулах + дэлгэрэнгүй) -->
+    <!-- ============================================================ -->
+    <record id="mng_print_queue_form" model="ir.ui.view">
+        <field name="name">mng.print.queue.form</field>
+        <field name="model">mng.print.queue</field>
+        <field name="arch" type="xml">
+            <form string="Хэвлэх ажил">
+                <header>
+                    <button name="action_cancel" string="Цуцлах"
+                            type="object" class="btn-secondary"
+                            invisible="state != 'pending'"/>
+                    <button name="action_retry" string="🔄 Дахин оролдох"
+                            type="object" class="btn-primary"
+                            invisible="state not in ('failed', 'cancelled')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="pending,printed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Баримтын нэр..."
+                                   required="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Баримт">
+                            <field name="pdf_data" filename="pdf_filename"
+                                   widget="binary" string="PDF файл"/>
+                            <field name="pdf_filename" invisible="1"/>
+                            <field name="printer_id" options="{'no_create': True}"/>
+                            <field name="copies"/>
+                            <field name="note" placeholder="Нэмэлт тэмдэглэл..."/>
+                        </group>
+                        <group string="Мэдээлэл">
+                            <field name="user_id"/>
+                            <field name="source_ref"/>
+                            <field name="create_date" string="Дарааллд орсон"/>
+                            <field name="printed_at"/>
+                            <field name="error_message"
+                                   invisible="state != 'failed'"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- ХЭВЛЭХ ДАРААЛАЛ — Жагсаалтын харагдац                        -->
+    <!-- ============================================================ -->
+    <record id="mng_print_queue_list" model="ir.ui.view">
+        <field name="name">mng.print.queue.list</field>
+        <field name="model">mng.print.queue</field>
+        <field name="arch" type="xml">
+            <list default_order="create_date desc"
+                  decoration-muted="state == 'cancelled'"
+                  decoration-danger="state == 'failed'"
+                  decoration-success="state == 'printed'">
+                <field name="create_date" string="Дарааллд орсон" width="160"/>
+                <field name="name"/>
+                <field name="pdf_filename" optional="show"/>
+                <field name="copies" optional="show"/>
+                <field name="printer_id" optional="show"/>
+                <field name="user_id" widget="many2one_avatar"/>
+                <field name="source_ref" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'printed'"
+                       decoration-danger="state == 'failed'"
+                       decoration-info="state == 'pending'"
+                       decoration-muted="state == 'cancelled'"/>
+                <field name="printed_at" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- ХЭВЛЭХ ДАРААЛАЛ — Канбан харагдац                             -->
+    <!-- ============================================================ -->
+    <record id="mng_print_queue_kanban" model="ir.ui.view">
+        <field name="name">mng.print.queue.kanban</field>
+        <field name="model">mng.print.queue</field>
+        <field name="arch" type="xml">
+            <kanban default_order="create_date desc">
+                <field name="name"/>
+                <field name="pdf_filename"/>
+                <field name="state"/>
+                <field name="user_id"/>
+                <field name="create_date"/>
+                <field name="printed_at"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex align-items-center mb-1">
+                            <field name="state" widget="badge"
+                                   decoration-success="state == 'printed'"
+                                   decoration-danger="state == 'failed'"
+                                   decoration-info="state == 'pending'"
+                                   decoration-muted="state == 'cancelled'"/>
+                            <span class="ms-auto text-muted small">
+                                <field name="create_date" widget="datetime"/>
+                            </span>
+                        </div>
+                        <strong>
+                            <field name="name"/>
+                        </strong>
+                        <div class="text-muted small" t-if="record.pdf_filename.value">
+                            📄 <field name="pdf_filename"/>
+                        </div>
+                        <div class="mt-1">
+                            <field name="user_id" widget="many2one_avatar_user"/>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- ХЭВЛЭХ ДАРААЛАЛ — Хайлтын харагдац                            -->
+    <!-- ============================================================ -->
+    <record id="mng_print_queue_search" model="ir.ui.view">
+        <field name="name">mng.print.queue.search</field>
+        <field name="model">mng.print.queue</field>
+        <field name="arch" type="xml">
+            <search string="Хэвлэх ажлууд">
+                <field name="name"/>
+                <field name="pdf_filename"/>
+                <field name="user_id"/>
+                <filter name="pending" string="⏳ Хүлээгдэж буй"
+                        domain="[('state', '=', 'pending')]"/>
+                <filter name="printed" string="✅ Хэвлэгдсэн"
+                        domain="[('state', '=', 'printed')]"/>
+                <filter name="failed" string="❌ Амжилтгүй"
+                        domain="[('state', '=', 'failed')]"/>
+                <separator/>
+                <filter name="my_jobs" string="Миний ажлууд"
+                        domain="[('user_id', '=', uid)]"/>
+                <filter name="today" string="Өнөөдөр"
+                        domain="[('create_date', '&gt;=', (context_today()).strftime('%%Y-%%m-%%d'))]"/>
+                <group>
+                    <filter name="group_state" string="Төлөвөөр"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_user" string="Хэрэглэгчээр"
+                            context="{'group_by': 'user_id'}"/>
+                    <filter name="group_date" string="Огноогоор"
+                            context="{'group_by': 'create_date:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- ДЭЭД ТҮВШНИЙ АПП + ЦЭС                                      -->
+    <!-- ============================================================ -->
+    <record id="mng_print_queue_action" model="ir.actions.act_window">
+        <field name="name">Хэвлэх дараалал</field>
+        <field name="res_model">mng.print.queue</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="search_view_id" ref="mng_print_queue_search"/>
+        <field name="context">{'search_default_pending': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Хэвлэх ажил байхгүй байна!
+            </p>
+            <p>
+                <b>"Шинэ"</b> товч дарж баримтаа байршуулна уу,<br/>
+                эсвэл нэхэмжлэх, захиалга дээрх <b>"🖨️ Оффист хэвлэх"</b> товчийг ашиглана уу.
+            </p>
+        </field>
+    </record>
+
+    <record id="mng_print_all_action" model="ir.actions.act_window">
+        <field name="name">Бүх ажлууд</field>
+        <field name="res_model">mng.print.queue</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="search_view_id" ref="mng_print_queue_search"/>
+        <field name="context">{}</field>
+    </record>
+
+    <!-- Үндсэн цэс (апп жагсаалтад харагдана) -->
+    <menuitem id="mng_printer_root_menu"
+              name="MNG Принтер"
+              web_icon="mngglobal_printer,static/description/icon.png"
+              sequence="90"/>
+
+    <!-- Дэд цэсүүд -->
+    <menuitem id="mng_printer_queue_menu"
+              name="🖨️ Хэвлэх дараалал"
+              action="mng_print_queue_action"
+              parent="mng_printer_root_menu"
+              sequence="10"/>
+
+    <menuitem id="mng_printer_all_menu"
+              name="📋 Бүх ажлууд"
+              action="mng_print_all_action"
+              parent="mng_printer_root_menu"
+              sequence="20"/>
+
+    <!-- ============================================================ -->
+    <!-- ПРИНТЕР ТӨХӨӨРӨМЖҮҮД — Харагдацууд                           -->
+    <!-- ============================================================ -->
+    <record id="mng_printer_device_list" model="ir.ui.view">
+        <field name="name">mng.printer.device.list</field>
+        <field name="model">mng.printer.device</field>
+        <field name="arch" type="xml">
+            <list default_order="is_default desc, name"
+                  decoration-success="is_online == True"
+                  decoration-muted="is_online == False">
+                <field name="name"/>
+                <field name="client_name"/>
+                <field name="is_default" widget="boolean_toggle"/>
+                <field name="is_online" widget="boolean"/>
+                <field name="port" optional="hide"/>
+                <field name="last_seen"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="mng_printer_device_form" model="ir.ui.view">
+        <field name="name">mng.printer.device.form</field>
+        <field name="model">mng.printer.device</field>
+        <field name="arch" type="xml">
+            <form string="Принтер төхөөрөмж">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group string="Ерөнхий">
+                            <field name="client_name"/>
+                            <field name="is_default"/>
+                            <field name="port"/>
+                        </group>
+                        <group string="Төлөв">
+                            <field name="is_online"/>
+                            <field name="last_seen"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="mng_printer_device_action" model="ir.actions.act_window">
+        <field name="name">Принтерүүд</field>
+        <field name="res_model">mng.printer.device</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Принтер бүртгэгдээгүй байна.
+            </p>
+            <p>
+                Клиент програм холбогдоход принтерүүд автоматаар бүртгэгдэнэ.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="mng_printer_devices_menu"
+              name="🖥️ Принтерүүд"
+              action="mng_printer_device_action"
+              parent="mng_printer_root_menu"
+              sequence="30"/>
+
+    <!-- ============================================================ -->
+    <!-- НЭХЭМЖЛЭХ — "Оффист хэвлэх" товч                            -->
+    <!-- ============================================================ -->
+    <record id="view_move_form_print_bridge" model="ir.ui.view">
+        <field name="name">account.move.form.print.bridge</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="priority">999</field>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_print_at_office"
+                        string="🖨️ Оффист хэвлэх"
+                        type="object"
+                        class="btn-primary"
+                        invisible="state not in ('posted',)"
+                        groups="base.group_user"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- БОРЛУУЛАЛТЫН ЗАХИАЛГА — "Оффист хэвлэх" товч                 -->
+    <!-- ============================================================ -->
+    <record id="view_sale_order_form_print_bridge" model="ir.ui.view">
+        <field name="name">sale.order.form.print.bridge</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="priority">999</field>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_print_at_office"
+                        string="🖨️ Оффист хэвлэх"
+                        type="object"
+                        class="btn-primary"
+                        invisible="state not in ('sale', 'done')"
+                        groups="base.group_user"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- ХУДАЛДАН АВАЛТЫН ЗАХИАЛГА — "Оффист хэвлэх" товч             -->
+    <!-- ============================================================ -->
+    <record id="view_purchase_order_form_print_bridge" model="ir.ui.view">
+        <field name="name">purchase.order.form.print.bridge</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="priority">999</field>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_print_at_office"
+                        string="🖨️ Оффист хэвлэх"
+                        type="object"
+                        class="btn-primary"
+                        invisible="state not in ('purchase', 'done')"
+                        groups="base.group_user"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

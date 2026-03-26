@@ -1,0 +1,39 @@
+# Credentials
+config.ini
+
+# Logs
+*.log
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Temp PDF downloads
+temp_prints/
+
+# PyInstaller build artifacts
+build/
+dist/
+*.spec
+
+# Downloaded SumatraPDF portable (bundled into .exe)
+SumatraPDF.exe
+
+# Built .exe (distribute separately)
+MNG_Printer_Bridge.exe
+
+# Wine build environment
+.wine_python/
+python-installer.exe
+
+# Generated icon
+*.ico
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,153 @@
+name: 🖨️ Build & Release
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:  # manual trigger button
+
+jobs:
+  # ══════════════════════════════════════════════════════════
+  # BUILD WINDOWS .EXE
+  # ══════════════════════════════════════════════════════════
+  build-exe:
+    name: 🔨 Build Windows .exe
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install pyinstaller
+
+      - name: Download SumatraPDF
+        run: |
+          Invoke-WebRequest -Uri "https://www.sumatrapdfreader.org/dl/rel/3.5.2/SumatraPDF-3.5.2.exe" -OutFile "SumatraPDF.exe"
+        shell: pwsh
+
+      - name: Build .exe
+        run: |
+          pyinstaller --onefile --windowed `
+            --name "MNG_Printer_Bridge" `
+            --add-data "SumatraPDF.exe;." `
+            --add-data "icon.png;." `
+            printer_bridge.py
+        shell: pwsh
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MNG_Printer_Bridge
+          path: dist/MNG_Printer_Bridge.exe
+
+  # ══════════════════════════════════════════════════════════
+  # DEPLOY ODOO MODULE TO VPS
+  # ══════════════════════════════════════════════════════════
+  deploy-odoo:
+    name: 🚀 Deploy Odoo Module
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to VPS via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            echo "🔄 Updating MNG Printer module..."
+
+            # Backup current module
+            ADDON_PATH="${{ secrets.ODOO_ADDON_PATH }}"
+            MODULE_DIR="$ADDON_PATH/mngglobal_printer"
+
+            if [ -d "$MODULE_DIR" ]; then
+              cp -r "$MODULE_DIR" "${MODULE_DIR}_backup_$(date +%Y%m%d_%H%M%S)"
+            fi
+
+            # Remove old and pull new
+            rm -rf "$MODULE_DIR"
+
+      - name: Copy module files to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: "odoo_module/mngglobal_printer"
+          target: ${{ secrets.ODOO_ADDON_PATH }}
+          strip_components: 1
+
+      - name: Restart Odoo & Upgrade Module
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            echo "♻️ Restarting Odoo..."
+            sudo systemctl restart odoo
+
+            # Wait for Odoo to start
+            sleep 10
+
+            # Auto-upgrade the module via CLI
+            echo "⬆️ Upgrading mngglobal_printer module..."
+            sudo su - odoo -c "/opt/odoo19/odoo19/odoo-bin \
+              -c /etc/odoo.conf \
+              -d ${{ secrets.ODOO_DB }} \
+              -u mngglobal_printer \
+              --stop-after-init" || true
+
+            # Restart one more time to pick up changes
+            sudo systemctl restart odoo
+            echo "✅ Deploy complete!"
+
+  # ══════════════════════════════════════════════════════════
+  # CREATE GITHUB RELEASE (on tag push)
+  # ══════════════════════════════════════════════════════════
+  release:
+    name: 📦 Create Release
+    runs-on: ubuntu-latest
+    needs: build-exe
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download .exe artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: MNG_Printer_Bridge
+          path: dist/
+
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "MNG Printer Bridge ${{ steps.version.outputs.VERSION }}"
+          body: |
+            ## 🖨️ MNG Printer Bridge ${{ steps.version.outputs.VERSION }}
+
+            ### Суулгах заавар:
+            1. `MNG_Printer_Bridge.exe` файлыг татаж аваад ажлын компьютерт хуулна
+            2. Давхар дарж нээнэ
+            3. Odoo холболтын мэдээллээ оруулна
+            4. "Start Printing" товч дарна
+
+            ### Шинэ өөрчлөлтүүд:
+            - Энэ хувилбарын өөрчлөлтүүдийг доорх commit-уудаас харна уу
+          files: |
+            dist/MNG_Printer_Bridge.exe
+          draft: false
+          prerelease: false

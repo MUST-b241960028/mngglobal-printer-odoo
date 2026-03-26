@@ -1,0 +1,9 @@
+# Odoo Printer Bridge
+# This project uses only Python standard library modules:
+#   - xmlrpc.client (Odoo API)
+#   - configparser (config.ini)
+#   - subprocess (printing)
+#   - base64, os, sys, time, logging, tempfile
+#
+# No external packages required!
+# Just run: python printer_bridge.py
