@@ -91,22 +91,19 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            echo "♻️ Restarting Odoo..."
-            sudo systemctl restart odoo
-
-            # Wait for Odoo to start
-            sleep 10
+            echo "♻️ Stopping Odoo..."
+            sudo systemctl stop odoo19
 
             # Auto-upgrade the module via CLI
             echo "⬆️ Upgrading mngglobal_printer module..."
-            sudo su - odoo -c "/opt/odoo19/odoo19/odoo-bin \
-              -c /etc/odoo.conf \
+            sudo -u odoo19 /opt/odoo19/odoo19-venv/bin/python3 /opt/odoo19/odoo19/odoo-bin \
+              -c /etc/odoo19.conf \
               -d ${{ secrets.ODOO_DB }} \
               -u mngglobal_printer \
-              --stop-after-init" || true
+              --stop-after-init 2>&1 | tail -5
 
-            # Restart one more time to pick up changes
-            sudo systemctl restart odoo
+            # Restart to pick up changes
+            sudo systemctl start odoo19
             echo "✅ Deploy complete!"
 
   # ══════════════════════════════════════════════════════════
