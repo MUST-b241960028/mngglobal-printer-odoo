@@ -263,7 +263,7 @@
         <field name="res_model">mng.visa.application</field>
         <field name="view_mode">kanban,list,form</field>
         <field name="domain">[('program_type_id.code', '=', 'PH_ADULT')]</field>
-        <field name="context">{'default_program_type_id': %(mngglobal_visa.prog_ph_adult)d}</field>
+        <field name="context">{'default_program_type_id': ref('mngglobal_visa.prog_ph_adult')}</field>
     </record>
 
     <record id="mng_visa_app_action_ph_kids" model="ir.actions.act_window">
@@ -271,7 +271,7 @@
         <field name="res_model">mng.visa.application</field>
         <field name="view_mode">kanban,list,form</field>
         <field name="domain">[('program_type_id.code', '=', 'PH_KIDS')]</field>
-        <field name="context">{'default_program_type_id': %(mngglobal_visa.prog_ph_kids)d}</field>
+        <field name="context">{'default_program_type_id': ref('mngglobal_visa.prog_ph_kids')}</field>
     </record>
 
     <record id="mng_visa_app_action_jp_student" model="ir.actions.act_window">
@@ -279,7 +279,7 @@
         <field name="res_model">mng.visa.application</field>
         <field name="view_mode">kanban,list,form</field>
         <field name="domain">[('program_type_id.code', '=', 'JP_STUDENT')]</field>
-        <field name="context">{'default_program_type_id': %(mngglobal_visa.prog_jp_student)d}</field>
+        <field name="context">{'default_program_type_id': ref('mngglobal_visa.prog_jp_student')}</field>
     </record>
 
     <record id="mng_visa_app_action_jp_worker" model="ir.actions.act_window">
@@ -287,7 +287,7 @@
         <field name="res_model">mng.visa.application</field>
         <field name="view_mode">kanban,list,form</field>
         <field name="domain">[('program_type_id.code', '=', 'JP_WORKER')]</field>
-        <field name="context">{'default_program_type_id': %(mngglobal_visa.prog_jp_worker)d}</field>
+        <field name="context">{'default_program_type_id': ref('mngglobal_visa.prog_jp_worker')}</field>
     </record>
 
     <record id="mng_visa_app_action_kr" model="ir.actions.act_window">
@@ -295,7 +295,7 @@
         <field name="res_model">mng.visa.application</field>
         <field name="view_mode">kanban,list,form</field>
         <field name="domain">[('program_type_id.code', '=', 'KR')]</field>
-        <field name="context">{'default_program_type_id': %(mngglobal_visa.prog_kr)d}</field>
+        <field name="context">{'default_program_type_id': ref('mngglobal_visa.prog_kr')}</field>
     </record>
 
 </odoo>
