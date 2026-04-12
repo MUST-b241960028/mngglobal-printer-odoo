@@ -1,0 +1,443 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ══ Sequence ══ -->
+        <record id="seq_visa_application" model="ir.sequence">
+            <field name="name">Visa Application Sequence</field>
+            <field name="code">mng.visa.application</field>
+            <field name="prefix">MNG-%(year)s-</field>
+            <field name="padding">4</field>
+        </record>
+
+        <!-- ══════════════════════════════════════ -->
+        <!-- PROGRAM TYPES                         -->
+        <!-- ══════════════════════════════════════ -->
+        <record id="prog_ph_adult" model="mng.visa.program.type">
+            <field name="name">🇵🇭 Филиппин Насанд хүрэгч</field>
+            <field name="code">PH_ADULT</field>
+            <field name="sequence">10</field>
+            <field name="visa_type">student</field>
+        </record>
+        <record id="prog_ph_kids" model="mng.visa.program.type">
+            <field name="name">🇵🇭 Филиппин Хүүхэд (9-18)</field>
+            <field name="code">PH_KIDS</field>
+            <field name="sequence">20</field>
+            <field name="visa_type">camp</field>
+        </record>
+        <record id="prog_jp_student" model="mng.visa.program.type">
+            <field name="name">🇯🇵 Япон Оюутан</field>
+            <field name="code">JP_STUDENT</field>
+            <field name="sequence">30</field>
+            <field name="visa_type">student</field>
+        </record>
+        <record id="prog_jp_worker" model="mng.visa.program.type">
+            <field name="name">🇯🇵 Япон Ажилтан (Дадлагажигч)</field>
+            <field name="code">JP_WORKER</field>
+            <field name="sequence">40</field>
+            <field name="visa_type">work</field>
+        </record>
+        <record id="prog_kr" model="mng.visa.program.type">
+            <field name="name">🇰🇷 Солонгос</field>
+            <field name="code">KR</field>
+            <field name="sequence">50</field>
+            <field name="visa_type">student</field>
+        </record>
+
+        <!-- ══════════════════════════════════════ -->
+        <!-- STAGES: Philippines Adult              -->
+        <!-- ══════════════════════════════════════ -->
+        <record id="stage_ph_a_01" model="mng.visa.stage">
+            <field name="name">📋 Лавлагаа</field>
+            <field name="program_type_id" ref="prog_ph_adult"/>
+            <field name="sequence">10</field>
+        </record>
+        <record id="stage_ph_a_02" model="mng.visa.stage">
+            <field name="name">📝 Гэрээ + 30% урьдчилгаа</field>
+            <field name="program_type_id" ref="prog_ph_adult"/>
+            <field name="sequence">20</field>
+        </record>
+        <record id="stage_ph_a_03" model="mng.visa.stage">
+            <field name="name">📄 Бэлтгэл жагсаалт өгсөн</field>
+            <field name="program_type_id" ref="prog_ph_adult"/>
+            <field name="sequence">30</field>
+        </record>
+        <record id="stage_ph_a_04" model="mng.visa.stage">
+            <field name="name">💬 Group chat + PH Manager</field>
+            <field name="program_type_id" ref="prog_ph_adult"/>
+            <field name="sequence">40</field>
+        </record>
+        <record id="stage_ph_a_05" model="mng.visa.stage">
+            <field name="name">ℹ️ QR, дүрэм, заавар өгсөн</field>
+            <field name="program_type_id" ref="prog_ph_adult"/>
+            <field name="sequence">50</field>
+        </record>
+        <record id="stage_ph_a_06" model="mng.visa.stage">
+            <field name="name">✈️ Тийз авсан</field>
+            <field name="program_type_id" ref="prog_ph_adult"/>
+            <field name="sequence">60</field>
+        </record>
+        <record id="stage_ph_a_07" model="mng.visa.stage">
+            <field name="name">📨 Урилга + нэхэмжлэл</field>
+            <field name="program_type_id" ref="prog_ph_adult"/>
+            <field name="sequence">70</field>
+        </record>
+        <record id="stage_ph_a_08" model="mng.visa.stage">
+            <field name="name">🛡️ Даатгал хийлгэсэн</field>
+            <field name="program_type_id" ref="prog_ph_adult"/>
+            <field name="sequence">80</field>
+        </record>
+        <record id="stage_ph_a_09" model="mng.visa.stage">
+            <field name="name">🛫 Нисэж явсан</field>
+            <field name="program_type_id" ref="prog_ph_adult"/>
+            <field name="sequence">90</field>
+        </record>
+        <record id="stage_ph_a_10" model="mng.visa.stage">
+            <field name="name">🏫 Очсон + 70% төлсөн</field>
+            <field name="program_type_id" ref="prog_ph_adult"/>
+            <field name="sequence">100</field>
+        </record>
+        <record id="stage_ph_a_11" model="mng.visa.stage">
+            <field name="name">✅ Дууссан</field>
+            <field name="program_type_id" ref="prog_ph_adult"/>
+            <field name="sequence">110</field>
+            <field name="is_done" eval="True"/>
+            <field name="fold" eval="True"/>
+        </record>
+
+        <!-- ══════════════════════════════════════ -->
+        <!-- STAGES: Philippines Kids               -->
+        <!-- ══════════════════════════════════════ -->
+        <record id="stage_ph_k_01" model="mng.visa.stage">
+            <field name="name">📋 Лавлагаа</field>
+            <field name="program_type_id" ref="prog_ph_kids"/>
+            <field name="sequence">10</field>
+        </record>
+        <record id="stage_ph_k_02" model="mng.visa.stage">
+            <field name="name">📝 3 талын гэрээ + 30%</field>
+            <field name="program_type_id" ref="prog_ph_kids"/>
+            <field name="sequence">20</field>
+        </record>
+        <record id="stage_ph_k_03" model="mng.visa.stage">
+            <field name="name">💵 Бэлэн мөнгө + баримт</field>
+            <field name="program_type_id" ref="prog_ph_kids"/>
+            <field name="sequence">30</field>
+        </record>
+        <record id="stage_ph_k_04" model="mng.visa.stage">
+            <field name="name">🛂 Паспорт хуулбарласан</field>
+            <field name="program_type_id" ref="prog_ph_kids"/>
+            <field name="sequence">40</field>
+        </record>
+        <record id="stage_ph_k_05" model="mng.visa.stage">
+            <field name="name">📜 Итгэмжлэл (Нотариат)</field>
+            <field name="program_type_id" ref="prog_ph_kids"/>
+            <field name="sequence">50</field>
+        </record>
+        <record id="stage_ph_k_06" model="mng.visa.stage">
+            <field name="name">👮 Тодорхойлолт (Цагдаа)</field>
+            <field name="program_type_id" ref="prog_ph_kids"/>
+            <field name="sequence">60</field>
+        </record>
+        <record id="stage_ph_k_07" model="mng.visa.stage">
+            <field name="name">🛡️ Даатгал</field>
+            <field name="program_type_id" ref="prog_ph_kids"/>
+            <field name="sequence">70</field>
+        </record>
+        <record id="stage_ph_k_08" model="mng.visa.stage">
+            <field name="name">👨‍👩‍👧 Эцэг эхийн уулзалт</field>
+            <field name="program_type_id" ref="prog_ph_kids"/>
+            <field name="sequence">80</field>
+        </record>
+        <record id="stage_ph_k_09" model="mng.visa.stage">
+            <field name="name">📄 Баримт бичиг бүрэн</field>
+            <field name="program_type_id" ref="prog_ph_kids"/>
+            <field name="sequence">90</field>
+        </record>
+        <record id="stage_ph_k_10" model="mng.visa.stage">
+            <field name="name">✈️ Тийз + QR бүглэсэн</field>
+            <field name="program_type_id" ref="prog_ph_kids"/>
+            <field name="sequence">100</field>
+        </record>
+        <record id="stage_ph_k_11" model="mng.visa.stage">
+            <field name="name">🛫 Нисэж явсан</field>
+            <field name="program_type_id" ref="prog_ph_kids"/>
+            <field name="sequence">110</field>
+        </record>
+        <record id="stage_ph_k_12" model="mng.visa.stage">
+            <field name="name">🏫 Хөтөлбөрт байна</field>
+            <field name="program_type_id" ref="prog_ph_kids"/>
+            <field name="sequence">120</field>
+        </record>
+        <record id="stage_ph_k_13" model="mng.visa.stage">
+            <field name="name">✅ Хүлээлгэж өгсөн</field>
+            <field name="program_type_id" ref="prog_ph_kids"/>
+            <field name="sequence">130</field>
+            <field name="is_done" eval="True"/>
+            <field name="fold" eval="True"/>
+        </record>
+
+        <!-- ══════════════════════════════════════ -->
+        <!-- STAGES: Japan Student                  -->
+        <!-- ══════════════════════════════════════ -->
+        <record id="stage_jp_s_01" model="mng.visa.stage">
+            <field name="name">📋 Лавлагаа</field>
+            <field name="program_type_id" ref="prog_jp_student"/>
+            <field name="sequence">10</field>
+        </record>
+        <record id="stage_jp_s_02" model="mng.visa.stage">
+            <field name="name">📝 Гэрээ + 600K орчуулга</field>
+            <field name="program_type_id" ref="prog_jp_student"/>
+            <field name="sequence">20</field>
+        </record>
+        <record id="stage_jp_s_03" model="mng.visa.stage">
+            <field name="name">📄 Анкет бөглөсөн</field>
+            <field name="program_type_id" ref="prog_jp_student"/>
+            <field name="sequence">30</field>
+        </record>
+        <record id="stage_jp_s_04" model="mng.visa.stage">
+            <field name="name">📂 Материал бүрдүүлж байна</field>
+            <field name="program_type_id" ref="prog_jp_student"/>
+            <field name="sequence">40</field>
+        </record>
+        <record id="stage_jp_s_05" model="mng.visa.stage">
+            <field name="name">🎌 150 цаг Япон хэлний бэлтгэл</field>
+            <field name="program_type_id" ref="prog_jp_student"/>
+            <field name="sequence">50</field>
+        </record>
+        <record id="stage_jp_s_06" model="mng.visa.stage">
+            <field name="name">🔤 Орчуулга хийж байна</field>
+            <field name="program_type_id" ref="prog_jp_student"/>
+            <field name="sequence">60</field>
+        </record>
+        <record id="stage_jp_s_07" model="mng.visa.stage">
+            <field name="name">💴 Бүртгэлийн хураамж</field>
+            <field name="program_type_id" ref="prog_jp_student"/>
+            <field name="sequence">70</field>
+        </record>
+        <record id="stage_jp_s_08" model="mng.visa.stage">
+            <field name="name">📮 Материал Японд илгээсэн</field>
+            <field name="program_type_id" ref="prog_jp_student"/>
+            <field name="sequence">80</field>
+        </record>
+        <record id="stage_jp_s_09" model="mng.visa.stage">
+            <field name="name">🎤 Сургуулийн ярилцлага</field>
+            <field name="program_type_id" ref="prog_jp_student"/>
+            <field name="sequence">90</field>
+        </record>
+        <record id="stage_jp_s_10" model="mng.visa.stage">
+            <field name="name">📋 Цагаачлалд мэдүүлсэн</field>
+            <field name="program_type_id" ref="prog_jp_student"/>
+            <field name="sequence">100</field>
+        </record>
+        <record id="stage_jp_s_11" model="mng.visa.stage">
+            <field name="name">⏳ Зөвшөөрөл хүлээж байна</field>
+            <field name="program_type_id" ref="prog_jp_student"/>
+            <field name="sequence">110</field>
+        </record>
+        <record id="stage_jp_s_12" model="mng.visa.stage">
+            <field name="name">📄 Шар хуудас гарсан</field>
+            <field name="program_type_id" ref="prog_jp_student"/>
+            <field name="sequence">120</field>
+        </record>
+        <record id="stage_jp_s_13" model="mng.visa.stage">
+            <field name="name">💰 Сургалтын төлбөр төлсөн</field>
+            <field name="program_type_id" ref="prog_jp_student"/>
+            <field name="sequence">130</field>
+        </record>
+        <record id="stage_jp_s_14" model="mng.visa.stage">
+            <field name="name">✅ Дууссан</field>
+            <field name="program_type_id" ref="prog_jp_student"/>
+            <field name="sequence">140</field>
+            <field name="is_done" eval="True"/>
+            <field name="fold" eval="True"/>
+        </record>
+
+        <!-- ══════════════════════════════════════ -->
+        <!-- STAGES: Japan Worker                   -->
+        <!-- ══════════════════════════════════════ -->
+        <record id="stage_jp_w_01" model="mng.visa.stage">
+            <field name="name">📋 Лавлагаа</field>
+            <field name="program_type_id" ref="prog_jp_worker"/>
+            <field name="sequence">10</field>
+        </record>
+        <record id="stage_jp_w_02" model="mng.visa.stage">
+            <field name="name">📝 Анкет + цээж зураг</field>
+            <field name="program_type_id" ref="prog_jp_worker"/>
+            <field name="sequence">20</field>
+        </record>
+        <record id="stage_jp_w_03" model="mng.visa.stage">
+            <field name="name">📅 Ярилцлага товлогдсон</field>
+            <field name="program_type_id" ref="prog_jp_worker"/>
+            <field name="sequence">30</field>
+        </record>
+        <record id="stage_jp_w_04" model="mng.visa.stage">
+            <field name="name">🤝 Ярилцлагын өдөр</field>
+            <field name="program_type_id" ref="prog_jp_worker"/>
+            <field name="sequence">40</field>
+        </record>
+        <record id="stage_jp_w_05" model="mng.visa.stage">
+            <field name="name">📊 Ярилцлагын хариу</field>
+            <field name="program_type_id" ref="prog_jp_worker"/>
+            <field name="sequence">50</field>
+        </record>
+        <record id="stage_jp_w_06" model="mng.visa.stage">
+            <field name="name">📋 Гэрээ + урьдчилгаа</field>
+            <field name="program_type_id" ref="prog_jp_worker"/>
+            <field name="sequence">60</field>
+        </record>
+        <record id="stage_jp_w_07" model="mng.visa.stage">
+            <field name="name">🎌 Япон хэлний сургалт (3-5 сар)</field>
+            <field name="program_type_id" ref="prog_jp_worker"/>
+            <field name="sequence">70</field>
+        </record>
+        <record id="stage_jp_w_08" model="mng.visa.stage">
+            <field name="name">📮 Виз мэдүүлсэн</field>
+            <field name="program_type_id" ref="prog_jp_worker"/>
+            <field name="sequence">80</field>
+        </record>
+        <record id="stage_jp_w_09" model="mng.visa.stage">
+            <field name="name">📄 Шар хуудас + 3 сая + тийз</field>
+            <field name="program_type_id" ref="prog_jp_worker"/>
+            <field name="sequence">90</field>
+        </record>
+        <record id="stage_jp_w_10" model="mng.visa.stage">
+            <field name="name">📝 Хэлний шалгалт + 2-р ярилцлага</field>
+            <field name="program_type_id" ref="prog_jp_worker"/>
+            <field name="sequence">100</field>
+        </record>
+        <record id="stage_jp_w_11" model="mng.visa.stage">
+            <field name="name">✅ Виз батлагдсан</field>
+            <field name="program_type_id" ref="prog_jp_worker"/>
+            <field name="sequence">110</field>
+        </record>
+        <record id="stage_jp_w_12" model="mng.visa.stage">
+            <field name="name">🛫 Японд нисэж явсан</field>
+            <field name="program_type_id" ref="prog_jp_worker"/>
+            <field name="sequence">120</field>
+        </record>
+        <record id="stage_jp_w_13" model="mng.visa.stage">
+            <field name="name">🏭 Ажилд орсон (3 жил)</field>
+            <field name="program_type_id" ref="prog_jp_worker"/>
+            <field name="sequence">130</field>
+        </record>
+        <record id="stage_jp_w_14" model="mng.visa.stage">
+            <field name="name">✅ Дууссан</field>
+            <field name="program_type_id" ref="prog_jp_worker"/>
+            <field name="sequence">140</field>
+            <field name="is_done" eval="True"/>
+            <field name="fold" eval="True"/>
+        </record>
+        <!-- Failed stage for JP Worker (send back to training) -->
+        <record id="stage_jp_w_fail" model="mng.visa.stage">
+            <field name="name">❌ Тэнцээгүй</field>
+            <field name="program_type_id" ref="prog_jp_worker"/>
+            <field name="sequence">150</field>
+            <field name="is_failed" eval="True"/>
+            <field name="fold" eval="True"/>
+        </record>
+
+        <!-- ══════════════════════════════════════ -->
+        <!-- STAGES: Korea                          -->
+        <!-- ══════════════════════════════════════ -->
+        <record id="stage_kr_01" model="mng.visa.stage">
+            <field name="name">📋 Лавлагаа</field>
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="sequence">10</field>
+        </record>
+        <record id="stage_kr_02" model="mng.visa.stage">
+            <field name="name">📝 Гэрээ + 400K урьдчилгаа</field>
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="sequence">20</field>
+        </record>
+        <record id="stage_kr_03" model="mng.visa.stage">
+            <field name="name">📄 Анкет бөглөсөн</field>
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="sequence">30</field>
+        </record>
+        <record id="stage_kr_04" model="mng.visa.stage">
+            <field name="name">📂 Баримт бүрдүүлж байна</field>
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="sequence">40</field>
+        </record>
+        <record id="stage_kr_05" model="mng.visa.stage">
+            <field name="name">🔤 Орчуулга + бүртгэл invoice</field>
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="sequence">50</field>
+        </record>
+        <record id="stage_kr_06" model="mng.visa.stage">
+            <field name="name">💰 Сургуулийн төлбөр (₩)</field>
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="sequence">60</field>
+        </record>
+        <record id="stage_kr_07" model="mng.visa.stage">
+            <field name="name">📮 Apostille + шуудан</field>
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="sequence">70</field>
+        </record>
+        <record id="stage_kr_08" model="mng.visa.stage">
+            <field name="name">🎤 Ярилцлага</field>
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="sequence">80</field>
+        </record>
+        <record id="stage_kr_09" model="mng.visa.stage">
+            <field name="name">📊 Сургуулийн хариу (14-28 хоног)</field>
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="sequence">90</field>
+        </record>
+        <record id="stage_kr_10" model="mng.visa.stage">
+            <field name="name">💰 Сургалтын төлбөр</field>
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="sequence">100</field>
+        </record>
+        <record id="stage_kr_11" model="mng.visa.stage">
+            <field name="name">📮 Визний хүсэлт</field>
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="sequence">110</field>
+        </record>
+        <record id="stage_kr_12" model="mng.visa.stage">
+            <field name="name">📋 Визний хариу</field>
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="sequence">120</field>
+        </record>
+        <record id="stage_kr_13" model="mng.visa.stage">
+            <field name="name">🏥 Шинжилгээ + 800K үлдэгдэл</field>
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="sequence">130</field>
+        </record>
+        <record id="stage_kr_14" model="mng.visa.stage">
+            <field name="name">✅ Виз батлагаажуулсан</field>
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="sequence">140</field>
+        </record>
+        <record id="stage_kr_15" model="mng.visa.stage">
+            <field name="name">🛂 Паспорт + тийз + гэрээ</field>
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="sequence">150</field>
+        </record>
+        <record id="stage_kr_16" model="mng.visa.stage">
+            <field name="name">🛫 Солонгос руу нисэж явсан</field>
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="sequence">160</field>
+        </record>
+        <record id="stage_kr_17" model="mng.visa.stage">
+            <field name="name">📚 Суралцаж байна</field>
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="sequence">170</field>
+        </record>
+        <record id="stage_kr_18" model="mng.visa.stage">
+            <field name="name">✅ Дууссан / Төгссөн</field>
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="sequence">180</field>
+            <field name="is_done" eval="True"/>
+            <field name="fold" eval="True"/>
+        </record>
+        <record id="stage_kr_fail" model="mng.visa.stage">
+            <field name="name">❌ Тэнцээгүй / Виз гараагүй</field>
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="sequence">190</field>
+            <field name="is_failed" eval="True"/>
+            <field name="fold" eval="True"/>
+        </record>
+
+    </data>
+</odoo>

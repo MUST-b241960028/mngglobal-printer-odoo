@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ══ Application Kanban ══ -->
+    <record id="mng_visa_app_kanban" model="ir.ui.view">
+        <field name="name">mng.visa.application.kanban</field>
+        <field name="model">mng.visa.application</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="stage_id" class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="program_type_id"/>
+                <field name="stage_id"/>
+                <field name="assigned_to"/>
+                <field name="priority"/>
+                <field name="payment_status"/>
+                <field name="checklist_progress"/>
+                <field name="kanban_state"/>
+                <field name="color"/>
+                <progressbar field="kanban_state"
+                    colors="{&quot;done&quot;: &quot;success&quot;, &quot;blocked&quot;: &quot;danger&quot;, &quot;normal&quot;: &quot;200&quot;}"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_details">
+                            <div class="o_kanban_record_top">
+                                <div class="o_kanban_record_headings">
+                                    <strong>
+                                        <field name="partner_id"/>
+                                    </strong>
+                                    <div class="text-muted">
+                                        <field name="name"/>
+                                    </div>
+                                </div>
+                                <div>
+                                    <field name="priority" widget="priority"/>
+                                </div>
+                            </div>
+                            <div>
+                                <field name="program_type_id" widget="badge"/>
+                            </div>
+                            <div class="mt-1">
+                                <field name="checklist_progress"
+                                       widget="progressbar"
+                                       options="{'editable': false}"/>
+                            </div>
+                            <div class="o_kanban_record_bottom mt-1">
+                                <div class="oe_kanban_bottom_left">
+                                    <field name="payment_status" widget="badge"
+                                           decoration-danger="payment_status == 'unpaid'"
+                                           decoration-warning="payment_status == 'partial'"
+                                           decoration-success="payment_status == 'paid'"/>
+                                </div>
+                                <div class="oe_kanban_bottom_right">
+                                    <field name="assigned_to"
+                                           widget="many2one_avatar_user"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- ══ Application List ══ -->
+    <record id="mng_visa_app_list" model="ir.ui.view">
+        <field name="name">mng.visa.application.list</field>
+        <field name="model">mng.visa.application</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="active == False">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="client_phone"/>
+                <field name="program_type_id"/>
+                <field name="stage_id"/>
+                <field name="departure_date"/>
+                <field name="payment_status" widget="badge"
+                       decoration-danger="payment_status == 'unpaid'"
+                       decoration-warning="payment_status == 'partial'"
+                       decoration-success="payment_status == 'paid'"/>
+                <field name="assigned_to" widget="many2one_avatar_user"/>
+                <field name="checklist_progress" widget="progressbar"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ══ Application Form ══ -->
+    <record id="mng_visa_app_form" model="ir.ui.view">
+        <field name="name">mng.visa.application.form</field>
+        <field name="model">mng.visa.application</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_create_invoice"
+                            string="💳 Нэхэмжлэл үүсгэх"
+                            type="object" class="oe_highlight"/>
+                    <field name="stage_id" widget="statusbar"
+                           options="{'clickable': '1'}"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_invoices" type="object"
+                                class="oe_stat_button" icon="fa-money">
+                            <field name="invoice_count" widget="statinfo"
+                                   string="Нэхэмжлэл"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                        <field name="priority" widget="priority"/>
+                    </div>
+                    <group>
+                        <group string="Үйлчлүүлэгч">
+                            <field name="partner_id"/>
+                            <field name="client_phone"/>
+                            <field name="client_email"/>
+                            <field name="passport_number"/>
+                            <field name="passport_expiry"/>
+                            <field name="date_of_birth"/>
+                        </group>
+                        <group string="Хөтөлбөр">
+                            <field name="program_type_id"/>
+                            <field name="school_name"/>
+                            <field name="city"/>
+                            <field name="program_duration"/>
+                            <field name="departure_date"/>
+                            <field name="assigned_to"/>
+                        </group>
+                    </group>
+                    <!-- Kids program extra fields -->
+                    <group string="Хүүхдийн хөтөлбөр (PH Kids)"
+                           invisible="program_type_id != %(mngglobal_visa.prog_ph_kids)d">
+                        <group>
+                            <field name="parent_name"/>
+                            <field name="parent_phone"/>
+                        </group>
+                        <group>
+                            <field name="teacher_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="📋 Шалгах хуудас">
+                            <field name="checklist_progress" widget="progressbar"/>
+                            <field name="checklist_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="is_done" widget="boolean_toggle"/>
+                                    <field name="done_date"/>
+                                    <field name="done_by"/>
+                                    <field name="notes" optional="hide"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="💰 Төлбөр">
+                            <group>
+                                <group>
+                                    <field name="total_fee"/>
+                                    <field name="advance_paid"/>
+                                    <field name="remaining_fee"/>
+                                    <field name="currency_id"/>
+                                </group>
+                                <group>
+                                    <field name="payment_status" widget="badge"/>
+                                </group>
+                            </group>
+                            <field name="payment_ids">
+                                <list editable="bottom">
+                                    <field name="name"/>
+                                    <field name="amount"/>
+                                    <field name="currency"/>
+                                    <field name="date_due"/>
+                                    <field name="date_paid"/>
+                                    <field name="state" widget="badge"
+                                           decoration-danger="state == 'overdue'"
+                                           decoration-success="state == 'paid'"/>
+                                    <field name="payment_method"/>
+                                    <field name="receipt_file" filename="receipt_filename"/>
+                                    <field name="receipt_filename" column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="📅 Огноонууд">
+                            <group>
+                                <group>
+                                    <field name="date_inquiry"/>
+                                    <field name="date_contract"/>
+                                    <field name="date_submitted"/>
+                                </group>
+                                <group>
+                                    <field name="date_result"/>
+                                    <field name="date_departed"/>
+                                    <field name="date_done"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="📝 Тэмдэглэл">
+                            <field name="notes"/>
+                            <group invisible="not rejection_reason">
+                                <field name="rejection_reason"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ══ Application Search ══ -->
+    <record id="mng_visa_app_search" model="ir.ui.view">
+        <field name="name">mng.visa.application.search</field>
+        <field name="model">mng.visa.application</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="client_phone"/>
+                <field name="passport_number"/>
+                <separator/>
+                <filter string="🇵🇭 Филиппин" name="ph"
+                        domain="[('program_type_id.code', 'in', ['PH_ADULT', 'PH_KIDS'])]"/>
+                <filter string="🇯🇵 Япон" name="jp"
+                        domain="[('program_type_id.code', 'in', ['JP_STUDENT', 'JP_WORKER'])]"/>
+                <filter string="🇰🇷 Солонгос" name="kr"
+                        domain="[('program_type_id.code', '=', 'KR')]"/>
+                <separator/>
+                <filter string="Миний өргөдлүүд" name="mine"
+                        domain="[('assigned_to', '=', uid)]"/>
+                <filter string="Хугацаат" name="deadline"
+                        domain="[('departure_date', '!=', False)]"/>
+                <separator/>
+                <filter string="Төлөөгүй" name="unpaid"
+                        domain="[('payment_status', '=', 'unpaid')]"/>
+                <filter string="Хэсэгчлэн" name="partial"
+                        domain="[('payment_status', '=', 'partial')]"/>
+                <separator/>
+                <group expand="0" string="Бүлэглэх">
+                    <filter string="Хөтөлбөр" name="group_program"
+                            context="{'group_by': 'program_type_id'}"/>
+                    <filter string="Хариуцагч" name="group_user"
+                            context="{'group_by': 'assigned_to'}"/>
+                    <filter string="Үе шат" name="group_stage"
+                            context="{'group_by': 'stage_id'}"/>
+                    <filter string="Төлбөр" name="group_payment"
+                            context="{'group_by': 'payment_status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ══ Per-program actions ══ -->
+    <record id="mng_visa_app_action_all" model="ir.actions.act_window">
+        <field name="name">📋 Бүх өргөдлүүд</field>
+        <field name="res_model">mng.visa.application</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="mng_visa_app_search"/>
+    </record>
+
+    <record id="mng_visa_app_action_ph_adult" model="ir.actions.act_window">
+        <field name="name">🇵🇭 Филиппин Насанд хүрэгч</field>
+        <field name="res_model">mng.visa.application</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('program_type_id.code', '=', 'PH_ADULT')]</field>
+        <field name="context">{'default_program_type_id': %(mngglobal_visa.prog_ph_adult)d}</field>
+    </record>
+
+    <record id="mng_visa_app_action_ph_kids" model="ir.actions.act_window">
+        <field name="name">🇵🇭 Филиппин Хүүхэд</field>
+        <field name="res_model">mng.visa.application</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('program_type_id.code', '=', 'PH_KIDS')]</field>
+        <field name="context">{'default_program_type_id': %(mngglobal_visa.prog_ph_kids)d}</field>
+    </record>
+
+    <record id="mng_visa_app_action_jp_student" model="ir.actions.act_window">
+        <field name="name">🇯🇵 Япон Оюутан</field>
+        <field name="res_model">mng.visa.application</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('program_type_id.code', '=', 'JP_STUDENT')]</field>
+        <field name="context">{'default_program_type_id': %(mngglobal_visa.prog_jp_student)d}</field>
+    </record>
+
+    <record id="mng_visa_app_action_jp_worker" model="ir.actions.act_window">
+        <field name="name">🇯🇵 Япон Ажилтан</field>
+        <field name="res_model">mng.visa.application</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('program_type_id.code', '=', 'JP_WORKER')]</field>
+        <field name="context">{'default_program_type_id': %(mngglobal_visa.prog_jp_worker)d}</field>
+    </record>
+
+    <record id="mng_visa_app_action_kr" model="ir.actions.act_window">
+        <field name="name">🇰🇷 Солонгос</field>
+        <field name="res_model">mng.visa.application</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('program_type_id.code', '=', 'KR')]</field>
+        <field name="context">{'default_program_type_id': %(mngglobal_visa.prog_kr)d}</field>
+    </record>
+
+</odoo>
