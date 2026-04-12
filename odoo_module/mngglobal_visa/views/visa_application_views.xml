@@ -220,6 +220,7 @@
                 <field name="passport_number"/>
                 <field name="program_type_id"/>
                 <field name="assigned_to"/>
+                <separator/>
                 <filter string="Филиппин" name="ph"
                         domain="[('program_type_id.code', 'in', ['PH_ADULT', 'PH_KIDS'])]"/>
                 <filter string="Япон" name="jp"
@@ -236,16 +237,15 @@
                         domain="[('payment_status', '=', 'unpaid')]"/>
                 <filter string="Хэсэгчлэн" name="partial"
                         domain="[('payment_status', '=', 'partial')]"/>
-                <group string="Бүлэглэх">
-                    <filter string="Хөтөлбөр" name="group_program"
-                            context="{'group_by': 'program_type_id'}"/>
-                    <filter string="Хариуцагч" name="group_user"
-                            context="{'group_by': 'assigned_to'}"/>
-                    <filter string="Үе шат" name="group_stage"
-                            context="{'group_by': 'stage_id'}"/>
-                    <filter string="Төлбөр" name="group_payment"
-                            context="{'group_by': 'payment_status'}"/>
-                </group>
+                <separator/>
+                <filter string="Хөтөлбөр" name="group_program"
+                        context="{'group_by': 'program_type_id'}"/>
+                <filter string="Хариуцагч" name="group_user"
+                        context="{'group_by': 'assigned_to'}"/>
+                <filter string="Үе шат" name="group_stage"
+                        context="{'group_by': 'stage_id'}"/>
+                <filter string="Төлбөр" name="group_payment"
+                        context="{'group_by': 'payment_status'}"/>
             </search>
         </field>
     </record>
