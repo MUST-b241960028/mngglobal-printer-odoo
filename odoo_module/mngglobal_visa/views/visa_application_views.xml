@@ -218,12 +218,13 @@
                 <field name="partner_id"/>
                 <field name="client_phone"/>
                 <field name="passport_number"/>
-                <separator/>
-                <filter string="🇵🇭 Филиппин" name="ph"
+                <field name="program_type_id"/>
+                <field name="assigned_to"/>
+                <filter string="Филиппин" name="ph"
                         domain="[('program_type_id.code', 'in', ['PH_ADULT', 'PH_KIDS'])]"/>
-                <filter string="🇯🇵 Япон" name="jp"
+                <filter string="Япон" name="jp"
                         domain="[('program_type_id.code', 'in', ['JP_STUDENT', 'JP_WORKER'])]"/>
-                <filter string="🇰🇷 Солонгос" name="kr"
+                <filter string="Солонгос" name="kr"
                         domain="[('program_type_id.code', '=', 'KR')]"/>
                 <separator/>
                 <filter string="Миний өргөдлүүд" name="mine"
@@ -235,8 +236,7 @@
                         domain="[('payment_status', '=', 'unpaid')]"/>
                 <filter string="Хэсэгчлэн" name="partial"
                         domain="[('payment_status', '=', 'partial')]"/>
-                <separator/>
-                <group expand="0" string="Бүлэглэх">
+                <group string="Бүлэглэх">
                     <filter string="Хөтөлбөр" name="group_program"
                             context="{'group_by': 'program_type_id'}"/>
                     <filter string="Хариуцагч" name="group_user"
