@@ -130,8 +130,7 @@
                         </group>
                     </group>
                     <!-- Kids program extra fields -->
-                    <group string="Хүүхдийн хөтөлбөр (PH Kids)"
-                           invisible="program_type_id != %(mngglobal_visa.prog_ph_kids)d">
+                    <group string="Хүүхдийн хөтөлбөр (PH Kids)">
                         <group>
                             <field name="parent_name"/>
                             <field name="parent_phone"/>
@@ -198,7 +197,7 @@
                         </page>
                         <page string="📝 Тэмдэглэл">
                             <field name="notes"/>
-                            <group invisible="not rejection_reason">
+                            <group invisible="rejection_reason == False">
                                 <field name="rejection_reason"/>
                             </group>
                         </page>
