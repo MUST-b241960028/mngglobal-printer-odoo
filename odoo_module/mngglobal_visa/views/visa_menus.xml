@@ -9,49 +9,49 @@
 
     <!-- ── Leads ── -->
     <menuitem id="mng_visa_leads_menu"
-              name="📞 Leads"
+              name=" Leads"
               action="mng_visa_lead_action"
               parent="mng_visa_root_menu"
               sequence="5"/>
 
     <!-- ── Applications ── -->
     <menuitem id="mng_visa_apps_parent"
-              name="📋 Өргөдлүүд"
+              name=" Өргөдлүүд"
               parent="mng_visa_root_menu"
               sequence="10"/>
 
     <menuitem id="mng_visa_all_menu"
-              name="📋 Бүгд"
+              name=" Бүгд"
               action="mng_visa_app_action_all"
               parent="mng_visa_apps_parent"
               sequence="1"/>
 
     <menuitem id="mng_visa_ph_adult_menu"
-              name="🇵🇭 Филиппин Насанд хүрэгч"
+              name=" Филиппин Насанд хүрэгч"
               action="mng_visa_app_action_ph_adult"
               parent="mng_visa_apps_parent"
               sequence="10"/>
 
     <menuitem id="mng_visa_ph_kids_menu"
-              name="🇵🇭 Филиппин Хүүхэд"
+              name=" Филиппин Хүүхэд"
               action="mng_visa_app_action_ph_kids"
               parent="mng_visa_apps_parent"
               sequence="20"/>
 
     <menuitem id="mng_visa_jp_student_menu"
-              name="🇯🇵 Япон Оюутан"
+              name=" Япон Оюутан"
               action="mng_visa_app_action_jp_student"
               parent="mng_visa_apps_parent"
               sequence="30"/>
 
     <menuitem id="mng_visa_jp_worker_menu"
-              name="🇯🇵 Япон Ажилтан"
+              name=" Япон Ажилтан"
               action="mng_visa_app_action_jp_worker"
               parent="mng_visa_apps_parent"
               sequence="40"/>
 
     <menuitem id="mng_visa_kr_menu"
-              name="🇰🇷 Солонгос"
+              name=" Солонгос"
               action="mng_visa_app_action_kr"
               parent="mng_visa_apps_parent"
               sequence="50"/>
