@@ -69,14 +69,14 @@
               name="Санхүү"
               parent="mng_visa_root_menu"
               sequence="20"
-              groups="mngglobal_visa.group_visa_finance"/>
+              groups="mngglobal_visa.group_visa_finance,mngglobal_visa.group_visa_manager"/>
 
     <menuitem id="mng_visa_finance_apps_menu"
               name="Төлбөрийн тоймлол"
               action="mng_visa_app_action_finance"
               parent="mng_visa_finance_menu"
               sequence="10"
-              groups="mngglobal_visa.group_visa_finance"/>
+              groups="mngglobal_visa.group_visa_finance,mngglobal_visa.group_visa_manager"/>
 
     <!-- ── Configuration ── -->
     <menuitem id="mng_visa_config_menu"
@@ -95,7 +95,7 @@
               action="mng_visa_fee_tmpl_action"
               parent="mng_visa_config_menu"
               sequence="20"
-              groups="mngglobal_visa.group_visa_finance"/>
+              groups="mngglobal_visa.group_visa_finance,mngglobal_visa.group_visa_manager"/>
 
 </odoo>
 

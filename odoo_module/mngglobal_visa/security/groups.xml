@@ -1,8 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
+    <!-- Finance: read+write on payments/invoices -->
     <record id="group_visa_finance" model="res.groups">
         <field name="name">Санхүү</field>
         <field name="category_id" ref="base.module_category_services"/>
         <field name="comment">Төлбөр, нэхэмжлэл, санхүүгийн мэдээлэлд хандах эрх</field>
     </record>
+
+    <!-- Manager: read-only on everything + sees finance sections -->
+    <record id="group_visa_manager" model="res.groups">
+        <field name="name">Менежер</field>
+        <field name="category_id" ref="base.module_category_services"/>
+        <field name="comment">Бүх мэдээллийг харах, засах эрхгүй. CEO болон удирдлагын зориулалт.</field>
+    </record>
+
 </odoo>

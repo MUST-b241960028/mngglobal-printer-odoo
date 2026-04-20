@@ -72,7 +72,7 @@
                        decoration-danger="payment_status == 'unpaid'"
                        decoration-warning="payment_status == 'partial'"
                        decoration-success="payment_status == 'paid'"
-                       groups="mngglobal_visa.group_visa_finance"/>
+                       groups="mngglobal_visa.group_visa_finance,mngglobal_visa.group_visa_manager"/>
                 <field name="assigned_to" widget="many2one_avatar_user"/>
                 <field name="checklist_progress" widget="progressbar"/>
             </list>
@@ -89,18 +89,18 @@
                     <button name="action_generate_fee_schedule"
                             string="Төлбөрийн хуваарь үүсгэх"
                             type="object"
-                            groups="mngglobal_visa.group_visa_finance"
+                            groups="mngglobal_visa.group_visa_finance,mngglobal_visa.group_visa_manager"
                             invisible="not program_type_id"/>
                     <button name="action_create_invoice"
                             string="Нэхэмжлэл үүсгэх"
                             type="object" class="oe_highlight"
-                            groups="mngglobal_visa.group_visa_finance"/>
+                            groups="mngglobal_visa.group_visa_finance,mngglobal_visa.group_visa_manager"/>
                     <field name="stage_id" widget="statusbar"
                            options="{'clickable': '1'}"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box"
-                         groups="mngglobal_visa.group_visa_finance">
+                         groups="mngglobal_visa.group_visa_finance,mngglobal_visa.group_visa_manager">
                         <button name="action_open_invoices" type="object"
                                 class="oe_stat_button" icon="fa-money">
                             <field name="invoice_count" widget="statinfo"
@@ -162,7 +162,7 @@
                                 </list>
                             </field>
                         </page>
-                        <page string="Төлбөр" groups="mngglobal_visa.group_visa_finance">
+                        <page string="Төлбөр" groups="mngglobal_visa.group_visa_finance,mngglobal_visa.group_visa_manager">
                             <group>
                                 <group>
                                     <field name="total_fee"/>
