@@ -16,4 +16,7 @@ class MngVisaStage(models.Model):
         help="Энэ үе шатыг kanban-д хураасан байдлаар харуулна")
     is_done = fields.Boolean(string="Дууссан үе шат")
     is_failed = fields.Boolean(string="Амжилтгүй үе шат")
+    is_yellow_card = fields.Boolean(
+        string="Шар хуудасны үе шат",
+        help="Энэ үе шатад орох үед шар хуудасны огноо автоматаар тэмдэглэгдэнэ")
     description = fields.Text(string="Тайлбар")

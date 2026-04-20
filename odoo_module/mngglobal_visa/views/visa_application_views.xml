@@ -195,6 +195,7 @@
                                     <field name="date_contract"/>
                                     <field name="date_submitted"/>
                                     <field name="date_result"/>
+                                    <field name="date_yellow_card"/>
                                     <field name="date_departed"/>
                                     <field name="date_done"/>
                                 </group>

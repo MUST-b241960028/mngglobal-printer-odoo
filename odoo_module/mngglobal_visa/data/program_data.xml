@@ -230,7 +230,7 @@
  <field name="sequence">100</field>
  </record>
  <record id="stage_jp_s_11" model="mng.visa.stage">
- <field name="name">⏳ Зөвшөөрөл хүлээж байна</field>
+ <field name="name">Зөвшөөрөл хүлээж байна</field>
  <field name="program_type_id" ref="prog_jp_student"/>
  <field name="sequence">110</field>
  </record>
@@ -238,6 +238,7 @@
  <field name="name">Шар хуудас гарсан</field>
  <field name="program_type_id" ref="prog_jp_student"/>
  <field name="sequence">120</field>
+ <field name="is_yellow_card" eval="True"/>
  </record>
  <record id="stage_jp_s_13" model="mng.visa.stage">
  <field name="name">Сургалтын төлбөр төлсөн</field>
@@ -299,6 +300,7 @@
  <field name="name">Шар хуудас + 3 сая + тийз</field>
  <field name="program_type_id" ref="prog_jp_worker"/>
  <field name="sequence">90</field>
+ <field name="is_yellow_card" eval="True"/>
  </record>
  <record id="stage_jp_w_10" model="mng.visa.stage">
  <field name="name">Хэлний шалгалт + 2-р ярилцлага</field>

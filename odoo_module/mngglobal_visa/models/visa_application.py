@@ -115,6 +115,9 @@ class MngVisaApplication(models.Model):
     checklist_progress = fields.Float(
         string="Явц %", compute="_compute_checklist_progress")
 
+    # ── Yellow card ──
+    date_yellow_card = fields.Date(string="Шар хуудас гарсан огноо", tracking=True)
+
     # ── Insurance ──
     insurance_done = fields.Boolean(string="Даатгал хийсэн", tracking=True)
     insurance_date = fields.Date(string="Даатгал хийсэн огноо")
@@ -197,6 +200,8 @@ class MngVisaApplication(models.Model):
                 vals.setdefault("date_inquiry", today)
             if stage.is_done:
                 vals.setdefault("date_done", today)
+            if stage.is_yellow_card:
+                vals.setdefault("date_yellow_card", today)
         result = super().write(vals)
         if "stage_id" in vals:
             stage = self.env["mng.visa.stage"].browse(vals["stage_id"])

@@ -7,6 +7,13 @@
               web_icon="mngglobal_visa,static/description/icon.png"
               sequence="5"/>
 
+    <!-- ── Dashboard ── -->
+    <menuitem id="mng_visa_dashboard_menu"
+              name="Dashboard"
+              action="mng_visa_dashboard_action"
+              parent="mng_visa_root_menu"
+              sequence="1"/>
+
     <!-- ── Leads ── -->
     <menuitem id="mng_visa_leads_menu"
               name="Leads"

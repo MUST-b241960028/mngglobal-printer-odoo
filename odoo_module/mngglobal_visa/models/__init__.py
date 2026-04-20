@@ -5,3 +5,4 @@ from . import visa_application
 from . import visa_payment
 from . import visa_checklist
 from . import visa_fee_template
+from . import visa_dashboard
