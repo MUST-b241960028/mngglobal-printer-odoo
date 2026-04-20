@@ -27,7 +27,11 @@ class MngVisaApplication(models.Model):
             if vals.get("name", "New") == "New":
                 vals["name"] = self.env["ir.sequence"].next_by_code(
                     "mng.visa.application") or "New"
-        return super().create(vals_list)
+        records = super().create(vals_list)
+        for rec in records:
+            if rec.program_type_id and rec.stage_id:
+                rec._populate_checklist_from_template(rec.stage_id)
+        return records
 
     # ── Program & Stage ──
     program_type_id = fields.Many2one(
@@ -181,7 +185,33 @@ class MngVisaApplication(models.Model):
                 vals.setdefault("date_inquiry", today)
             if stage.is_done:
                 vals.setdefault("date_done", today)
-        return super().write(vals)
+        result = super().write(vals)
+        if "stage_id" in vals:
+            stage = self.env["mng.visa.stage"].browse(vals["stage_id"])
+            for rec in self:
+                rec._populate_checklist_from_template(stage)
+        return result
+
+    def _populate_checklist_from_template(self, stage):
+        """Add checklist items from template for the given stage (skips duplicates)."""
+        self.ensure_one()
+        if not self.program_type_id:
+            return
+        templates = self.env["mng.visa.checklist.template"].search([
+            ("program_type_id", "=", self.program_type_id.id),
+            ("stage_id", "=", stage.id),
+        ], order="sequence")
+        if not templates:
+            return
+        existing_names = set(self.checklist_ids.mapped("name"))
+        ChecklistItem = self.env["mng.visa.checklist.item"]
+        for tmpl in templates:
+            if tmpl.name not in existing_names:
+                ChecklistItem.create({
+                    "application_id": self.id,
+                    "name": tmpl.name,
+                    "sequence": tmpl.sequence,
+                })
 
     @api.onchange("program_type_id")
     def _onchange_program_type(self):

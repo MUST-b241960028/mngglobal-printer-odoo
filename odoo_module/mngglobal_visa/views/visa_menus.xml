@@ -56,4 +56,18 @@
               parent="mng_visa_apps_parent"
               sequence="50"/>
 
+
+    <!-- ── Configuration ── -->
+    <menuitem id="mng_visa_config_menu"
+              name=" Тохиргоо"
+              parent="mng_visa_root_menu"
+              sequence="100"/>
+
+    <menuitem id="mng_visa_checklist_tmpl_menu"
+              name="Шалгах хуудасны загвар"
+              action="mng_visa_checklist_tmpl_action"
+              parent="mng_visa_config_menu"
+              sequence="10"/>
+
 </odoo>
+

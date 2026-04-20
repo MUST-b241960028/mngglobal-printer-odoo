@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ══ Checklist Template List ══ -->
+    <record id="mng_visa_checklist_tmpl_list" model="ir.ui.view">
+        <field name="name">mng.visa.checklist.template.list</field>
+        <field name="model">mng.visa.checklist.template</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="program_type_id"/>
+                <field name="stage_id" domain="[('program_type_id', '=', program_type_id)]"/>
+                <field name="name"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ══ Checklist Template Search ══ -->
+    <record id="mng_visa_checklist_tmpl_search" model="ir.ui.view">
+        <field name="name">mng.visa.checklist.template.search</field>
+        <field name="model">mng.visa.checklist.template</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="program_type_id"/>
+                <field name="stage_id"/>
+                <field name="name"/>
+                <filter string="Хөтөлбөр" name="group_program"
+                        context="{'group_by': 'program_type_id'}"/>
+                <filter string="Үе шат" name="group_stage"
+                        context="{'group_by': 'stage_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- ══ Checklist Template Action ══ -->
+    <record id="mng_visa_checklist_tmpl_action" model="ir.actions.act_window">
+        <field name="name">Шалгах хуудасны загвар</field>
+        <field name="res_model">mng.visa.checklist.template</field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="mng_visa_checklist_tmpl_search"/>
+    </record>
+
+</odoo>
