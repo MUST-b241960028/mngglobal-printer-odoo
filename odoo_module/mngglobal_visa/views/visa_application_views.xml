@@ -114,7 +114,7 @@
                         <field name="priority" widget="priority"/>
                     </div>
                     <!-- Insurance warning -->
-                    <div class="alert alert-warning"
+                    <div class="alert alert-warning" role="alert"
                          invisible="insurance_done or not insurance_due_date">
                         Анхааруулга: Даатгал хийлгэх эцсийн хугацаа
                         <field name="insurance_due_date" readonly="1"/> — яаралтай хийлгэнэ үү!

@@ -110,7 +110,7 @@
         <field name="res_model">mng.visa.application</field>
         <field name="view_mode">list,form</field>
         <field name="views" eval="[(ref('mng_visa_app_list_finance'), 'list'), (False, 'form')]"/>
-        <field name="groups_id" eval="[(4, ref('mngglobal_visa.group_visa_finance')), (4, ref('mngglobal_visa.group_visa_manager'))]"/>
+        <field name="group_ids" eval="[(4, ref('mngglobal_visa.group_visa_finance')), (4, ref('mngglobal_visa.group_visa_manager'))]"/>
     </record>
 
 </odoo>
