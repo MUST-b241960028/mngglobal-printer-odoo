@@ -34,7 +34,7 @@ class MngPrintQueue(models.Model):
         ("printed", "Хэвлэгдсэн"),
         ("failed", "Амжилтгүй"),
         ("cancelled", "Цуцлагдсан"),
-    ], default="pending", string="Төлөв", tracking=True)
+    ], default="pending", string="Төлөв")
     printed_at = fields.Datetime(string="Хэвлэгдсэн огноо")
     error_message = fields.Text(string="Алдааны мэдээлэл")
     note = fields.Text(string="Тэмдэглэл",

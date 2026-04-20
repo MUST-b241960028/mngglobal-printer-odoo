@@ -1,5 +1,5 @@
 import logging
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 
 _logger = logging.getLogger(__name__)
 
@@ -23,9 +23,11 @@ class MngPrinterDevice(models.Model):
     last_seen = fields.Datetime(string="Сүүлд холбогдсон", readonly=True)
     port = fields.Char(string="Порт")
 
-    _sql_constraints = [
-        ("unique_printer_per_client", "unique(name, client_name)",
-         "Энэ компьютерт ижил нэртэй принтер бүртгэгдсэн байна!"),
+    _constraints = [
+        models.Constraint(
+            "unique(name, client_name)",
+            "Энэ компьютерт ижил нэртэй принтер бүртгэгдсэн байна!",
+        ),
     ]
 
     @api.depends("name", "client_name", "is_default")

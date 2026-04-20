@@ -65,16 +65,13 @@ jobs:
             echo "Updating MNG modules..."
             ADDON_PATH="${{ secrets.ODOO_ADDON_PATH }}"
 
+            # Remove old modules (git history is our backup)
             for MODULE in mngglobal_printer mngglobal_visa; do
-              MODULE_DIR="$ADDON_PATH/$MODULE"
-              if [ -d "$MODULE_DIR" ]; then
-                cp -r "$MODULE_DIR" "${MODULE_DIR}_backup_$(date +%Y%m%d_%H%M%S)"
-              fi
-              rm -rf "$MODULE_DIR"
-
-              # Retain only the 3 newest backups per module
-              ls -1dt "${MODULE_DIR}_backup_"* 2>/dev/null | tail -n +4 | xargs -r rm -rf
+              rm -rf "$ADDON_PATH/$MODULE"
             done
+
+            # Clean any leftover backups
+            rm -rf "$ADDON_PATH"/*_backup_*
 
       - name: Copy module files to VPS
         uses: appleboy/scp-action@v0.1.7
