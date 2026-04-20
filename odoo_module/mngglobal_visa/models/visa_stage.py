@@ -19,4 +19,3 @@ class MngVisaStage(models.Model):
     is_yellow_card = fields.Boolean(
         string="Шар хуудасны үе шат",
         help="Энэ үе шатад орох үед шар хуудасны огноо автоматаар тэмдэглэгдэнэ")
-    description = fields.Text(string="Тайлбар")

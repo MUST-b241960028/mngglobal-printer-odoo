@@ -16,17 +16,6 @@ class MngVisaChecklistItem(models.Model):
     done_by = fields.Many2one("res.users", string="Хийсэн хүн")
     notes = fields.Text(string="Тэмдэглэл")
 
-    def toggle_done(self):
-        """Toggle checklist item completion."""
-        for rec in self:
-            rec.is_done = not rec.is_done
-            if rec.is_done:
-                rec.done_date = fields.Date.today()
-                rec.done_by = self.env.uid
-            else:
-                rec.done_date = False
-                rec.done_by = False
-
 
 class MngVisaChecklistTemplate(models.Model):
     _name = "mng.visa.checklist.template"

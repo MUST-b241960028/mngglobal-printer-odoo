@@ -107,15 +107,3 @@ class MngVisaDashboard(models.TransientModel):
                     ("insurance_due_date", "<=", in_7),
                     ("insurance_due_date", "!=", False),
                 ]}
-
-    @api.model
-    def action_open_dashboard(self):
-        rec = self.create({})
-        return {
-            "type": "ir.actions.act_window",
-            "res_model": "mng.visa.dashboard",
-            "res_id": rec.id,
-            "view_mode": "form",
-            "target": "main",
-            "name": "CEO Dashboard",
-        }
