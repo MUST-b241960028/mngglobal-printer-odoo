@@ -16,6 +16,7 @@
     "license": "LGPL-3",
     "depends": ["base", "mail", "contacts", "account"],
     "data": [
+        "security/groups.xml",
         "security/ir.model.access.csv",
         "data/program_data.xml",
         "views/visa_lead_views.xml",

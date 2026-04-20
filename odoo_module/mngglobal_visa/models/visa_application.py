@@ -89,8 +89,6 @@ class MngVisaApplication(models.Model):
 
     # ── Finance ──
     total_fee = fields.Monetary(string="Нийт хураамж", currency_field="currency_id")
-    advance_paid = fields.Monetary(
-        string="Урьдчилгаа", currency_field="currency_id")
     remaining_fee = fields.Monetary(
         string="Үлдэгдэл", compute="_compute_remaining",
         currency_field="currency_id", store=True)
@@ -134,12 +132,10 @@ class MngVisaApplication(models.Model):
 
     # ══ Computed ══
 
-    @api.depends("total_fee", "advance_paid", "payment_ids.amount",
-                 "payment_ids.state")
+    @api.depends("total_fee", "payment_ids.amount", "payment_ids.state")
     def _compute_remaining(self):
         for rec in self:
-            paid = rec.advance_paid + sum(
-                p.amount for p in rec.payment_ids if p.state == "paid")
+            paid = sum(p.amount for p in rec.payment_ids if p.state == "paid")
             rec.remaining_fee = rec.total_fee - paid
 
     @api.depends("remaining_fee", "total_fee")

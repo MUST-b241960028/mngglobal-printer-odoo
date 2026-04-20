@@ -20,19 +20,19 @@ class MngVisaLead(models.Model):
         ("other", "Бусад"),
     ], string="Эх сурвалж", default="chatbot", tracking=True)
     interest = fields.Selection([
-        ("ph_adult", "🇵🇭 Филиппин Насанд хүрэгч"),
-        ("ph_kids", "🇵🇭 Филиппин Хүүхэд"),
-        ("jp_student", "🇯🇵 Япон Оюутан"),
-        ("jp_worker", "🇯🇵 Япон Ажилтан"),
-        ("kr", "🇰🇷 Солонгос"),
+        ("ph_adult", "Филиппин Насанд хүрэгч"),
+        ("ph_kids", "Филиппин Хүүхэд"),
+        ("jp_student", "Япон Оюутан"),
+        ("jp_worker", "Япон Ажилтан"),
+        ("kr", "Солонгос"),
         ("unknown", "Тодорхойгүй"),
     ], string="Сонирхож буй хөтөлбөр", default="unknown", tracking=True)
     state = fields.Selection([
-        ("new", "🆕 Шинэ"),
-        ("contacted", "📞 Холбогдсон"),
-        ("meeting", "💬 Уулзсан"),
-        ("converted", "✅ Үйлчлүүлэгч болсон"),
-        ("lost", "❌ Алдагдсан"),
+        ("new", "Шинэ"),
+        ("contacted", "Холбогдсон"),
+        ("meeting", "Уулзсан"),
+        ("converted", "Үйлчлүүлэгч болсон"),
+        ("lost", "Алдагдсан"),
     ], string="Төлөв", default="new", tracking=True, group_expand="_expand_states")
     assigned_to = fields.Many2one(
         "res.users", string="Хариуцагч", tracking=True)

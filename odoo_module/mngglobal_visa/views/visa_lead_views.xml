@@ -19,7 +19,7 @@
                             <strong>
                                 <field name="name"/>
                             </strong>
-                            <div>📞 <field name="phone"/></div>
+                            <div><field name="phone"/></div>
                             <div><field name="interest"/></div>
                             <div class="o_kanban_bottom_left">
                                 <field name="assigned_to" widget="many2one_avatar_user"/>
@@ -60,7 +60,7 @@
             <form>
                 <header>
                     <button name="action_convert_to_application"
-                            string="✅ Зуучлал эхлүүлэх"
+                            string="Зуучлал эхлүүлэх"
                             type="object" class="oe_highlight"
                             invisible="state == 'converted'"/>
                     <field name="state" widget="statusbar"
@@ -95,7 +95,7 @@
 
     <!-- ══ Lead Action ══ -->
     <record id="mng_visa_lead_action" model="ir.actions.act_window">
-        <field name="name">📞 Leads</field>
+        <field name="name">Leads</field>
         <field name="res_model">mng.visa.lead</field>
         <field name="view_mode">kanban,list,form</field>
         <field name="help" type="html">

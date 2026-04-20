@@ -12,14 +12,10 @@ class MngVisaPayment(models.Model):
     name = fields.Char(
         string="Тайлбар", required=True,
         help="Жишээ: '30% урьдчилгаа', 'Сургуулийн хураамж'")
-    amount = fields.Float(string="Дүн", required=True)
-    currency = fields.Selection([
-        ("MNT", "₮ Төгрөг"),
-        ("USD", "$ Доллар"),
-        ("JPY", "¥ Иен"),
-        ("KRW", "₩ Вон"),
-        ("PHP", "₱ Песо"),
-    ], string="Валют", default="MNT", required=True)
+    amount = fields.Monetary(string="Дүн", required=True, currency_field="currency_id")
+    currency_id = fields.Many2one(
+        "res.currency", string="Валют",
+        related="application_id.currency_id", store=True, readonly=False)
     date_due = fields.Date(string="Төлөх хугацаа")
     date_paid = fields.Date(string="Төлсөн огноо")
     state = fields.Selection([
@@ -28,8 +24,7 @@ class MngVisaPayment(models.Model):
         ("overdue", "Хугацаа хэтэрсэн"),
     ], string="Төлөв", default="pending", compute="_compute_state", store=True)
     payment_method = fields.Selection([
-        ("cash_mnt", "Бэлэн (₮)"),
-        ("cash_usd", "Бэлэн ($)"),
+        ("cash", "Бэлэн мөнгө"),
         ("transfer", "Шилжүүлэг"),
         ("card", "Карт"),
     ], string="Төлбөрийн хэлбэр")
