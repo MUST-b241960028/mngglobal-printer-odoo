@@ -61,16 +61,19 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
+            set -e
             echo "Updating MNG modules..."
             ADDON_PATH="${{ secrets.ODOO_ADDON_PATH }}"
 
-            # Backup and remove old modules
             for MODULE in mngglobal_printer mngglobal_visa; do
               MODULE_DIR="$ADDON_PATH/$MODULE"
               if [ -d "$MODULE_DIR" ]; then
                 cp -r "$MODULE_DIR" "${MODULE_DIR}_backup_$(date +%Y%m%d_%H%M%S)"
               fi
               rm -rf "$MODULE_DIR"
+
+              # Retain only the 3 newest backups per module
+              ls -1dt "${MODULE_DIR}_backup_"* 2>/dev/null | tail -n +4 | xargs -r rm -rf
             done
 
       - name: Copy module files to VPS
@@ -90,24 +93,31 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
+            set -o pipefail
             echo "Stopping Odoo..."
             sudo systemctl stop odoo19
 
             echo "Upgrading MNG modules..."
+            UPGRADE_LOG=$(mktemp)
             sudo -u odoo19 /opt/odoo19/odoo19-venv/bin/python3 /opt/odoo19/odoo19/odoo-bin \
               -c /etc/odoo19.conf \
               -d ${{ secrets.ODOO_DB }} \
-              -u mngglobal_printer -u mngglobal_visa \
-              --stop-after-init 2>&1 | tail -20
+              -u mngglobal_printer,mngglobal_visa \
+              --stop-after-init > "$UPGRADE_LOG" 2>&1
             UPGRADE_EXIT=$?
 
             echo "Starting Odoo..."
             sudo systemctl start odoo19
 
             if [ $UPGRADE_EXIT -ne 0 ]; then
-              echo "WARNING: upgrade step exited with code $UPGRADE_EXIT — check logs"
+              echo "=========== UPGRADE FAILED (exit=$UPGRADE_EXIT) ==========="
+              tail -80 "$UPGRADE_LOG"
+              rm -f "$UPGRADE_LOG"
               exit $UPGRADE_EXIT
             fi
+            echo "--- Upgrade tail ---"
+            tail -20 "$UPGRADE_LOG"
+            rm -f "$UPGRADE_LOG"
             echo "Deploy complete!"
 
   # ══════════════════════════════════════════════════════════
