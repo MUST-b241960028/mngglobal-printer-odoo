@@ -23,12 +23,10 @@ class MngPrinterDevice(models.Model):
     last_seen = fields.Datetime(string="Сүүлд холбогдсон", readonly=True)
     port = fields.Char(string="Порт")
 
-    _constraints = [
-        models.Constraint(
-            "unique(name, client_name)",
-            "Энэ компьютерт ижил нэртэй принтер бүртгэгдсэн байна!",
-        ),
-    ]
+    _unique_printer_per_client = models.Constraint(
+        "unique(name, client_name)",
+        "Энэ компьютерт ижил нэртэй принтер бүртгэгдсэн байна!",
+    )
 
     @api.depends("name", "client_name", "is_default")
     def _compute_display_name(self):
