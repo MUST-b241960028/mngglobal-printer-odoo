@@ -83,5 +83,12 @@
               parent="mng_visa_config_menu"
               sequence="10"/>
 
+    <menuitem id="mng_visa_fee_tmpl_menu"
+              name="Төлбөрийн загвар"
+              action="mng_visa_fee_tmpl_action"
+              parent="mng_visa_config_menu"
+              sequence="20"
+              groups="mngglobal_visa.group_visa_finance"/>
+
 </odoo>
 

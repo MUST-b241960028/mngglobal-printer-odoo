@@ -1,0 +1,613 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <!-- FEE TEMPLATES                                              -->
+        <!-- ══════════════════════════════════════════════════════════ -->
+
+        <!-- Philippines Adult -->
+        <record id="fee_ph_adult_01" model="mng.visa.fee.template">
+            <field name="program_type_id" ref="prog_ph_adult"/>
+            <field name="name">30% урьдчилгаа (гэрээний үед)</field>
+            <field name="sequence">10</field>
+            <field name="fee_type">percentage</field>
+            <field name="percentage">30</field>
+            <field name="payment_method">transfer</field>
+        </record>
+        <record id="fee_ph_adult_02" model="mng.visa.fee.template">
+            <field name="program_type_id" ref="prog_ph_adult"/>
+            <field name="name">70% үлдэгдэл (сургуульд очсоны дараа, $-аар)</field>
+            <field name="sequence">20</field>
+            <field name="fee_type">percentage</field>
+            <field name="percentage">70</field>
+            <field name="payment_method">cash</field>
+        </record>
+
+        <!-- Philippines Kids -->
+        <record id="fee_ph_kids_01" model="mng.visa.fee.template">
+            <field name="program_type_id" ref="prog_ph_kids"/>
+            <field name="name">30% урьдчилгаа = 690$ бэлэн долларaar</field>
+            <field name="sequence">10</field>
+            <field name="fee_type">fixed</field>
+            <field name="fixed_amount">690</field>
+            <field name="currency_id" ref="base.USD"/>
+            <field name="payment_method">cash</field>
+        </record>
+        <record id="fee_ph_kids_02" model="mng.visa.fee.template">
+            <field name="program_type_id" ref="prog_ph_kids"/>
+            <field name="name">70% үлдэгдэл</field>
+            <field name="sequence">20</field>
+            <field name="fee_type">percentage</field>
+            <field name="percentage">70</field>
+            <field name="payment_method">transfer</field>
+        </record>
+
+        <!-- Japan Student -->
+        <record id="fee_jp_student_01" model="mng.visa.fee.template">
+            <field name="program_type_id" ref="prog_jp_student"/>
+            <field name="name">Орчуулгын хураамж (гэрээний үед)</field>
+            <field name="sequence">10</field>
+            <field name="fee_type">fixed</field>
+            <field name="fixed_amount">600000</field>
+            <field name="payment_method">transfer</field>
+        </record>
+        <record id="fee_jp_student_02" model="mng.visa.fee.template">
+            <field name="program_type_id" ref="prog_jp_student"/>
+            <field name="name">Сургуулийн бүртгэлийн хураамж (иен-ээр)</field>
+            <field name="sequence">20</field>
+            <field name="fee_type">fixed</field>
+            <field name="fixed_amount">25000</field>
+            <field name="currency_id" ref="base.JPY"/>
+            <field name="payment_method">transfer</field>
+        </record>
+        <record id="fee_jp_student_03" model="mng.visa.fee.template">
+            <field name="program_type_id" ref="prog_jp_student"/>
+            <field name="name">Сургалтын төлбөр (шар хуудас гарсны дараа)</field>
+            <field name="sequence">30</field>
+            <field name="fee_type">percentage</field>
+            <field name="percentage">100</field>
+            <field name="payment_method">transfer</field>
+        </record>
+
+        <!-- Japan Worker -->
+        <record id="fee_jp_worker_01" model="mng.visa.fee.template">
+            <field name="program_type_id" ref="prog_jp_worker"/>
+            <field name="name">Урьдчилгаа (тэнцсэний дараа)</field>
+            <field name="sequence">10</field>
+            <field name="fee_type">percentage</field>
+            <field name="percentage">30</field>
+            <field name="payment_method">transfer</field>
+        </record>
+        <record id="fee_jp_worker_02" model="mng.visa.fee.template">
+            <field name="program_type_id" ref="prog_jp_worker"/>
+            <field name="name">Үлдэгдэл 3,000,000 (шар хуудас гарсны дараа)</field>
+            <field name="sequence">20</field>
+            <field name="fee_type">fixed</field>
+            <field name="fixed_amount">3000000</field>
+            <field name="payment_method">transfer</field>
+        </record>
+
+        <!-- Korea -->
+        <record id="fee_kr_01" model="mng.visa.fee.template">
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="name">Урьдчилгаа 400,000 (гэрээний үед)</field>
+            <field name="sequence">10</field>
+            <field name="fee_type">fixed</field>
+            <field name="fixed_amount">400000</field>
+            <field name="payment_method">transfer</field>
+        </record>
+        <record id="fee_kr_02" model="mng.visa.fee.template">
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="name">Сургалтын төлбөр (вон-оор, 5 ажлын өдөрт)</field>
+            <field name="sequence">20</field>
+            <field name="fee_type">percentage</field>
+            <field name="percentage">100</field>
+            <field name="currency_id" ref="base.KRW"/>
+            <field name="payment_method">transfer</field>
+        </record>
+        <record id="fee_kr_03" model="mng.visa.fee.template">
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="name">Үлдэгдэл 800,000 (виз гарсны дараа)</field>
+            <field name="sequence">30</field>
+            <field name="fee_type">fixed</field>
+            <field name="fixed_amount">800000</field>
+            <field name="payment_method">transfer</field>
+        </record>
+
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <!-- CHECKLIST TEMPLATES — Philippines Adult                    -->
+        <!-- ══════════════════════════════════════════════════════════ -->
+
+        <record id="chk_ph_a_01_1" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_ph_adult"/>
+            <field name="stage_id" ref="stage_ph_a_01"/>
+            <field name="name">Chat / утасны холбоо тогтоосон</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="chk_ph_a_01_2" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_ph_adult"/>
+            <field name="stage_id" ref="stage_ph_a_01"/>
+            <field name="name">Ирж уулзаж мэдээлэл авсан</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <record id="chk_ph_a_02_1" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_ph_adult"/>
+            <field name="stage_id" ref="stage_ph_a_02"/>
+            <field name="name">Гэрээ байгуулсан</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="chk_ph_a_02_2" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_ph_adult"/>
+            <field name="stage_id" ref="stage_ph_a_02"/>
+            <field name="name">30% урьдчилгаа төлсөн</field>
+            <field name="sequence">20</field>
+        </record>
+        <record id="chk_ph_a_02_3" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_ph_adult"/>
+            <field name="stage_id" ref="stage_ph_a_02"/>
+            <field name="name">Бэлтгэл жагсаалт, сургуулийн хөтөлбөр өгсөн</field>
+            <field name="sequence">30</field>
+        </record>
+
+        <record id="chk_ph_a_04_1" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_ph_adult"/>
+            <field name="stage_id" ref="stage_ph_a_04"/>
+            <field name="name">Филиппин менежертэй group chat үүсгэсэн</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="chk_ph_a_04_2" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_ph_adult"/>
+            <field name="stage_id" ref="stage_ph_a_04"/>
+            <field name="name">Хил нэвтрэх QR code өгсөн</field>
+            <field name="sequence">20</field>
+        </record>
+        <record id="chk_ph_a_04_3" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_ph_adult"/>
+            <field name="stage_id" ref="stage_ph_a_04"/>
+            <field name="name">Сургуулийн дүрэм өгсөн</field>
+            <field name="sequence">30</field>
+        </record>
+        <record id="chk_ph_a_04_4" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_ph_adult"/>
+            <field name="stage_id" ref="stage_ph_a_04"/>
+            <field name="name">Ерөнхий зааварчилгаа өгсөн</field>
+            <field name="sequence">40</field>
+        </record>
+
+        <record id="chk_ph_a_06_1" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_ph_adult"/>
+            <field name="stage_id" ref="stage_ph_a_06"/>
+            <field name="name">Тийз авсан (өөрөө / компаниар)</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="chk_ph_a_07_1" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_ph_adult"/>
+            <field name="stage_id" ref="stage_ph_a_07"/>
+            <field name="name">Хамтрагч сургуулиас урилга ирсэн</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="chk_ph_a_07_2" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_ph_adult"/>
+            <field name="stage_id" ref="stage_ph_a_07"/>
+            <field name="name">Нэхэмжлэл өгсөн</field>
+            <field name="sequence">20</field>
+        </record>
+        <record id="chk_ph_a_07_3" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_ph_adult"/>
+            <field name="stage_id" ref="stage_ph_a_07"/>
+            <field name="name">Commission receipt авсан</field>
+            <field name="sequence">30</field>
+        </record>
+
+        <record id="chk_ph_a_08_1" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_ph_adult"/>
+            <field name="stage_id" ref="stage_ph_a_08"/>
+            <field name="name">Аяллын даатгал хийлгэсэн (78,800 MNT)</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <!-- CHECKLIST TEMPLATES — Philippines Kids                     -->
+        <!-- ══════════════════════════════════════════════════════════ -->
+
+        <record id="chk_ph_k_01_1" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_ph_kids"/>
+            <field name="stage_id" ref="stage_ph_k_01"/>
+            <field name="name">Chat / утасны холбоо тогтоосон</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="chk_ph_k_01_2" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_ph_kids"/>
+            <field name="stage_id" ref="stage_ph_k_01"/>
+            <field name="name">Ирж уулзаж мэдээлэл авсан</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <record id="chk_ph_k_02_1" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_ph_kids"/>
+            <field name="stage_id" ref="stage_ph_k_02"/>
+            <field name="name">3 талын гэрээ байгуулсан (батлан даагч, компани, багш)</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="chk_ph_k_02_2" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_ph_kids"/>
+            <field name="stage_id" ref="stage_ph_k_02"/>
+            <field name="name">30% = 690$ бэлэн долларaar авсан</field>
+            <field name="sequence">20</field>
+        </record>
+        <record id="chk_ph_k_02_3" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_ph_kids"/>
+            <field name="stage_id" ref="stage_ph_k_02"/>
+            <field name="name">Мөнгөний баримт бэлдсэн</field>
+            <field name="sequence">30</field>
+        </record>
+        <record id="chk_ph_k_02_4" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_ph_kids"/>
+            <field name="stage_id" ref="stage_ph_k_02"/>
+            <field name="name">Хуваарь, бэлтгэл жагсаалт, хүүхдэд зориулсан дүрэм өгсөн</field>
+            <field name="sequence">40</field>
+        </record>
+
+        <record id="chk_ph_k_03_1" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_ph_kids"/>
+            <field name="stage_id" ref="stage_ph_k_03"/>
+            <field name="name">Тийз яаралтай захиалсан (компани заасан өдөртэй тааруулж)</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="chk_ph_k_04_1" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_ph_kids"/>
+            <field name="stage_id" ref="stage_ph_k_04"/>
+            <field name="name">Гадаад паспорт авчирч хуулбарласан</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="chk_ph_k_05_1" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_ph_kids"/>
+            <field name="stage_id" ref="stage_ph_k_05"/>
+            <field name="name">Багшийн иргэний үнэмлэхийн лавлага эцэг эхэд илгээсэн</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="chk_ph_k_05_2" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_ph_kids"/>
+            <field name="stage_id" ref="stage_ph_k_05"/>
+            <field name="name">Нотариатаар итгэмжлэл хийлгэсэн (3 хувь)</field>
+            <field name="sequence">20</field>
+        </record>
+        <record id="chk_ph_k_05_3" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_ph_kids"/>
+            <field name="stage_id" ref="stage_ph_k_05"/>
+            <field name="name">Итгэмжлэл компанид авчирсан (2 хувь компани, 1 хувь эцэг эх)</field>
+            <field name="sequence">30</field>
+        </record>
+
+        <record id="chk_ph_k_06_1" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_ph_kids"/>
+            <field name="stage_id" ref="stage_ph_k_06"/>
+            <field name="name">Цагдаагийн газраас тодорхойлолт авсан</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="chk_ph_k_07_1" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_ph_kids"/>
+            <field name="stage_id" ref="stage_ph_k_07"/>
+            <field name="name">Аяллын даатгал хийлгэсэн (78,800 MNT)</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="chk_ph_k_08_1" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_ph_kids"/>
+            <field name="stage_id" ref="stage_ph_k_08"/>
+            <field name="name">Эцэг эхийн нэгдсэн уулзалт хийсэн</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="chk_ph_k_09_1" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_ph_kids"/>
+            <field name="stage_id" ref="stage_ph_k_09"/>
+            <field name="name">Аав ээжийн иргэний үнэмлэхийн лавлага (Англи хэлээр)</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="chk_ph_k_09_2" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_ph_kids"/>
+            <field name="stage_id" ref="stage_ph_k_09"/>
+            <field name="name">Хүүхдийн төрсний бүртгэлийн лавлага (Англи хэлээр)</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <record id="chk_ph_k_10_1" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_ph_kids"/>
+            <field name="stage_id" ref="stage_ph_k_10"/>
+            <field name="name">Тийз багш биечлэн авсан</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="chk_ph_k_10_2" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_ph_kids"/>
+            <field name="stage_id" ref="stage_ph_k_10"/>
+            <field name="name">QR код бүгдийн утсанд хадгалсан</field>
+            <field name="sequence">20</field>
+        </record>
+        <record id="chk_ph_k_10_3" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_ph_kids"/>
+            <field name="stage_id" ref="stage_ph_k_10"/>
+            <field name="name">MNGGLOBAL логотой подволк хүүхэд бүрт өгсөн</field>
+            <field name="sequence">30</field>
+        </record>
+
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <!-- CHECKLIST TEMPLATES — Japan Student                        -->
+        <!-- ══════════════════════════════════════════════════════════ -->
+
+        <record id="chk_jp_s_01_1" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_jp_student"/>
+            <field name="stage_id" ref="stage_jp_s_01"/>
+            <field name="name">Chat / утасны холбоо тогтоосон</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="chk_jp_s_01_2" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_jp_student"/>
+            <field name="stage_id" ref="stage_jp_s_01"/>
+            <field name="name">Ирж уулзаж мэдээлэл авсан, хот болон сургуулиа сонгосон</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <record id="chk_jp_s_02_1" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_jp_student"/>
+            <field name="stage_id" ref="stage_jp_s_02"/>
+            <field name="name">Гэрээ уншиж танилцсан, гарын үсэг зурсан</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="chk_jp_s_02_2" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_jp_student"/>
+            <field name="stage_id" ref="stage_jp_s_02"/>
+            <field name="name">Орчуулгын хураамж 600,000 MNT төлсөн</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <record id="chk_jp_s_03_1" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_jp_student"/>
+            <field name="stage_id" ref="stage_jp_s_03"/>
+            <field name="name">Хувийн мэдээллийн анкет бөглөсөн</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="chk_jp_s_05_1" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_jp_student"/>
+            <field name="stage_id" ref="stage_jp_s_05"/>
+            <field name="name">150 цагийн Япон хэлний бэлтгэлийн товлосон</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="chk_jp_s_07_1" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_jp_student"/>
+            <field name="stage_id" ref="stage_jp_s_07"/>
+            <field name="name">Сургуулийн бүртгэлийн хураамж төлсөн (20,000-30,000 иен)</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="chk_jp_s_08_1" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_jp_student"/>
+            <field name="stage_id" ref="stage_jp_s_08"/>
+            <field name="name">Эх хувь болон орчуулгатай материал Японд илгээсэн</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="chk_jp_s_12_1" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_jp_student"/>
+            <field name="stage_id" ref="stage_jp_s_12"/>
+            <field name="name">Шар хуудас гарсан</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="chk_jp_s_13_1" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_jp_student"/>
+            <field name="stage_id" ref="stage_jp_s_13"/>
+            <field name="name">Сургалтын төлбөрийн нэхэмжлэл ирсэн</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="chk_jp_s_13_2" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_jp_student"/>
+            <field name="stage_id" ref="stage_jp_s_13"/>
+            <field name="name">Ажлын 5 хоногт сургалтын төлбөр төлсөн</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <!-- CHECKLIST TEMPLATES — Japan Worker                         -->
+        <!-- ══════════════════════════════════════════════════════════ -->
+
+        <record id="chk_jp_w_02_1" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_jp_worker"/>
+            <field name="stage_id" ref="stage_jp_w_02"/>
+            <field name="name">Анкет бөглөсөн (1 хувь цээж зурагтай)</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="chk_jp_w_04_1" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_jp_worker"/>
+            <field name="stage_id" ref="stage_jp_w_04"/>
+            <field name="name">Ярилцлагаас 1 цагийн өмнө ирсэн</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="chk_jp_w_04_2" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_jp_worker"/>
+            <field name="stage_id" ref="stage_jp_w_04"/>
+            <field name="name">Энгэрийн тэмдэг зуулсан</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <record id="chk_jp_w_06_1" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_jp_worker"/>
+            <field name="stage_id" ref="stage_jp_w_06"/>
+            <field name="name">Зуучлалын гэрээ байгуулсан</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="chk_jp_w_06_2" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_jp_worker"/>
+            <field name="stage_id" ref="stage_jp_w_06"/>
+            <field name="name">Урьдчилгаа төлбөрийн нэхэмжлэл өгсөн</field>
+            <field name="sequence">20</field>
+        </record>
+        <record id="chk_jp_w_06_3" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_jp_worker"/>
+            <field name="stage_id" ref="stage_jp_w_06"/>
+            <field name="name">Япон хэлний хичээлийн хуваарь өгсөн</field>
+            <field name="sequence">30</field>
+        </record>
+
+        <record id="chk_jp_w_09_1" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_jp_worker"/>
+            <field name="stage_id" ref="stage_jp_w_09"/>
+            <field name="name">Шар хуудас гарсан</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="chk_jp_w_09_2" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_jp_worker"/>
+            <field name="stage_id" ref="stage_jp_w_09"/>
+            <field name="name">Үлдэгдэл 3,000,000 MNT төлсөн</field>
+            <field name="sequence">20</field>
+        </record>
+        <record id="chk_jp_w_09_3" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_jp_worker"/>
+            <field name="stage_id" ref="stage_jp_w_09"/>
+            <field name="name">Нэг талын тийз авсан (өөрийн мөнгөөр, компани заасан өдрөөр)</field>
+            <field name="sequence">30</field>
+        </record>
+
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <!-- CHECKLIST TEMPLATES — Korea                                -->
+        <!-- ══════════════════════════════════════════════════════════ -->
+
+        <record id="chk_kr_01_1" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="stage_id" ref="stage_kr_01"/>
+            <field name="name">Chat / утасны холбоо тогтоосон</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="chk_kr_02_1" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="stage_id" ref="stage_kr_02"/>
+            <field name="name">Гэрээ байгуулсан</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="chk_kr_02_2" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="stage_id" ref="stage_kr_02"/>
+            <field name="name">Урьдчилгаа 400,000 MNT төлсөн</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <record id="chk_kr_03_1" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="stage_id" ref="stage_kr_03"/>
+            <field name="name">Хувийн мэдээллийн анкет бөглөсөн</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="chk_kr_05_1" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="stage_id" ref="stage_kr_05"/>
+            <field name="name">Орчуулга хийлгэсэн</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="chk_kr_05_2" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="stage_id" ref="stage_kr_05"/>
+            <field name="name">Сургуулийн бүртгэлийн нэхэмжлэл ирсэн</field>
+            <field name="sequence">20</field>
+        </record>
+        <record id="chk_kr_05_3" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="stage_id" ref="stage_kr_05"/>
+            <field name="name">Ажлын 5 хоногт сургалтын төлбөр төлсөн (вон-оор)</field>
+            <field name="sequence">30</field>
+        </record>
+
+        <record id="chk_kr_07_1" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="stage_id" ref="stage_kr_07"/>
+            <field name="name">Apostille хийлгэсэн</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="chk_kr_07_2" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="stage_id" ref="stage_kr_07"/>
+            <field name="name">Бичиг баримт шуудангаар илгээсэн (эх хувь + орчуулга)</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <record id="chk_kr_13_1" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="stage_id" ref="stage_kr_13"/>
+            <field name="name">Эмнэлгийн шинжилгээ өгсөн</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="chk_kr_13_2" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="stage_id" ref="stage_kr_13"/>
+            <field name="name">Эмчийн бичгийг паспорт, цээж зурагтай хамт компанид авчирсан</field>
+            <field name="sequence">20</field>
+        </record>
+        <record id="chk_kr_13_3" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="stage_id" ref="stage_kr_13"/>
+            <field name="name">Үлдэгдэл 800,000 MNT төлсөн</field>
+            <field name="sequence">30</field>
+        </record>
+
+        <record id="chk_kr_14_1" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="stage_id" ref="stage_kr_14"/>
+            <field name="name">Баркодтой цаасан виз компанид ирсэн</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="chk_kr_14_2" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="stage_id" ref="stage_kr_14"/>
+            <field name="name">Сургуулийн аж ахуй эрхлэгчийн гэрчилгээ (6 сар доторх) авсан</field>
+            <field name="sequence">20</field>
+        </record>
+        <record id="chk_kr_14_3" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="stage_id" ref="stage_kr_14"/>
+            <field name="name">Сургуулийн урилга, хичээлийн хуваарь, төлбөр баримт суралцагчид өгсөн</field>
+            <field name="sequence">30</field>
+        </record>
+
+        <record id="chk_kr_15_1" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="stage_id" ref="stage_kr_15"/>
+            <field name="name">Суралцагч виз 7 хоногт батлагаажуулсан</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="chk_kr_15_2" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="stage_id" ref="stage_kr_15"/>
+            <field name="name">Паспорт буцаан авсан</field>
+            <field name="sequence">20</field>
+        </record>
+        <record id="chk_kr_15_3" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="stage_id" ref="stage_kr_15"/>
+            <field name="name">Батлан даагчтай хамт оффист ирж барьцааны гэрээ байгуулсан</field>
+            <field name="sequence">30</field>
+        </record>
+        <record id="chk_kr_15_4" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="stage_id" ref="stage_kr_15"/>
+            <field name="name">Солонгосын утасны дугаар компаниас авсан (үнэгүй)</field>
+            <field name="sequence">40</field>
+        </record>
+        <record id="chk_kr_15_5" model="mng.visa.checklist.template">
+            <field name="program_type_id" ref="prog_kr"/>
+            <field name="stage_id" ref="stage_kr_15"/>
+            <field name="name">Тийз захиалсан (AirTrans, бусад суралцагчидтай хамт)</field>
+            <field name="sequence">50</field>
+        </record>
+
+    </data>
+</odoo>

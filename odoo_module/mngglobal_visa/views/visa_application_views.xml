@@ -86,6 +86,11 @@
         <field name="arch" type="xml">
             <form>
                 <header>
+                    <button name="action_generate_fee_schedule"
+                            string="Төлбөрийн хуваарь үүсгэх"
+                            type="object"
+                            groups="mngglobal_visa.group_visa_finance"
+                            invisible="not program_type_id"/>
                     <button name="action_create_invoice"
                             string="Нэхэмжлэл үүсгэх"
                             type="object" class="oe_highlight"
@@ -108,6 +113,13 @@
                         </h1>
                         <field name="priority" widget="priority"/>
                     </div>
+                    <!-- Insurance warning -->
+                    <div class="alert alert-warning"
+                         invisible="insurance_done or not insurance_due_date">
+                        Анхааруулга: Даатгал хийлгэх эцсийн хугацаа
+                        <field name="insurance_due_date" readonly="1"/> — яаралтай хийлгэнэ үү!
+                    </div>
+
                     <group>
                         <group string="Үйлчлүүлэгч">
                             <field name="partner_id"/>
@@ -178,15 +190,19 @@
                         </page>
                         <page string="Огноонууд">
                             <group>
-                                <group>
+                                <group string="Үе шатны огноонууд">
                                     <field name="date_inquiry"/>
                                     <field name="date_contract"/>
                                     <field name="date_submitted"/>
-                                </group>
-                                <group>
                                     <field name="date_result"/>
                                     <field name="date_departed"/>
                                     <field name="date_done"/>
+                                </group>
+                                <group string="Даатгал">
+                                    <field name="insurance_due_date" readonly="1"/>
+                                    <field name="insurance_done"/>
+                                    <field name="insurance_date"
+                                           invisible="not insurance_done"/>
                                 </group>
                             </group>
                         </page>

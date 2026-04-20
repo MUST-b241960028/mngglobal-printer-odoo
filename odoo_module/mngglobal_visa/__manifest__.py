@@ -19,6 +19,7 @@
         "security/groups.xml",
         "security/ir.model.access.csv",
         "data/program_data.xml",
+        "data/template_data.xml",
         "views/visa_lead_views.xml",
         "views/visa_application_views.xml",
         "views/visa_config_views.xml",

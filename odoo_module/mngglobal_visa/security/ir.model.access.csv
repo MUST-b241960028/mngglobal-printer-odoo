@@ -12,3 +12,5 @@ access_visa_payment_manager,mng.visa.payment manager,model_mng_visa_payment,base
 access_visa_checklist_item_user,mng.visa.checklist.item user,model_mng_visa_checklist_item,base.group_user,1,1,1,1
 access_visa_checklist_template_user,mng.visa.checklist.template user,model_mng_visa_checklist_template,base.group_user,1,0,0,0
 access_visa_checklist_template_manager,mng.visa.checklist.template manager,model_mng_visa_checklist_template,base.group_system,1,1,1,1
+access_visa_fee_template_user,mng.visa.fee.template user,model_mng_visa_fee_template,base.group_user,1,0,0,0
+access_visa_fee_template_manager,mng.visa.fee.template manager,model_mng_visa_fee_template,base.group_system,1,1,1,1

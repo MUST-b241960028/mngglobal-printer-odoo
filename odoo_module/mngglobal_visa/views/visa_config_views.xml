@@ -41,6 +41,46 @@
     </record>
 
 
+    <!-- ══ Fee Template List ══ -->
+    <record id="mng_visa_fee_tmpl_list" model="ir.ui.view">
+        <field name="name">mng.visa.fee.template.list</field>
+        <field name="model">mng.visa.fee.template</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="program_type_id"/>
+                <field name="name"/>
+                <field name="fee_type"/>
+                <field name="percentage" invisible="fee_type != 'percentage'"/>
+                <field name="fixed_amount" invisible="fee_type != 'fixed'"/>
+                <field name="currency_id"/>
+                <field name="payment_method"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ══ Fee Template Search ══ -->
+    <record id="mng_visa_fee_tmpl_search" model="ir.ui.view">
+        <field name="name">mng.visa.fee.template.search</field>
+        <field name="model">mng.visa.fee.template</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="program_type_id"/>
+                <field name="name"/>
+                <filter string="Хөтөлбөр" name="group_program"
+                        context="{'group_by': 'program_type_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- ══ Fee Template Action ══ -->
+    <record id="mng_visa_fee_tmpl_action" model="ir.actions.act_window">
+        <field name="name">Төлбөрийн загвар</field>
+        <field name="res_model">mng.visa.fee.template</field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="mng_visa_fee_tmpl_search"/>
+    </record>
+
     <!-- ══ Finance: Application list with payment columns ══ -->
     <record id="mng_visa_app_list_finance" model="ir.ui.view">
         <field name="name">mng.visa.application.list.finance</field>

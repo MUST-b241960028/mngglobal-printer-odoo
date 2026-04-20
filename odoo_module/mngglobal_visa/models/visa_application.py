@@ -115,6 +115,13 @@ class MngVisaApplication(models.Model):
     checklist_progress = fields.Float(
         string="Явц %", compute="_compute_checklist_progress")
 
+    # ── Insurance ──
+    insurance_done = fields.Boolean(string="Даатгал хийсэн", tracking=True)
+    insurance_date = fields.Date(string="Даатгал хийсэн огноо")
+    insurance_due_date = fields.Date(
+        string="Даатгал хийх эцсийн огноо",
+        compute="_compute_insurance_due", store=True)
+
     # ── Dates (auto-set on stage change) ──
     date_inquiry = fields.Date(string="Лавлагаа авсан")
     date_contract = fields.Date(string="Гэрээ хийсэн")
@@ -131,6 +138,15 @@ class MngVisaApplication(models.Model):
     color = fields.Integer(string="Өнгө")
 
     # ══ Computed ══
+
+    @api.depends("departure_date")
+    def _compute_insurance_due(self):
+        from datetime import timedelta
+        for rec in self:
+            if rec.departure_date:
+                rec.insurance_due_date = rec.departure_date - timedelta(days=7)
+            else:
+                rec.insurance_due_date = False
 
     @api.depends("total_fee", "payment_ids.amount", "payment_ids.state")
     def _compute_remaining(self):
@@ -250,4 +266,45 @@ class MngVisaApplication(models.Model):
             "name": "Нэхэмжлэлүүд",
             "view_mode": "list,form",
             "domain": [("id", "in", self.invoice_ids.ids)],
+        }
+
+    def action_generate_fee_schedule(self):
+        """Generate payment records from fee templates for this program."""
+        self.ensure_one()
+        from datetime import timedelta
+        templates = self.env["mng.visa.fee.template"].search([
+            ("program_type_id", "=", self.program_type_id.id),
+        ], order="sequence")
+        if not templates:
+            return {
+                "type": "ir.actions.client",
+                "tag": "display_notification",
+                "params": {
+                    "message": "Энэ хөтөлбөрт тохирох төлбөрийн загвар байхгүй байна.",
+                    "type": "warning",
+                },
+            }
+        created = 0
+        for tmpl in templates:
+            if tmpl.fee_type == "percentage":
+                amount = self.total_fee * tmpl.percentage / 100
+            else:
+                amount = tmpl.fixed_amount
+            due_date = False
+            self.env["mng.visa.payment"].create({
+                "application_id": self.id,
+                "name": tmpl.name,
+                "amount": amount,
+                "currency_id": tmpl.currency_id.id,
+                "payment_method": tmpl.payment_method or False,
+                "date_due": due_date,
+            })
+            created += 1
+        return {
+            "type": "ir.actions.client",
+            "tag": "display_notification",
+            "params": {
+                "message": f"{created} төлбөрийн бичлэг үүслээ.",
+                "type": "success",
+            },
         }
