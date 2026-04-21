@@ -88,3 +88,21 @@ class MngPrinterDevice(models.Model):
         _logger.info("Принтер бүртгэл шинэчлэгдлээ: %s — %d принтер (%s)",
                      client_name, len(result), ", ".join(printer_names))
         return result
+
+    def action_mark_offline(self):
+        """Сонгосон принтерүүдийг офлайн болгох."""
+        self.write({"is_online": False})
+        return True
+
+    @api.model
+    def cron_mark_stale_offline(self):
+        """5 минутаас дээш хугацаанд холбогдоогүй принтерүүдийг офлайн болгох."""
+        from datetime import timedelta
+        cutoff = fields.Datetime.now() - timedelta(minutes=5)
+        stale = self.search([
+            ("is_online", "=", True),
+            ("last_seen", "<", cutoff),
+        ])
+        if stale:
+            _logger.info("Cron: %d принтер офлайн болгогдлоо (5 мин дээш идэвхгүй)", len(stale))
+            stale.write({"is_online": False})

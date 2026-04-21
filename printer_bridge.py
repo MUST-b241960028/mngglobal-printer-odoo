@@ -628,7 +628,17 @@ class BridgeEngine:
         self._emit("status", "polling")
         self._emit("log", f"Polling every {self.poll_interval}s ...")
 
+        poll_count = 0
         while self.running:
+            # Re-register printers every 30 polls (~5 min at 10s interval)
+            if poll_count > 0 and poll_count % 30 == 0:
+                try:
+                    printers = discover_printers()
+                    if printers:
+                        self.odoo.register_printers(printers)
+                except Exception:
+                    pass
+            poll_count += 1
             try:
                 self._check_for_jobs()
             except xmlrpc.client.Fault as e:

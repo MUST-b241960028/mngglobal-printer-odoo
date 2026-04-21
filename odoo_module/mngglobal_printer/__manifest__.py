@@ -20,6 +20,7 @@
     "data": [
         "security/ir.model.access.csv",
         "views/print_queue_views.xml",
+        "data/cron_data.xml",
     ],
     "installable": True,
     "application": True,
