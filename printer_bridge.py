@@ -31,6 +31,13 @@ import socket
 from pathlib import Path
 from datetime import datetime, timedelta
 
+try:
+    import pystray
+    from PIL import Image as PilImage
+    HAS_PYSTRAY = True
+except ImportError:
+    HAS_PYSTRAY = False
+
 # ──────────────────────────────────────────────────────────────────────
 # PyInstaller / Path helpers
 # ──────────────────────────────────────────────────────────────────────
@@ -1290,14 +1297,47 @@ def run_gui(start_minimized=False):
     # Auto-scan printers on startup
     refresh_printers()
 
-    # ── Window close ──
+    # ── System tray icon ──
+    tray_icon_ref = [None]
+
+    def _build_tray_icon():
+        if not HAS_PYSTRAY:
+            return None
+        try:
+            img = PilImage.open(resource_path(ICON_FILE)).resize((64, 64))
+        except Exception:
+            img = PilImage.new("RGBA", (64, 64), (80, 50, 140, 255))
+
+        def _on_show(icon, _item):
+            icon.stop()
+            tray_icon_ref[0] = None
+            root.after(0, _show_from_tray)
+
+        def _on_quit(icon, _item):
+            icon.stop()
+            tray_icon_ref[0] = None
+            if engine_ref[0] and engine_ref[0].running:
+                engine_ref[0].stop()
+            root.after(0, root.destroy)
+
+        menu = pystray.Menu(
+            pystray.MenuItem("MNG Printer Bridge", None, enabled=False),
+            pystray.Menu.SEPARATOR,
+            pystray.MenuItem("Show Window", _on_show, default=True),
+            pystray.MenuItem("Quit", _on_quit),
+        )
+        return pystray.Icon("MNGPrinterBridge", img, "MNG Printer Bridge", menu)
+
     def _minimize_to_tray():
-        """Hide window — it keeps running in the background."""
         root.withdraw()
-        append_log("Minimized to background. Still printing!", "dim")
+        append_log("Minimized to tray. Still printing!", "dim")
+        if HAS_PYSTRAY and tray_icon_ref[0] is None:
+            icon = _build_tray_icon()
+            if icon:
+                tray_icon_ref[0] = icon
+                threading.Thread(target=icon.run, daemon=True).start()
 
     def _show_from_tray():
-        """Restore window from tray."""
         root.deiconify()
         root.lift()
         root.focus_force()
@@ -1305,14 +1345,17 @@ def run_gui(start_minimized=False):
     def on_close():
         is_running = engine_ref[0] and engine_ref[0].running
         if is_running and tray_var.get():
-            # Minimize to tray instead of quitting
             _minimize_to_tray()
         elif is_running:
             if messagebox.askyesno("Quit", "Printer bridge is running.\nStop and exit?"):
+                if tray_icon_ref[0]:
+                    tray_icon_ref[0].stop()
                 engine_ref[0].stop()
                 time.sleep(0.5)
                 root.destroy()
         else:
+            if tray_icon_ref[0]:
+                tray_icon_ref[0].stop()
             root.destroy()
 
     root.protocol("WM_DELETE_WINDOW", on_close)
