@@ -65,7 +65,7 @@ def app_dir():
 # ──────────────────────────────────────────────────────────────────────
 
 APP_NAME = "MNG Printer Bridge"
-APP_VERSION = "1.0.4"
+APP_VERSION = "1.0.5"
 CONFIG_FILE = os.path.join(app_dir(), "config.ini")
 LOG_FILE = os.path.join(app_dir(), "printer_bridge.log")
 ICON_FILE = "icon.png"  # resolved via resource_path()
@@ -310,20 +310,19 @@ def save_config(config_path, odoo_url, database, username, password,
 # Windows Auto-Start
 # ──────────────────────────────────────────────────────────────────────
 
+def _startup_folder():
+    """Return path to Windows user Startup folder."""
+    return os.path.join(os.environ.get("APPDATA", ""),
+                        r"Microsoft\Windows\Start Menu\Programs\Startup")
+
+def _vbs_path():
+    return os.path.join(_startup_folder(), "MNGPrinterBridge.vbs")
+
 def get_autostart_enabled(config_path=None):
-    """Check if this app is set to auto-start with Windows.
-    Falls back to config.ini if registry is unavailable."""
+    """Check autostart state: Startup folder VBScript takes priority, then config.ini."""
     if sys.platform == "win32":
-        try:
-            import winreg
-            key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, AUTOSTART_REG_KEY, 0, winreg.KEY_READ)
-            val, _ = winreg.QueryValueEx(key, AUTOSTART_REG_NAME)
-            winreg.CloseKey(key)
-            log.info(f"Auto-start registry read: {'enabled' if bool(val) else 'disabled'}")
-            return bool(val)
-        except (FileNotFoundError, OSError):
-            pass
-    # Fallback: read from config.ini
+        if os.path.exists(_vbs_path()):
+            return True
     if config_path:
         cfg = load_config(config_path)
         if cfg:
@@ -331,25 +330,25 @@ def get_autostart_enabled(config_path=None):
     return False
 
 def set_autostart_enabled(enable):
-    """Enable or disable auto-start on Windows boot. Returns (success, error_msg)."""
+    """Enable/disable auto-start via Windows Startup folder VBScript. Returns (success, error_msg)."""
     if sys.platform != "win32":
         return True, None
+    vbs = _vbs_path()
     try:
-        import winreg
-        key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, AUTOSTART_REG_KEY, 0,
-                             winreg.KEY_SET_VALUE)
         if enable:
-            exe_path = sys.executable if _is_frozen() else f'python "{os.path.abspath(__file__)}"'
-            winreg.SetValueEx(key, AUTOSTART_REG_NAME, 0, winreg.REG_SZ,
-                              f'"{exe_path}" --minimized')
-            log.info(f"Auto-start enabled: {exe_path}")
+            exe_path = sys.executable if _is_frozen() else os.path.abspath(__file__)
+            vbs_content = (
+                'Set WShell = CreateObject("WScript.Shell")\n'
+                f'WShell.Run Chr(34) & "{exe_path}" & Chr(34) & " --minimized", 0, False\n'
+            )
+            os.makedirs(_startup_folder(), exist_ok=True)
+            with open(vbs, "w", encoding="utf-8") as f:
+                f.write(vbs_content)
+            log.info(f"Auto-start enabled via Startup folder: {vbs}")
         else:
-            try:
-                winreg.DeleteValue(key, AUTOSTART_REG_NAME)
-            except FileNotFoundError:
-                pass
-            log.info("Auto-start disabled")
-        winreg.CloseKey(key)
+            if os.path.exists(vbs):
+                os.remove(vbs)
+            log.info("Auto-start disabled, VBS removed")
         return True, None
     except Exception as e:
         log.error(f"Failed to set auto-start: {e}")
