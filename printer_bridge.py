@@ -271,8 +271,12 @@ def load_config(config_path=CONFIG_FILE):
     return config
 
 def save_config(config_path, odoo_url, database, username, password,
-                sumatra_path, printer_name, poll_interval):
+                sumatra_path, printer_name, poll_interval, autostart=None):
     config = configparser.ConfigParser()
+    # Preserve existing settings not passed in
+    existing = load_config(config_path)
+    if autostart is None and existing:
+        autostart = existing.getboolean("settings", "autostart", fallback=False)
     config["odoo"] = {
         "url": odoo_url, "database": database,
         "username": username, "password": password,
@@ -283,6 +287,7 @@ def save_config(config_path, odoo_url, database, username, password,
     config["settings"] = {
         "poll_interval": str(poll_interval),
         "temp_folder": "temp_prints",
+        "autostart": str(bool(autostart)),
     }
     with open(config_path, "w", encoding="utf-8") as f:
         config.write(f)
@@ -292,33 +297,39 @@ def save_config(config_path, odoo_url, database, username, password,
 # Windows Auto-Start
 # ──────────────────────────────────────────────────────────────────────
 
-def get_autostart_enabled():
-    """Check if this app is set to auto-start with Windows."""
-    if sys.platform != "win32":
-        return False
-    try:
-        import winreg
-        key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, AUTOSTART_REG_KEY, 0, winreg.KEY_READ)
-        val, _ = winreg.QueryValueEx(key, AUTOSTART_REG_NAME)
-        winreg.CloseKey(key)
-        return bool(val)
-    except (FileNotFoundError, OSError):
-        return False
+def get_autostart_enabled(config_path=None):
+    """Check if this app is set to auto-start with Windows.
+    Falls back to config.ini if registry is unavailable."""
+    if sys.platform == "win32":
+        try:
+            import winreg
+            key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, AUTOSTART_REG_KEY, 0, winreg.KEY_READ)
+            val, _ = winreg.QueryValueEx(key, AUTOSTART_REG_NAME)
+            winreg.CloseKey(key)
+            log.info(f"Auto-start registry read: {'enabled' if bool(val) else 'disabled'}")
+            return bool(val)
+        except (FileNotFoundError, OSError):
+            pass
+    # Fallback: read from config.ini
+    if config_path:
+        cfg = load_config(config_path)
+        if cfg:
+            return cfg.getboolean("settings", "autostart", fallback=False)
+    return False
 
 def set_autostart_enabled(enable):
-    """Enable or disable auto-start on Windows boot."""
+    """Enable or disable auto-start on Windows boot. Returns (success, error_msg)."""
     if sys.platform != "win32":
-        return
+        return True, None
     try:
         import winreg
         key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, AUTOSTART_REG_KEY, 0,
                              winreg.KEY_SET_VALUE)
         if enable:
             exe_path = sys.executable if _is_frozen() else f'python "{os.path.abspath(__file__)}"'
-            # Add --minimized flag so it starts in tray
             winreg.SetValueEx(key, AUTOSTART_REG_NAME, 0, winreg.REG_SZ,
                               f'"{exe_path}" --minimized')
-            log.info("Auto-start enabled")
+            log.info(f"Auto-start enabled: {exe_path}")
         else:
             try:
                 winreg.DeleteValue(key, AUTOSTART_REG_NAME)
@@ -326,8 +337,10 @@ def set_autostart_enabled(enable):
                 pass
             log.info("Auto-start disabled")
         winreg.CloseKey(key)
+        return True, None
     except Exception as e:
         log.error(f"Failed to set auto-start: {e}")
+        return False, str(e)
 
 # ──────────────────────────────────────────────────────────────────────
 # Odoo XML-RPC Connection
@@ -978,13 +991,36 @@ def run_gui(start_minimized=False):
     make_card_title(svc_inner, "⚙️", "Background Service")
 
     # ── Auto-start on Windows boot ──
-    autostart_var = tk.BooleanVar(value=get_autostart_enabled())
+    autostart_var = tk.BooleanVar(value=get_autostart_enabled(config_path))
+
+    def _toggle_autostart():
+        enabled = autostart_var.get()
+        ok, err = set_autostart_enabled(enabled)
+        if not ok:
+            append_log(f"Auto-start registry write failed: {err}", "error")
+            from tkinter import messagebox
+            messagebox.showerror(
+                "Auto-Start Error",
+                f"Could not write to Windows registry:\n{err}\n\n"
+                "The setting was saved to config.ini as a fallback."
+            )
+        # Always persist to config.ini so checkbox state survives
+        try:
+            poll = int(poll_var.get())
+        except (ValueError, NameError):
+            poll = 10
+        save_config(config_path,
+                    url_var.get(), db_var.get(), user_var.get(), pass_var.get(),
+                    sumatra_var.get(), _get_printer_name(), poll,
+                    autostart=enabled)
+        append_log(f"Auto-start {'enabled' if enabled else 'disabled'} ✓", "success")
+
     autostart_chk = tk.Checkbutton(
         svc_inner, text="Start automatically when PC turns on",
         variable=autostart_var, bg=COLOR_BG_CARD, fg=COLOR_TEXT,
         activebackground=COLOR_BG_CARD, activeforeground=COLOR_TEXT,
         selectcolor=COLOR_INPUT_BG, font=("Segoe UI", 10),
-        command=lambda: set_autostart_enabled(autostart_var.get()),
+        command=_toggle_autostart,
     )
     autostart_chk.grid(row=1, column=0, columnspan=4, sticky="w", pady=3)
 
@@ -1045,7 +1081,8 @@ def run_gui(start_minimized=False):
         pname = _get_printer_name()
         save_config(config_path,
                      url_var.get(), db_var.get(), user_var.get(), pass_var.get(),
-                     sumatra_var.get(), pname, poll)
+                     sumatra_var.get(), pname, poll,
+                     autostart=autostart_var.get())
         append_log("Settings saved ✓", "success")
 
     def on_test():
