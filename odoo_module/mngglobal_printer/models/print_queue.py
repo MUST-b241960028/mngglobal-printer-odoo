@@ -59,13 +59,15 @@ class MngPrintQueue(models.Model):
             "state": "printed",
             "printed_at": fields.Datetime.now(),
         })
+        return True
 
     def action_mark_failed(self, error=""):
         """Хэвлэх амжилтгүй болсон тохиолдолд клиент дуудна."""
         self.write({
             "state": "failed",
-            "error_message": error,
+            "error_message": error or "",
         })
+        return True
 
     def action_cancel(self):
         """Хүлээгдэж буй хэвлэх ажлыг цуцлах."""

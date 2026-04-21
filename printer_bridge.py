@@ -65,7 +65,7 @@ def app_dir():
 # ──────────────────────────────────────────────────────────────────────
 
 APP_NAME = "MNG Printer Bridge"
-APP_VERSION = "1.0.2"
+APP_VERSION = "1.0.4"
 CONFIG_FILE = os.path.join(app_dir(), "config.ini")
 LOG_FILE = os.path.join(app_dir(), "printer_bridge.log")
 ICON_FILE = "icon.png"  # resolved via resource_path()
@@ -278,12 +278,17 @@ def load_config(config_path=CONFIG_FILE):
     return config
 
 def save_config(config_path, odoo_url, database, username, password,
-                sumatra_path, printer_name, poll_interval, autostart=None):
+                sumatra_path, printer_name, poll_interval,
+                autostart=None, minimize_to_tray=None):
     config = configparser.ConfigParser()
     # Preserve existing settings not passed in
     existing = load_config(config_path)
     if autostart is None and existing:
         autostart = existing.getboolean("settings", "autostart", fallback=False)
+    if minimize_to_tray is None and existing:
+        minimize_to_tray = existing.getboolean("settings", "minimize_to_tray", fallback=True)
+    if minimize_to_tray is None:
+        minimize_to_tray = True
     config["odoo"] = {
         "url": odoo_url, "database": database,
         "username": username, "password": password,
@@ -295,6 +300,7 @@ def save_config(config_path, odoo_url, database, username, password,
         "poll_interval": str(poll_interval),
         "temp_folder": "temp_prints",
         "autostart": str(bool(autostart)),
+        "minimize_to_tray": str(bool(minimize_to_tray)),
     }
     with open(config_path, "w", encoding="utf-8") as f:
         config.write(f)
@@ -417,9 +423,7 @@ class OdooConnection:
     def mark_printed(self, job_id):
         """Mark a job as printed."""
         try:
-            now = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
-            self.execute("mng.print.queue", "write", [job_id],
-                         vals={"state": "printed", "printed_at": now})
+            self.execute("mng.print.queue", "action_mark_printed", [job_id])
             return True
         except Exception as e:
             log.error(f"Failed to mark job {job_id} as printed: {e}")
@@ -428,8 +432,8 @@ class OdooConnection:
     def mark_failed(self, job_id, error=""):
         """Mark a job as failed."""
         try:
-            self.execute("mng.print.queue", "write", [job_id],
-                         vals={"state": "failed", "error_message": error})
+            self.execute("mng.print.queue", "action_mark_failed",
+                         [job_id], error=error or "")
         except Exception as e:
             log.error(f"Failed to mark job {job_id}: {e}")
 
@@ -1019,7 +1023,7 @@ def run_gui(start_minimized=False):
         save_config(config_path,
                     url_var.get(), db_var.get(), user_var.get(), pass_var.get(),
                     sumatra_var.get(), _get_printer_name(), poll,
-                    autostart=enabled)
+                    autostart=enabled, minimize_to_tray=tray_var.get())
         append_log(f"Auto-start {'enabled' if enabled else 'disabled'} ✓", "success")
 
     autostart_chk = tk.Checkbutton(
@@ -1032,7 +1036,10 @@ def run_gui(start_minimized=False):
     autostart_chk.grid(row=1, column=0, columnspan=4, sticky="w", pady=3)
 
     # ── Minimize to tray on close ──
-    tray_var = tk.BooleanVar(value=True)
+    _tray_default = True
+    if config:
+        _tray_default = config.getboolean("settings", "minimize_to_tray", fallback=True)
+    tray_var = tk.BooleanVar(value=_tray_default)
     tray_chk = tk.Checkbutton(
         svc_inner, text="Minimize to system tray when window is closed",
         variable=tray_var, bg=COLOR_BG_CARD, fg=COLOR_TEXT,
@@ -1089,7 +1096,8 @@ def run_gui(start_minimized=False):
         save_config(config_path,
                      url_var.get(), db_var.get(), user_var.get(), pass_var.get(),
                      sumatra_var.get(), pname, poll,
-                     autostart=autostart_var.get())
+                     autostart=autostart_var.get(),
+                     minimize_to_tray=tray_var.get())
         append_log("Settings saved ✓", "success")
 
     def on_test():
@@ -1369,8 +1377,16 @@ def run_gui(start_minimized=False):
 
     # ── Auto-start if launched with --minimized (e.g. on boot) ──
     if start_minimized and config:
-        # Auto-fill is already done. Auto-start printing.
-        root.after(1500, lambda: (on_start(), _minimize_to_tray()))
+        # Hide window immediately so it doesn't flash on screen at boot.
+        root.withdraw()
+        # Build tray icon now so it's visible right away.
+        if HAS_PYSTRAY and tray_icon_ref[0] is None:
+            _tray = _build_tray_icon()
+            if _tray:
+                tray_icon_ref[0] = _tray
+                threading.Thread(target=_tray.run, daemon=True).start()
+        # Kick off printing after UI is fully initialized.
+        root.after(1500, on_start)
 
     root.mainloop()
 
