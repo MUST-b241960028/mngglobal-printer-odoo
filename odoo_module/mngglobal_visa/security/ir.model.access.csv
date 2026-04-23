@@ -16,4 +16,4 @@ access_visa_checklist_template_admin,mng.visa.checklist.template admin,model_mng
 access_visa_fee_template_user,mng.visa.fee.template user,model_mng_visa_fee_template,mngglobal_visa.group_visa_user,1,0,0,0
 access_visa_fee_template_admin,mng.visa.fee.template admin,model_mng_visa_fee_template,base.group_system,1,1,1,1
 access_visa_fee_template_mgr,mng.visa.fee.template manager,model_mng_visa_fee_template,mngglobal_visa.group_visa_manager,1,1,1,1
-access_visa_dashboard_user,mng.visa.dashboard user,model_mng_visa_dashboard,base.group_user,1,1,1,1
+access_visa_dashboard_user,mng.visa.dashboard user,model_mng_visa_dashboard,mngglobal_visa.group_visa_manager,1,1,1,1

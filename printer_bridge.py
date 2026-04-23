@@ -65,7 +65,7 @@ def app_dir():
 # ──────────────────────────────────────────────────────────────────────
 
 APP_NAME = "MNG Printer Bridge"
-APP_VERSION = "1.0.5"
+APP_VERSION = "1.1.0"
 CONFIG_FILE = os.path.join(app_dir(), "config.ini")
 LOG_FILE = os.path.join(app_dir(), "printer_bridge.log")
 ICON_FILE = "icon.png"  # resolved via resource_path()
@@ -592,13 +592,30 @@ class BridgeEngine:
     def stop(self):
         self.running = False
 
+    def _connect_with_retry(self, is_reconnect=False):
+        """Connect to Odoo with exponential backoff. Returns True when connected, False if engine stopped."""
+        delays = [5, 10, 30, 60, 120]
+        attempt = 0
+        label = "Re-connecting" if is_reconnect else "Connecting"
+        while self.running:
+            if self.odoo.connect():
+                return True
+            wait = delays[min(attempt, len(delays) - 1)]
+            attempt += 1
+            self._emit("warning", f"{label} to Odoo failed (attempt {attempt}). Retrying in {wait}s...")
+            self._emit("status", "reconnecting")
+            for _ in range(wait * 2):
+                if not self.running:
+                    return False
+                time.sleep(0.5)
+        return False
+
     def _run(self):
         self.start_time = datetime.now()
         self._emit("status", "connecting")
 
-        if not self.odoo.connect():
-            self._emit("error", "Failed to connect to Odoo. Check settings.")
-            self._emit("status", "disconnected")
+        if not self._connect_with_retry():
+            self._emit("status", "stopped")
             self._emit("engine_stopped", None)
             return
 
@@ -628,6 +645,7 @@ class BridgeEngine:
         self._emit("log", f"Polling every {self.poll_interval}s ...")
 
         poll_count = 0
+        consecutive_errors = 0
         while self.running:
             # Re-register printers every 30 polls (~5 min at 10s interval)
             if poll_count > 0 and poll_count % 30 == 0:
@@ -640,13 +658,26 @@ class BridgeEngine:
             poll_count += 1
             try:
                 self._check_for_jobs()
+                consecutive_errors = 0
             except xmlrpc.client.Fault as e:
+                consecutive_errors += 1
                 self._emit("error", f"Odoo API error: {e.faultString}")
             except (ConnectionError, OSError) as e:
+                consecutive_errors += 1
                 self._emit("warning", f"Connection lost: {e}")
                 self._emit("status", "reconnecting")
             except Exception as e:
+                consecutive_errors += 1
                 self._emit("error", f"Error: {e}")
+
+            # After 3 consecutive failures, force a full re-connect
+            if consecutive_errors >= 3:
+                self._emit("warning", "Persistent errors — re-connecting to Odoo...")
+                if not self._connect_with_retry(is_reconnect=True):
+                    break
+                consecutive_errors = 0
+                self._emit("status", "polling")
+                self._emit("log", "Reconnected to Odoo ✓")
 
             for _ in range(self.poll_interval * 2):
                 if not self.running:
@@ -1139,10 +1170,14 @@ def run_gui(start_minimized=False):
     def on_start():
         _save()
         if not url_var.get().strip() or not db_var.get().strip():
-            messagebox.showwarning("Missing Info", "Please fill in the Odoo connection details.")
+            if not start_minimized:
+                messagebox.showwarning("Missing Info", "Please fill in the Odoo connection details.")
+            append_log("Cannot start: Odoo URL / database not configured.", "error")
             return
         if not user_var.get().strip() or not pass_var.get().strip():
-            messagebox.showwarning("Missing Info", "Please enter username and password.")
+            if not start_minimized:
+                messagebox.showwarning("Missing Info", "Please enter username and password.")
+            append_log("Cannot start: username / password not configured.", "error")
             return
 
         try:
@@ -1298,6 +1333,12 @@ def run_gui(start_minimized=False):
                         append_log("No printers found", "warning")
                 elif t == "engine_stopped":
                     on_stop()
+                    if start_minimized:
+                        append_log("Auto-restarting in 30s...", "warning")
+                        def _auto_restart():
+                            if not (engine_ref[0] and engine_ref[0].running):
+                                on_start()
+                        root.after(30000, _auto_restart)
         except queue.Empty:
             pass
 
