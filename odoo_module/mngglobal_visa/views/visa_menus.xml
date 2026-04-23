@@ -17,12 +17,6 @@
               parent="mng_visa_root_menu"
               sequence="10"/>
 
-    <menuitem id="mng_visa_all_menu"
-              name="Бүгд"
-              action="mng_visa_app_action_all"
-              parent="mng_visa_apps_parent"
-              sequence="1"/>
-
     <menuitem id="mng_visa_ph_adult_menu"
               name="Филиппин Насанд хүрэгч"
               action="mng_visa_app_action_ph_adult"
