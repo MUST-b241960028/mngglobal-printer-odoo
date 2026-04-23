@@ -2,11 +2,11 @@
 <odoo>
     <data noupdate="1">
 
-        <!-- All applications for Managers -->
+        <!-- All applications for Managers and Admins -->
         <record id="rule_visa_application_manager" model="ir.rule">
-            <field name="name">Manager: All Applications</field>
+            <field name="name">Manager/Admin: All Applications</field>
             <field name="model_id" ref="model_mng_visa_application"/>
-            <field name="groups" eval="[(4, ref('group_visa_manager'))]"/>
+            <field name="groups" eval="[(4, ref('group_visa_manager')), (4, ref('base.group_system'))]"/>
             <field name="domain_force">[(1, '=', 1)]</field>
         </record>
 
