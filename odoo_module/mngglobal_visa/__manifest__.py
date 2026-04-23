@@ -26,7 +26,11 @@
         "views/visa_dashboard_views.xml",
         "views/visa_menus.xml",
     ],
-    "assets": {},
+    "assets": {
+        "web.assets_backend": [
+            "mngglobal_visa/static/src/css/dashboard.css"
+        ]
+    },
     "application": True,
     "installable": True,
     "auto_install": False,

@@ -1,0 +1,123 @@
+/* Modern Dashboard Styling for MNG Visa */
+
+.o_form_view.o_mng_visa_dashboard {
+    background-color: #f8fafc !important;
+}
+
+.o_form_view.o_mng_visa_dashboard .o_form_sheet {
+    max-width: 1200px !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+}
+
+/* Header Styling */
+.o_dashboard_header {
+    margin-bottom: 24px;
+    padding: 10px 0;
+}
+
+.o_dashboard_title {
+    color: #1e293b;
+    font-weight: 800;
+    font-size: 24px;
+    letter-spacing: -0.5px;
+}
+
+/* Card Styling */
+.mng_visa_card {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.mng_visa_card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.08);
+}
+
+.mng_visa_card_header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #f1f5f9;
+    border-radius: 16px 16px 0 0;
+}
+
+.mng_visa_card_header h5 {
+    margin: 0;
+    font-weight: 700;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Stat Buttons Redesign */
+.o_mng_visa_dashboard .oe_stat_button {
+    border: none !important;
+    background: transparent !important;
+    width: 100% !important;
+    height: auto !important;
+    padding: 12px !important;
+    text-align: left !important;
+    display: flex !important;
+    align-items: center !important;
+    opacity: 1 !important;
+}
+
+.o_mng_visa_dashboard .o_stat_info {
+    vertical-align: middle !important;
+}
+
+.o_mng_visa_dashboard .o_stat_value {
+    font-size: 20px !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    display: block !important;
+}
+
+.o_mng_visa_dashboard .o_stat_text {
+    font-size: 11px !important;
+    color: #64748b !important;
+    text-transform: uppercase !important;
+    font-weight: 600 !important;
+}
+
+/* Color Accents */
+.border-indigo { border-left: 5px solid #6366f1 !important; }
+.border-emerald { border-left: 5px solid #10b981 !important; }
+.border-amber { border-left: 5px solid #f59e0b !important; }
+.border-rose { border-left: 5px solid #f43f5e !important; }
+.border-purple { border-left: 5px solid #8b5cf6 !important; }
+
+/* Grid adjustments */
+.mng_stat_grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    width: 100%;
+}
+
+.mng_program_grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+/* Analytics Buttons */
+.mng_analytics_btn {
+    border-radius: 10px !important;
+    padding: 12px 24px !important;
+    font-weight: 600 !important;
+    transition: all 0.2s;
+    border: 1px solid #e2e8f0 !important;
+    background: white !important;
+}
+
+.mng_analytics_btn:hover {
+    background: #f1f5f9 !important;
+    border-color: #cbd5e1 !important;
+    transform: scale(1.02);
+}
