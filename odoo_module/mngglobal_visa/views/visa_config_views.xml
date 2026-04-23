@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- ══ Checklist Template List ══ -->
+    <!-- Checklist Template List -->
     <record id="mng_visa_checklist_tmpl_list" model="ir.ui.view">
         <field name="name">mng.visa.checklist.template.list</field>
         <field name="model">mng.visa.checklist.template</field>
@@ -15,7 +15,7 @@
         </field>
     </record>
 
-    <!-- ══ Checklist Template Search ══ -->
+    <!-- Checklist Template Search -->
     <record id="mng_visa_checklist_tmpl_search" model="ir.ui.view">
         <field name="name">mng.visa.checklist.template.search</field>
         <field name="model">mng.visa.checklist.template</field>
@@ -32,7 +32,7 @@
         </field>
     </record>
 
-    <!-- ══ Checklist Template Action ══ -->
+    <!-- Checklist Template Action -->
     <record id="mng_visa_checklist_tmpl_action" model="ir.actions.act_window">
         <field name="name">Шалгах хуудасны загвар</field>
         <field name="res_model">mng.visa.checklist.template</field>
@@ -41,7 +41,7 @@
     </record>
 
 
-    <!-- ══ Fee Template List ══ -->
+    <!-- Fee Template List -->
     <record id="mng_visa_fee_tmpl_list" model="ir.ui.view">
         <field name="name">mng.visa.fee.template.list</field>
         <field name="model">mng.visa.fee.template</field>
@@ -59,7 +59,7 @@
         </field>
     </record>
 
-    <!-- ══ Fee Template Search ══ -->
+    <!-- Fee Template Search -->
     <record id="mng_visa_fee_tmpl_search" model="ir.ui.view">
         <field name="name">mng.visa.fee.template.search</field>
         <field name="model">mng.visa.fee.template</field>
@@ -73,7 +73,7 @@
         </field>
     </record>
 
-    <!-- ══ Fee Template Action ══ -->
+    <!-- Fee Template Action -->
     <record id="mng_visa_fee_tmpl_action" model="ir.actions.act_window">
         <field name="name">Төлбөрийн загвар</field>
         <field name="res_model">mng.visa.fee.template</field>
@@ -81,7 +81,7 @@
         <field name="search_view_id" ref="mng_visa_fee_tmpl_search"/>
     </record>
 
-    <!-- ══ Finance: Application list with payment columns ══ -->
+    <!-- Finance: Application list with payment columns -->
     <record id="mng_visa_app_list_finance" model="ir.ui.view">
         <field name="name">mng.visa.application.list.finance</field>
         <field name="model">mng.visa.application</field>
@@ -104,7 +104,7 @@
         </field>
     </record>
 
-    <!-- ══ Finance Action ══ -->
+    <!-- Finance Action -->
     <record id="mng_visa_app_action_finance" model="ir.actions.act_window">
         <field name="name">Төлбөрийн тоймлол</field>
         <field name="res_model">mng.visa.application</field>

@@ -3,9 +3,6 @@ access_visa_program_type_user,mng.visa.program.type user,model_mng_visa_program_
 access_visa_program_type_admin,mng.visa.program.type admin,model_mng_visa_program_type,base.group_system,1,1,1,1
 access_visa_stage_user,mng.visa.stage user,model_mng_visa_stage,base.group_user,1,0,0,0
 access_visa_stage_admin,mng.visa.stage admin,model_mng_visa_stage,base.group_system,1,1,1,1
-access_visa_lead_user,mng.visa.lead user,model_mng_visa_lead,base.group_user,1,1,1,0
-access_visa_lead_admin,mng.visa.lead admin,model_mng_visa_lead,base.group_system,1,1,1,1
-access_visa_lead_mgr,mng.visa.lead manager,model_mng_visa_lead,mngglobal_visa.group_visa_manager,1,0,0,0
 access_visa_application_user,mng.visa.application user,model_mng_visa_application,base.group_user,1,1,1,0
 access_visa_application_admin,mng.visa.application admin,model_mng_visa_application,base.group_system,1,1,1,1
 access_visa_application_mgr,mng.visa.application manager,model_mng_visa_application,mngglobal_visa.group_visa_manager,1,0,0,0

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- ══ Application Kanban ══ -->
+    <!-- Application Kanban -->
     <record id="mng_visa_app_kanban" model="ir.ui.view">
         <field name="name">mng.visa.application.kanban</field>
         <field name="model">mng.visa.application</field>
@@ -56,7 +56,7 @@
         </field>
     </record>
 
-    <!-- ══ Application List ══ -->
+    <!-- Application List -->
     <record id="mng_visa_app_list" model="ir.ui.view">
         <field name="name">mng.visa.application.list</field>
         <field name="model">mng.visa.application</field>
@@ -79,7 +79,7 @@
         </field>
     </record>
 
-    <!-- ══ Application Form ══ -->
+    <!-- Application Form -->
     <record id="mng_visa_app_form" model="ir.ui.view">
         <field name="name">mng.visa.application.form</field>
         <field name="model">mng.visa.application</field>
@@ -220,7 +220,7 @@
         </field>
     </record>
 
-    <!-- ══ Application Search ══ -->
+    <!-- Application Search -->
     <record id="mng_visa_app_search" model="ir.ui.view">
         <field name="name">mng.visa.application.search</field>
         <field name="model">mng.visa.application</field>
@@ -262,7 +262,7 @@
         </field>
     </record>
 
-    <!-- ══ Per-program actions ══ -->
+    <!-- Per-program actions -->
     <record id="mng_visa_app_action_all" model="ir.actions.act_window">
         <field name="name">Бүх өргөдлүүд</field>
         <field name="res_model">mng.visa.application</field>

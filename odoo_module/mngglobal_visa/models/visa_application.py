@@ -8,7 +8,7 @@ class MngVisaApplication(models.Model):
     _order = "priority desc, create_date desc"
     _rec_name = "display_name"
 
-    # ── Sequence ──
+    # Sequence
     name = fields.Char(
         string="Дугаар", readonly=True, copy=False, default="New")
 
@@ -33,7 +33,7 @@ class MngVisaApplication(models.Model):
                 rec._populate_checklist_from_template(rec.stage_id)
         return records
 
-    # ── Program & Stage ──
+    # Program & Stage
     program_type_id = fields.Many2one(
         "mng.visa.program.type", string="Хөтөлбөр",
         required=True, tracking=True)
@@ -55,7 +55,7 @@ class MngVisaApplication(models.Model):
     ], string="Kanban төлөв", default="normal")
     active = fields.Boolean(default=True)
 
-    # ── Client (res.partner) ──
+    # Client (res.partner)
     partner_id = fields.Many2one(
         "res.partner", string="Үйлчлүүлэгч",
         required=True, tracking=True)
@@ -67,27 +67,25 @@ class MngVisaApplication(models.Model):
     passport_expiry = fields.Date(string="Паспорт дуусах")
     date_of_birth = fields.Date(string="Төрсөн он")
 
-    # ── Kids program fields ──
+    # Kids program fields
     parent_name = fields.Char(string="Эцэг/эхийн нэр")
     parent_phone = fields.Char(string="Эцэг/эхийн утас")
     teacher_id = fields.Many2one(
         "res.users", string="Хариуцсан багш",
         help="Филиппин хүүхдийн хөтөлбөрийн хариуцсан багш")
 
-    # ── Program details ──
+    # Program details
     school_name = fields.Char(string="Сургуулийн нэр")
     city = fields.Char(string="Хот")
     program_duration = fields.Char(string="Хугацаа")
     departure_date = fields.Date(string="Нисэх огноо", tracking=True)
 
-    # ── Staff ──
+    # Staff
     assigned_to = fields.Many2one(
         "res.users", string="Хариуцагч",
         default=lambda self: self.env.uid, tracking=True)
-    lead_id = fields.Many2one(
-        "mng.visa.lead", string="Lead", readonly=True)
 
-    # ── Finance ──
+    # Finance
     total_fee = fields.Monetary(string="Нийт хураамж", currency_field="currency_id")
     remaining_fee = fields.Monetary(
         string="Үлдэгдэл", compute="_compute_remaining",
@@ -109,23 +107,23 @@ class MngVisaApplication(models.Model):
     invoice_count = fields.Integer(
         compute="_compute_invoice_count")
 
-    # ── Checklist ──
+    # Checklist
     checklist_ids = fields.One2many(
         "mng.visa.checklist.item", "application_id", string="Шалгах хуудас")
     checklist_progress = fields.Float(
         string="Явц %", compute="_compute_checklist_progress")
 
-    # ── Yellow card ──
+    # Yellow card
     date_yellow_card = fields.Date(string="Шар хуудас гарсан огноо", tracking=True)
 
-    # ── Insurance ──
+    # Insurance
     insurance_done = fields.Boolean(string="Даатгал хийсэн", tracking=True)
     insurance_date = fields.Date(string="Даатгал хийсэн огноо")
     insurance_due_date = fields.Date(
         string="Даатгал хийх эцсийн огноо",
         compute="_compute_insurance_due", store=True)
 
-    # ── Dates (auto-set on stage change) ──
+    # Dates (auto-set on stage change)
     date_inquiry = fields.Date(string="Лавлагаа авсан")
     date_contract = fields.Date(string="Гэрээ хийсэн")
     date_submitted = fields.Date(string="Мэдүүлсэн")
@@ -133,14 +131,14 @@ class MngVisaApplication(models.Model):
     date_departed = fields.Date(string="Нисэж явсан")
     date_done = fields.Date(string="Дууссан")
 
-    # ── Notes ──
+    # Notes
     notes = fields.Html(string="Тэмдэглэл")
     rejection_reason = fields.Text(string="Татгалзсан шалтгаан")
 
-    # ── Color for kanban ──
+    # Color for kanban
     color = fields.Integer(string="Өнгө")
 
-    # ══ Computed ══
+    # Computed
 
     @api.depends("departure_date")
     def _compute_insurance_due(self):
@@ -190,7 +188,7 @@ class MngVisaApplication(models.Model):
                 order="sequence")
         return stages.search([], order="sequence")
 
-    # ══ Stage change tracking ══
+    # Stage change tracking
 
     def write(self, vals):
         if "stage_id" in vals:
@@ -239,7 +237,7 @@ class MngVisaApplication(models.Model):
                 order="sequence", limit=1)
             self.stage_id = first
 
-    # ══ Actions ══
+    # Actions
 
     def action_create_invoice(self):
         """Create an invoice for this application."""
