@@ -22,7 +22,7 @@ class MngPrintWizard(models.TransientModel):
         
         # Call the existing rendering logic from the mixin
         report = record._get_print_report()
-        pdf_content, _ = record._render_pdf_for_print(report)
+        pdf_content, pdf_type = record._render_pdf_for_print(report)
         
         doc_name = (
             getattr(record, "name", None)
