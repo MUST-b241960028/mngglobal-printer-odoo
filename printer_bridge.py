@@ -453,7 +453,7 @@ class Printer:
         else:
             self.sumatra_path = _get_bundled_sumatra() or sp
 
-    def print_pdf(self, pdf_data_b64, filename):
+    def print_pdf(self, pdf_data_b64, filename, copies=1):
         try:
             pdf_bytes = base64.b64decode(pdf_data_b64)
         except Exception as e:
@@ -473,7 +473,18 @@ class Printer:
             log.error(f"Failed to save PDF: {e}")
             return False
 
-        success = self._send_to_printer(file_path)
+        success = True
+        num_copies = max(1, copies)
+        for i in range(num_copies):
+            if i > 0:
+                log.info(f"→ Printing copy {i+1} of {num_copies}...")
+            if not self._send_to_printer(file_path):
+                success = False
+                break
+            # Small delay between copies to avoid printer queue congestion
+            if num_copies > 1 and i < num_copies - 1:
+                time.sleep(0.5)
+
         try:
             if os.path.exists(file_path):
                 os.remove(file_path)
@@ -721,13 +732,15 @@ class BridgeEngine:
                 continue
 
             printer = self._get_printer_for_job(job)
+            copies = job.get("copies", 1) or 1
             if printer.printer_name:
-                self._emit("log", f"→ Using printer: {printer.printer_name}")
+                self._emit("log", f"→ Using printer: {printer.printer_name} ({copies} copies)")
 
-            if printer.print_pdf(data, name):
+            if printer.print_pdf(data, name, copies=copies):
                 if self.odoo.mark_printed(job_id):
                     self.jobs_printed += 1
-                    self._emit("success", f"✓ Printed: {name}")
+                    copy_str = f" ({copies} copies)" if copies > 1 else ""
+                    self._emit("success", f"✓ Printed: {name}{copy_str}")
                     self._emit("jobs_count", self.jobs_printed)
                 else:
                     self._emit("warning", f"Printed but status update failed: {name}")
