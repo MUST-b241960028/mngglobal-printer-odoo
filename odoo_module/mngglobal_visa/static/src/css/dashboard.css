@@ -1,123 +1,225 @@
-/* Modern Dashboard Styling for MNG Visa */
+/* Deep Modernization of the Dashboard */
 
+/* Backgrounds & Form layout */
 .o_form_view.o_mng_visa_dashboard {
     background-color: #f8fafc !important;
 }
 
-.o_form_view.o_mng_visa_dashboard .o_form_sheet {
-    max-width: 1200px !important;
-    background-color: transparent !important;
+.o_mng_visa_dashboard .o_form_sheet_bg {
+    background: transparent !important;
+    border: none !important;
+}
+
+.o_mng_visa_dashboard .o_form_sheet {
+    max-width: 1400px !important;
+    background: transparent !important;
     border: none !important;
     box-shadow: none !important;
-    padding: 0 !important;
+    padding: 20px 0 !important;
 }
 
-/* Header Styling */
-.o_dashboard_header {
+/* Base resets for buttons simulating cards */
+button.mng_stat_btn, button.mng_mini_stat, button.mng_analytics_link {
+    outline: none !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Header */
+.mng_dash_header {
     margin-bottom: 24px;
-    padding: 10px 0;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e2e8f0;
 }
-
-.o_dashboard_title {
-    color: #1e293b;
+.mng_dash_title {
+    font-size: 28px;
     font-weight: 800;
-    font-size: 24px;
+    color: #0f172a;
     letter-spacing: -0.5px;
 }
 
-/* Card Styling */
-.mng_visa_card {
-    background: #ffffff;
-    border-radius: 16px;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-    transition: all 0.3s ease;
-    margin-bottom: 20px;
-}
-
-.mng_visa_card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.08);
-}
-
-.mng_visa_card_header {
-    padding: 16px 20px;
-    border-bottom: 1px solid #f1f5f9;
-    border-radius: 16px 16px 0 0;
-}
-
-.mng_visa_card_header h5 {
-    margin: 0;
-    font-weight: 700;
-    font-size: 14px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-/* Stat Buttons Redesign */
-.o_mng_visa_dashboard .oe_stat_button {
-    border: none !important;
-    background: transparent !important;
-    width: 100% !important;
-    height: auto !important;
-    padding: 12px !important;
+/* Big KPIs (Top Row) */
+.mng_stat_btn {
+    display: block;
+    width: 100%;
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 20px !important;
+    padding: 24px !important;
     text-align: left !important;
-    display: flex !important;
-    align-items: center !important;
-    opacity: 1 !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+    cursor: pointer !important;
+}
+.mng_stat_btn:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+    border-color: #cbd5e1 !important;
 }
 
-.o_mng_visa_dashboard .o_stat_info {
-    vertical-align: middle !important;
+.mng_stat_inner {
+    display: flex;
+    align-items: center;
 }
 
-.o_mng_visa_dashboard .o_stat_value {
-    font-size: 20px !important;
-    font-weight: 800 !important;
-    color: #0f172a !important;
+/* Icon Containers */
+.mng_icon_box {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    flex-shrink: 0;
+}
+.bg-indigo-light { background: #e0e7ff; color: #4f46e5; }
+.bg-emerald-light { background: #d1fae5; color: #059669; }
+.bg-rose-light { background: #ffe4e6; color: #e11d48; }
+.bg-amber-light { background: #fef3c7; color: #d97706; }
+.bg-blue-light { background: #dbeafe; color: #2563eb; }
+
+/* Content within KPI Cards */
+.mng_stat_content {
+    margin-left: 20px;
+    overflow: hidden;
+}
+.mng_stat_title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.mng_stat_value {
+    font-size: 32px;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1;
+}
+
+/* Field values inside our custom elements to reset Odoo's styles */
+.mng_stat_value span, .mng_stat_value .o_field_widget {
+    font-size: inherit !important;
+    font-weight: inherit !important;
+    color: inherit !important;
+}
+
+/* Master Section Cards */
+.mng_section_card {
+    background: #ffffff;
+    border-radius: 20px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.mng_section_header {
+    background: #f8fafc;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1e293b;
+    border-radius: 20px 20px 0 0;
+    display: flex;
+    align-items: center;
+}
+.mng_section_header i {
+    margin-right: 12px;
+    font-size: 20px;
+}
+.mng_section_body {
+    padding: 24px;
+    flex-grow: 1;
+}
+
+/* Program Mini Cards */
+.mng_mini_stat {
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 16px !important;
+    padding: 16px !important;
+    text-align: center !important;
+    transition: all 0.2s ease !important;
+    cursor: pointer !important;
+    width: 100% !important;
     display: block !important;
 }
-
-.o_mng_visa_dashboard .o_stat_text {
-    font-size: 11px !important;
-    color: #64748b !important;
-    text-transform: uppercase !important;
-    font-weight: 600 !important;
+.mng_mini_stat:hover {
+    background: #ffffff !important;
+    border-color: #6366f1 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+}
+.mng_mini_icon {
+    font-size: 24px;
+    color: #64748b;
+    margin-bottom: 8px;
+    transition: color 0.2s ease;
+}
+.mng_mini_stat:hover .mng_mini_icon {
+    color: #6366f1;
+}
+.mng_mini_value {
+    font-size: 24px;
+    font-weight: 800;
+    color: #0f172a;
+}
+.mng_mini_title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    margin-top: 4px;
 }
 
-/* Color Accents */
-.border-indigo { border-left: 5px solid #6366f1 !important; }
-.border-emerald { border-left: 5px solid #10b981 !important; }
-.border-amber { border-left: 5px solid #f59e0b !important; }
-.border-rose { border-left: 5px solid #f43f5e !important; }
-.border-purple { border-left: 5px solid #8b5cf6 !important; }
-
-/* Grid adjustments */
-.mng_stat_grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
-    width: 100%;
+/* Finance Text Formatting */
+.mng_finance_amount {
+    font-size: 28px;
+    font-weight: 800;
+    display: block;
+    margin-top: 6px;
 }
-
-.mng_program_grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 12px;
+.mng_finance_amount span {
+    font-weight: 800 !important;
 }
+.text-emerald { color: #059669 !important; }
+.text-rose { color: #e11d48 !important; }
+.text-dark { color: #0f172a !important; }
+.text-purple { color: #8b5cf6 !important; }
 
-/* Analytics Buttons */
-.mng_analytics_btn {
-    border-radius: 10px !important;
-    padding: 12px 24px !important;
-    font-weight: 600 !important;
-    transition: all 0.2s;
+/* Bottom Analytics Links */
+.mng_analytics_link {
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
+    padding: 16px 20px !important;
+    background: #ffffff !important;
     border: 1px solid #e2e8f0 !important;
-    background: white !important;
+    border-radius: 12px !important;
+    color: #1e293b !important;
+    font-weight: 600 !important;
+    font-size: 15px !important;
+    transition: all 0.2s !important;
+    text-align: left !important;
 }
-
-.mng_analytics_btn:hover {
-    background: #f1f5f9 !important;
-    border-color: #cbd5e1 !important;
-    transform: scale(1.02);
+.mng_analytics_link:hover {
+    background: #f8fafc !important;
+    border-color: #94a3b8 !important;
+    transform: translateX(4px) !important;
+}
+.mng_analytics_icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 16px;
+    font-size: 20px;
+    flex-shrink: 0;
 }
