@@ -264,6 +264,85 @@
         </field>
     </record>
 
+    <!-- ═══════════════════════ Graph Views ═══════════════════════ -->
+
+    <!-- Pie: Applications by Program -->
+    <record id="mng_visa_app_graph_program" model="ir.ui.view">
+        <field name="name">mng.visa.application.graph.program</field>
+        <field name="model">mng.visa.application</field>
+        <field name="arch" type="xml">
+            <graph string="Хөтөлбөрийн тойм" type="pie">
+                <field name="program_type_id"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Bar: Worker Workload -->
+    <record id="mng_visa_app_graph_worker" model="ir.ui.view">
+        <field name="name">mng.visa.application.graph.worker</field>
+        <field name="model">mng.visa.application</field>
+        <field name="arch" type="xml">
+            <graph string="Ажилтны ачаалал" type="bar">
+                <field name="assigned_to"/>
+                <field name="program_type_id" type="col"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Bar: Pipeline by Stage -->
+    <record id="mng_visa_app_graph_stage" model="ir.ui.view">
+        <field name="name">mng.visa.application.graph.stage</field>
+        <field name="model">mng.visa.application</field>
+        <field name="arch" type="xml">
+            <graph string="Үе шатны тойм" type="bar" stacked="1">
+                <field name="stage_id"/>
+                <field name="program_type_id" type="col"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Pivot: Full breakdown -->
+    <record id="mng_visa_app_pivot" model="ir.ui.view">
+        <field name="name">mng.visa.application.pivot</field>
+        <field name="model">mng.visa.application</field>
+        <field name="arch" type="xml">
+            <pivot string="Нарийвчилсан тайлан">
+                <field name="assigned_to" type="row"/>
+                <field name="program_type_id" type="col"/>
+                <field name="stage_id" type="row"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- ═══════════════════ Analytics Actions ═══════════════════ -->
+
+    <record id="mng_visa_app_action_chart_program" model="ir.actions.act_window">
+        <field name="name">Хөтөлбөрийн тойм</field>
+        <field name="res_model">mng.visa.application</field>
+        <field name="view_mode">graph,pivot,list</field>
+        <field name="view_id" ref="mng_visa_app_graph_program"/>
+        <field name="domain">[('active', '=', True)]</field>
+        <field name="search_view_id" ref="mng_visa_app_search"/>
+    </record>
+
+    <record id="mng_visa_app_action_chart_worker" model="ir.actions.act_window">
+        <field name="name">Ажилтны ачаалал</field>
+        <field name="res_model">mng.visa.application</field>
+        <field name="view_mode">graph,pivot,list</field>
+        <field name="view_id" ref="mng_visa_app_graph_worker"/>
+        <field name="domain">[('active', '=', True)]</field>
+        <field name="search_view_id" ref="mng_visa_app_search"/>
+    </record>
+
+    <record id="mng_visa_app_action_chart_stage" model="ir.actions.act_window">
+        <field name="name">Үе шатны тойм</field>
+        <field name="res_model">mng.visa.application</field>
+        <field name="view_mode">graph,pivot,list</field>
+        <field name="view_id" ref="mng_visa_app_graph_stage"/>
+        <field name="domain">[('active', '=', True)]</field>
+        <field name="search_view_id" ref="mng_visa_app_search"/>
+    </record>
+
     <!-- Per-program actions -->
     <record id="mng_visa_app_action_all" model="ir.actions.act_window">
         <field name="name">Бүх өргөдлүүд</field>

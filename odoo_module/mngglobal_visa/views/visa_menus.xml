@@ -61,6 +61,30 @@
               sequence="10"
               groups="mngglobal_visa.group_visa_finance,mngglobal_visa.group_visa_manager"/>
 
+    <menuitem id="mng_visa_reports_menu"
+              name="Тайлан"
+              parent="mng_visa_root_menu"
+              sequence="50"
+              groups="mngglobal_visa.group_visa_manager,base.group_system"/>
+
+    <menuitem id="mng_visa_report_program_menu"
+              name="Хөтөлбөрийн тойм"
+              action="mng_visa_app_action_chart_program"
+              parent="mng_visa_reports_menu"
+              sequence="10"/>
+
+    <menuitem id="mng_visa_report_worker_menu"
+              name="Ажилтны ачаалал"
+              action="mng_visa_app_action_chart_worker"
+              parent="mng_visa_reports_menu"
+              sequence="20"/>
+
+    <menuitem id="mng_visa_report_stage_menu"
+              name="Үе шатны тойм"
+              action="mng_visa_app_action_chart_stage"
+              parent="mng_visa_reports_menu"
+              sequence="30"/>
+
     <menuitem id="mng_visa_config_menu"
               name="Тохиргоо"
               parent="mng_visa_root_menu"

@@ -153,6 +153,34 @@
                         </div>
                     </div>
 
+                    <!-- Row 4: Analytics -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card shadow-sm">
+                                <div class="card-header" style="background-color: #6f42c1; color: white;">
+                                    <h5 class="mb-0"><i class="fa fa-bar-chart me-2"/> Тайлан / Шинжилгээ</h5>
+                                </div>
+                                <div class="card-body d-flex flex-wrap gap-3 justify-content-center">
+                                    <button type="action"
+                                            name="%(mngglobal_visa.mng_visa_app_action_chart_program)d"
+                                            class="btn btn-outline-primary">
+                                        <i class="fa fa-pie-chart me-1"/> Хөтөлбөрийн тойм
+                                    </button>
+                                    <button type="action"
+                                            name="%(mngglobal_visa.mng_visa_app_action_chart_worker)d"
+                                            class="btn btn-outline-success">
+                                        <i class="fa fa-users me-1"/> Ажилтны ачаалал
+                                    </button>
+                                    <button type="action"
+                                            name="%(mngglobal_visa.mng_visa_app_action_chart_stage)d"
+                                            class="btn btn-outline-warning">
+                                        <i class="fa fa-tasks me-1"/> Үе шатны тойм
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </sheet>
             </form>
         </field>
