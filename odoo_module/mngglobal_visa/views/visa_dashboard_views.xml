@@ -5,132 +5,161 @@
         <field name="name">mng.visa.dashboard.form</field>
         <field name="model">mng.visa.dashboard</field>
         <field name="arch" type="xml">
-            <form create="false" edit="false" delete="false">
+            <form create="false" edit="false" delete="false" class="o_visa_dashboard">
+                <field name="currency_id" invisible="1"/>
                 <sheet>
-                    <div class="oe_title">
-                        <h1>MNG Global — Удирдлагын хэсэг</h1>
+                    <!-- Title -->
+                    <div class="oe_title mb-4">
+                        <h1>MNG Global — Удирдлагын самбар</h1>
                     </div>
 
-                    <group string="Идэвхтэй pipeline">
-                        <div class="o_stat_buttons">
-                            <button type="object" name="action_open_applications"
-                                    class="oe_stat_button" icon="fa-briefcase">
-                                <div class="o_stat_info">
-                                    <field name="total_active" class="o_stat_value"/>
-                                    <span class="o_stat_text">Нийт идэвхтэй</span>
+                    <!-- Row 1: Pipeline overview -->
+                    <div class="row mb-4">
+                        <div class="col-lg-6">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-header bg-primary text-white">
+                                    <h5 class="mb-0"><i class="fa fa-briefcase me-2"/>Идэвхтэй pipeline</h5>
                                 </div>
-                            </button>
-                            <button type="object" name="action_open_departures"
-                                    class="oe_stat_button" icon="fa-plane">
-                                <div class="o_stat_info">
-                                    <field name="departures_next_30" class="o_stat_value"/>
-                                    <span class="o_stat_text">Нисэх (30 хоног)</span>
+                                <div class="card-body d-flex flex-wrap gap-2 justify-content-center">
+                                    <button type="object" name="action_open_applications"
+                                            class="oe_stat_button" icon="fa-briefcase">
+                                        <div class="o_stat_info">
+                                            <field name="total_active" class="o_stat_value"/>
+                                            <span class="o_stat_text">Нийт идэвхтэй</span>
+                                        </div>
+                                    </button>
+                                    <button type="object" name="action_open_departures"
+                                            class="oe_stat_button" icon="fa-plane">
+                                        <div class="o_stat_info">
+                                            <field name="departures_next_30" class="o_stat_value"/>
+                                            <span class="o_stat_text">Нисэх (30 хоног)</span>
+                                        </div>
+                                    </button>
                                 </div>
-                            </button>
+                            </div>
                         </div>
-                    </group>
-
-                    <group string="Хөтөлбөр тус бүр">
-                        <div class="o_stat_buttons">
-                            <button type="object" name="action_open_ph_adult"
-                                    class="oe_stat_button" icon="fa-user">
-                                <div class="o_stat_info">
-                                    <field name="count_ph_adult" class="o_stat_value"/>
-                                    <span class="o_stat_text">Филиппин Насанд хүрэгч</span>
+                        <div class="col-lg-6">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-header bg-warning">
+                                    <h5 class="mb-0"><i class="fa fa-exclamation-triangle me-2"/>Анхааруулга</h5>
                                 </div>
-                            </button>
-                            <button type="object" name="action_open_ph_kids"
-                                    class="oe_stat_button" icon="fa-child">
-                                <div class="o_stat_info">
-                                    <field name="count_ph_kids" class="o_stat_value"/>
-                                    <span class="o_stat_text">Филиппин Хүүхэд</span>
+                                <div class="card-body d-flex flex-wrap gap-2 justify-content-center">
+                                    <button type="object" name="action_open_overdue"
+                                            class="oe_stat_button" icon="fa-exclamation-triangle"
+                                            groups="mngglobal_visa.group_visa_finance,mngglobal_visa.group_visa_manager">
+                                        <div class="o_stat_info">
+                                            <field name="overdue_payments" class="o_stat_value"/>
+                                            <span class="o_stat_text">Хугацаа хэтэрсэн</span>
+                                        </div>
+                                    </button>
+                                    <button type="object" name="action_open_insurance"
+                                            class="oe_stat_button" icon="fa-shield">
+                                        <div class="o_stat_info">
+                                            <field name="insurance_due_soon" class="o_stat_value"/>
+                                            <span class="o_stat_text">Даатгал (7 хоног)</span>
+                                        </div>
+                                    </button>
                                 </div>
-                            </button>
-                            <button type="object" name="action_open_jp_student"
-                                    class="oe_stat_button" icon="fa-graduation-cap">
-                                <div class="o_stat_info">
-                                    <field name="count_jp_student" class="o_stat_value"/>
-                                    <span class="o_stat_text">Япон Оюутан</span>
-                                </div>
-                            </button>
-                            <button type="object" name="action_open_jp_worker"
-                                    class="oe_stat_button" icon="fa-wrench">
-                                <div class="o_stat_info">
-                                    <field name="count_jp_worker" class="o_stat_value"/>
-                                    <span class="o_stat_text">Япон Ажилтан</span>
-                                </div>
-                            </button>
-                            <button type="object" name="action_open_kr"
-                                    class="oe_stat_button" icon="fa-book">
-                                <div class="o_stat_info">
-                                    <field name="count_kr" class="o_stat_value"/>
-                                    <span class="o_stat_text">Солонгос</span>
-                                </div>
-                            </button>
+                            </div>
                         </div>
-                    </group>
+                    </div>
 
-                    <group string="Санхүү"
-                           groups="mngglobal_visa.group_visa_finance,mngglobal_visa.group_visa_manager">
-                        <div class="o_stat_buttons">
-                            <button type="object" name="action_open_applications"
-                                    class="oe_stat_button" icon="fa-money">
-                                <div class="o_stat_info">
-                                    <field name="total_fees" class="o_stat_value"
-                                           widget="monetary"
-                                           options="{'currency_field': 'currency_id'}"/>
-                                    <span class="o_stat_text">Нийт хураамж</span>
+                    <!-- Row 2: Programs -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card shadow-sm">
+                                <div class="card-header bg-info text-white">
+                                    <h5 class="mb-0"><i class="fa fa-globe me-2"/>Хөтөлбөр тус бүр</h5>
                                 </div>
-                            </button>
-                            <button type="object" name="action_open_applications"
-                                    class="oe_stat_button" icon="fa-check-circle">
-                                <div class="o_stat_info">
-                                    <field name="total_collected" class="o_stat_value"
-                                           widget="monetary"
-                                           options="{'currency_field': 'currency_id'}"/>
-                                    <span class="o_stat_text">Цугласан</span>
+                                <div class="card-body d-flex flex-wrap gap-2 justify-content-center">
+                                    <button type="object" name="action_open_ph_adult"
+                                            class="oe_stat_button" icon="fa-user">
+                                        <div class="o_stat_info">
+                                            <field name="count_ph_adult" class="o_stat_value"/>
+                                            <span class="o_stat_text">PH Насанд хүрэгч</span>
+                                        </div>
+                                    </button>
+                                    <button type="object" name="action_open_ph_kids"
+                                            class="oe_stat_button" icon="fa-child">
+                                        <div class="o_stat_info">
+                                            <field name="count_ph_kids" class="o_stat_value"/>
+                                            <span class="o_stat_text">PH Хүүхэд</span>
+                                        </div>
+                                    </button>
+                                    <button type="object" name="action_open_jp_student"
+                                            class="oe_stat_button" icon="fa-graduation-cap">
+                                        <div class="o_stat_info">
+                                            <field name="count_jp_student" class="o_stat_value"/>
+                                            <span class="o_stat_text">JP Оюутан</span>
+                                        </div>
+                                    </button>
+                                    <button type="object" name="action_open_jp_worker"
+                                            class="oe_stat_button" icon="fa-wrench">
+                                        <div class="o_stat_info">
+                                            <field name="count_jp_worker" class="o_stat_value"/>
+                                            <span class="o_stat_text">JP Ажилтан</span>
+                                        </div>
+                                    </button>
+                                    <button type="object" name="action_open_kr"
+                                            class="oe_stat_button" icon="fa-book">
+                                        <div class="o_stat_info">
+                                            <field name="count_kr" class="o_stat_value"/>
+                                            <span class="o_stat_text">Солонгос</span>
+                                        </div>
+                                    </button>
                                 </div>
-                            </button>
-                            <button type="object" name="action_open_overdue"
-                                    class="oe_stat_button" icon="fa-clock-o">
-                                <div class="o_stat_info">
-                                    <field name="total_outstanding" class="o_stat_value"
-                                           widget="monetary"
-                                           options="{'currency_field': 'currency_id'}"/>
-                                    <span class="o_stat_text">Үлдэгдэл</span>
-                                </div>
-                            </button>
+                            </div>
                         </div>
-                    </group>
+                    </div>
 
-                    <group string="Анхааруулга">
-                        <div class="o_stat_buttons">
-                            <button type="object" name="action_open_overdue"
-                                    class="oe_stat_button" icon="fa-exclamation-triangle"
-                                    groups="mngglobal_visa.group_visa_finance,mngglobal_visa.group_visa_manager">
-                                <div class="o_stat_info">
-                                    <field name="overdue_payments" class="o_stat_value"/>
-                                    <span class="o_stat_text">Хугацаа хэтэрсэн төлбөр</span>
+                    <!-- Row 3: Finance -->
+                    <div class="row"
+                         groups="mngglobal_visa.group_visa_finance,mngglobal_visa.group_visa_manager">
+                        <div class="col-12">
+                            <div class="card shadow-sm">
+                                <div class="card-header bg-success text-white">
+                                    <h5 class="mb-0"><i class="fa fa-money me-2"/>Санхүү</h5>
                                 </div>
-                            </button>
-                            <button type="object" name="action_open_insurance"
-                                    class="oe_stat_button" icon="fa-shield">
-                                <div class="o_stat_info">
-                                    <field name="insurance_due_soon" class="o_stat_value"/>
-                                    <span class="o_stat_text">Даатгал яаралтай (7 хоног)</span>
+                                <div class="card-body d-flex flex-wrap gap-2 justify-content-center">
+                                    <button type="object" name="action_open_applications"
+                                            class="oe_stat_button" icon="fa-money">
+                                        <div class="o_stat_info">
+                                            <field name="total_fees" class="o_stat_value"
+                                                   widget="monetary"
+                                                   options="{'currency_field': 'currency_id'}"/>
+                                            <span class="o_stat_text">Нийт хураамж</span>
+                                        </div>
+                                    </button>
+                                    <button type="object" name="action_open_applications"
+                                            class="oe_stat_button" icon="fa-check-circle">
+                                        <div class="o_stat_info">
+                                            <field name="total_collected" class="o_stat_value"
+                                                   widget="monetary"
+                                                   options="{'currency_field': 'currency_id'}"/>
+                                            <span class="o_stat_text">Цугласан</span>
+                                        </div>
+                                    </button>
+                                    <button type="object" name="action_open_overdue"
+                                            class="oe_stat_button" icon="fa-clock-o">
+                                        <div class="o_stat_info">
+                                            <field name="total_outstanding" class="o_stat_value"
+                                                   widget="monetary"
+                                                   options="{'currency_field': 'currency_id'}"/>
+                                            <span class="o_stat_text">Үлдэгдэл</span>
+                                        </div>
+                                    </button>
                                 </div>
-                            </button>
+                            </div>
                         </div>
-                    </group>
+                    </div>
 
-                    <field name="currency_id" invisible="1"/>
                 </sheet>
             </form>
         </field>
     </record>
 
     <record id="mng_visa_dashboard_action" model="ir.actions.act_window">
-        <field name="name">Dashboard</field>
+        <field name="name">Удирдлагын самбар</field>
         <field name="res_model">mng.visa.dashboard</field>
         <field name="view_mode">form</field>
         <field name="target">main</field>
