@@ -74,18 +74,19 @@ class MngVisaDashboard(models.TransientModel):
             rec.departures_next_30 = len(active_apps.filtered(
                 lambda a: a.departure_date and today <= a.departure_date <= in_30))
 
-    def _open_apps(self, name, domain, ctx=None):
+    def _open_apps(self, name, domain, ctx=None, view_mode="kanban,list,form"):
         return {
             "type": "ir.actions.act_window",
             "name": name,
             "res_model": "mng.visa.application",
-            "view_mode": "kanban,list,form",
+            "view_mode": view_mode,
             "domain": domain,
             "context": ctx or {},
         }
 
     def action_open_applications(self):
-        return self._open_apps("Бүх өргөдлүүд", [("active", "=", True)])
+        return self._open_apps("Бүх өргөдлүүд", [("active", "=", True)],
+                               view_mode="list,form")
 
     def action_open_ph_adult(self):
         return self._open_apps("Филиппин Насанд хүрэгч",
@@ -123,6 +124,7 @@ class MngVisaDashboard(models.TransientModel):
             "Нисэх (30 хоног)",
             [("departure_date", ">=", today), ("departure_date", "<=", in_30),
              ("active", "=", True)],
+            view_mode="list,form",
         )
 
     def action_open_insurance(self):
@@ -133,4 +135,5 @@ class MngVisaDashboard(models.TransientModel):
              ("insurance_due_date", "<=", in_7),
              ("insurance_due_date", "!=", False),
              ("active", "=", True)],
+            view_mode="list,form",
         )
