@@ -76,35 +76,35 @@
                                             class="oe_stat_button" icon="fa-user">
                                         <div class="o_stat_info">
                                             <field name="count_ph_adult" class="o_stat_value"/>
-                                            <span class="o_stat_text">PH Насанд хүрэгч</span>
+                                            <span class="o_stat_text"> PH Насанд хүрэгч</span>
                                         </div>
                                     </button>
                                     <button type="object" name="action_open_ph_kids"
                                             class="oe_stat_button" icon="fa-child">
                                         <div class="o_stat_info">
                                             <field name="count_ph_kids" class="o_stat_value"/>
-                                            <span class="o_stat_text">PH Хүүхэд</span>
+                                            <span class="o_stat_text"> PH Хүүхэд</span>
                                         </div>
                                     </button>
                                     <button type="object" name="action_open_jp_student"
                                             class="oe_stat_button" icon="fa-graduation-cap">
                                         <div class="o_stat_info">
                                             <field name="count_jp_student" class="o_stat_value"/>
-                                            <span class="o_stat_text">JP Оюутан</span>
+                                            <span class="o_stat_text"> JP Оюутан</span>
                                         </div>
                                     </button>
                                     <button type="object" name="action_open_jp_worker"
                                             class="oe_stat_button" icon="fa-wrench">
                                         <div class="o_stat_info">
                                             <field name="count_jp_worker" class="o_stat_value"/>
-                                            <span class="o_stat_text">JP Ажилтан</span>
+                                            <span class="o_stat_text"> JP Ажилтан</span>
                                         </div>
                                     </button>
                                     <button type="object" name="action_open_kr"
                                             class="oe_stat_button" icon="fa-book">
                                         <div class="o_stat_info">
                                             <field name="count_kr" class="o_stat_value"/>
-                                            <span class="o_stat_text">Солонгос</span>
+                                            <span class="o_stat_text"> Солонгос</span>
                                         </div>
                                     </button>
                                 </div>
@@ -118,7 +118,7 @@
                         <div class="col-12">
                             <div class="card shadow-sm">
                                 <div class="card-header bg-success text-white">
-                                    <h5 class="mb-0"><i class="fa fa-money me-2"/>Санхүү</h5>
+                                    <h5 class="mb-0"><i class="fa fa-money me-2"/> Санхүү</h5>
                                 </div>
                                 <div class="card-body d-flex flex-wrap gap-2 justify-content-center">
                                     <button type="object" name="action_open_applications"
@@ -127,7 +127,7 @@
                                             <field name="total_fees" class="o_stat_value"
                                                    widget="monetary"
                                                    options="{'currency_field': 'currency_id'}"/>
-                                            <span class="o_stat_text">Нийт хураамж</span>
+                                            <span class="o_stat_text"> Нийт хураамж</span>
                                         </div>
                                     </button>
                                     <button type="object" name="action_open_applications"
@@ -136,7 +136,7 @@
                                             <field name="total_collected" class="o_stat_value"
                                                    widget="monetary"
                                                    options="{'currency_field': 'currency_id'}"/>
-                                            <span class="o_stat_text">Цугласан</span>
+                                            <span class="o_stat_text"> Цугласан</span>
                                         </div>
                                     </button>
                                     <button type="object" name="action_open_overdue"
@@ -145,7 +145,7 @@
                                             <field name="total_outstanding" class="o_stat_value"
                                                    widget="monetary"
                                                    options="{'currency_field': 'currency_id'}"/>
-                                            <span class="o_stat_text">Үлдэгдэл</span>
+                                            <span class="o_stat_text"> Үлдэгдэл</span>
                                         </div>
                                     </button>
                                 </div>
