@@ -25,14 +25,14 @@
                                             class="oe_stat_button" icon="fa-briefcase">
                                         <div class="o_stat_info">
                                             <field name="total_active" class="o_stat_value"/>
-                                            <span class="o_stat_text">Нийт идэвхтэй</span>
+                                            <span class="o_stat_text"> Нийт идэвхтэй</span>
                                         </div>
                                     </button>
                                     <button type="object" name="action_open_departures"
                                             class="oe_stat_button" icon="fa-plane">
                                         <div class="o_stat_info">
                                             <field name="departures_next_30" class="o_stat_value"/>
-                                            <span class="o_stat_text">Нисэх (30 хоног)</span>
+                                            <span class="o_stat_text"> Нисэх</span>
                                         </div>
                                     </button>
                                 </div>
@@ -49,14 +49,14 @@
                                             groups="mngglobal_visa.group_visa_finance,mngglobal_visa.group_visa_manager">
                                         <div class="o_stat_info">
                                             <field name="overdue_payments" class="o_stat_value"/>
-                                            <span class="o_stat_text">Хугацаа хэтэрсэн</span>
+                                            <span class="o_stat_text"> Хугацаа хэтэрсэн</span>
                                         </div>
                                     </button>
                                     <button type="object" name="action_open_insurance"
                                             class="oe_stat_button" icon="fa-shield">
                                         <div class="o_stat_info">
                                             <field name="insurance_due_soon" class="o_stat_value"/>
-                                            <span class="o_stat_text">Даатгал (7 хоног)</span>
+                                            <span class="o_stat_text"> Даатгал</span>
                                         </div>
                                     </button>
                                 </div>
@@ -145,7 +145,7 @@
                                             <field name="total_outstanding" class="o_stat_value"
                                                    widget="monetary"
                                                    options="{'currency_field': 'currency_id'}"/>
-                                            <span class="o_stat_text"> Үлдэгдэл</span>
+                                            <span class="o_stat_text"> Авлага</span>
                                         </div>
                                     </button>
                                 </div>
