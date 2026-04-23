@@ -6,6 +6,10 @@ class MngVisaDashboard(models.TransientModel):
     _name = "mng.visa.dashboard"
     _description = "MNG Visa Dashboard"
 
+    def _compute_display_name(self):
+        for rec in self:
+            rec.display_name = "Удирдлагын самбар"
+
     # Pipeline counts
     total_active = fields.Integer(compute="_compute_all")
     count_ph_adult = fields.Integer(compute="_compute_all")
