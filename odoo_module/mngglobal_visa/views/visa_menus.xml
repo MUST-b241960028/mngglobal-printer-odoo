@@ -13,7 +13,7 @@
               sequence="1"/>
 
     <menuitem id="mng_visa_apps_parent"
-              name="Өргөдлүүд"
+              name="Хөтөлбөрүүд"
               parent="mng_visa_root_menu"
               sequence="10"/>
 
