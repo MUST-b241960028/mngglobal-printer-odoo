@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mng_print_wizard_view_form" model="ir.ui.view">
+        <field name="name">mng.print.wizard.form</field>
+        <field name="model">mng.print.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Хэвлэх тохиргоо">
+                <group>
+                    <field name="printer_id" options="{'no_create': True, 'no_open': True}"/>
+                    <field name="copies"/>
+                    <field name="res_model" invisible="1"/>
+                    <field name="res_id" invisible="1"/>
+                </group>
+                <footer>
+                    <button name="action_print" string="Хэвлэх" type="object" class="btn-primary"/>
+                    <button string="Цуцлах" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="mng_print_wizard_action" model="ir.actions.act_window">
+        <field name="name">Хэвлэх тохиргоо</field>
+        <field name="res_model">mng.print.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

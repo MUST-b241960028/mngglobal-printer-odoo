@@ -2,3 +2,4 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_mng_print_queue_user,mng.print.queue.user,model_mng_print_queue,base.group_user,1,1,1,1
 access_mng_print_bridge_mixin_user,mng.print.bridge.mixin.user,model_mng_print_bridge_mixin,base.group_user,1,1,1,0
 access_mng_printer_device_user,mng.printer.device.user,model_mng_printer_device,base.group_user,1,1,1,1
+access_mng_print_wizard_user,mng.print.wizard.user,model_mng_print_wizard,base.group_user,1,1,1,1

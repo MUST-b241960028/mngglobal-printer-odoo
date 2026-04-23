@@ -60,7 +60,7 @@ class PrintBridgeMixin(models.AbstractModel):
         ))
 
     def action_print_at_office(self):
-        """PDF үүсгэж хэвлэх дарааллд оруулна. UI товчны үйлдэл."""
+        """PDF үүсгэж хэвлэх тохиргоо (wizard) нээнэ. UI товчны үйлдэл."""
         self.ensure_one()
 
         report = self._get_print_report()
@@ -70,45 +70,15 @@ class PrintBridgeMixin(models.AbstractModel):
                 "Системийн админтай холбогдоно уу."
             ) % self._name)
 
-        try:
-            pdf_content, _ = self._render_pdf_for_print(report)
-        except UserError:
-            raise
-        except Exception as e:
-            _logger.error("PDF үүсгэхэд алдаа: %s/%s: %s",
-                          self._name, self.id, e, exc_info=True)
-            raise UserError(_("PDF үүсгэхэд алдаа гарлаа: %s") % str(e))
-
-        doc_name = (
-            getattr(self, "name", None)
-            or getattr(self, "number", None)
-            or str(self.id)
-        )
-        filename = f"{doc_name}.pdf"
-        filename = "".join(c for c in filename if c.isalnum() or c in "._- ").strip()
-
-        self.env["mng.print.queue"].create({
-            "name": doc_name,
-            "pdf_data": base64.b64encode(pdf_content).decode("utf-8"),
-            "pdf_filename": filename,
-            "source_model": self._name,
-            "source_id": self.id,
-            "state": "pending",
-        })
-
-        _logger.info("Хэвлэх дарааллд орлоо: %s", filename)
-
         return {
-            "type": "ir.actions.client",
-            "tag": "display_notification",
-            "params": {
-                "title": _("Оффисын принтерт илгээлээ"),
-                "message": _(
-                    "'%s' хэвлэх дарааллд орлоо. Хэдхэн секундын дотор оффист хэвлэгдэнэ."
-                ) % doc_name,
-                "type": "success",
-                "sticky": False,
-                "next": {"type": "ir.actions.act_window_close"},
+            "name": _("Хэвлэх тохиргоо"),
+            "type": "ir.actions.act_window",
+            "res_model": "mng.print.wizard",
+            "view_mode": "form",
+            "target": "new",
+            "context": {
+                "default_res_model": self._name,
+                "default_res_id": self.id,
             },
         }
 
