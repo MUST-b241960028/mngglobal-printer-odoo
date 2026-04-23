@@ -1,6 +1,6 @@
 {
     "name": "MNG Виза — Зуучлалын Удирдлага",
-    "version": "1.2.1",
+    "version": "1.2.2",
     "category": "Services",
     "summary": "MNG Global зуучлалын үйл ажиллагааны удирдлагын систем",
     "description": """
@@ -18,6 +18,7 @@
     "data": [
         "security/groups.xml",
         "security/ir.model.access.csv",
+        "security/rules.xml",
         "data/program_data.xml",
         "data/template_data.xml",
         "views/visa_dashboard_views.xml",

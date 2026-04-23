@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- All applications for Managers -->
+        <record id="rule_visa_application_manager" model="ir.rule">
+            <field name="name">Manager: All Applications</field>
+            <field name="model_id" ref="model_mng_visa_application"/>
+            <field name="groups" eval="[(4, ref('group_visa_manager'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <!-- Program-specific Rules -->
+        <record id="rule_visa_application_ph_adult" model="ir.rule">
+            <field name="name">Program: PH Adult</field>
+            <field name="model_id" ref="model_mng_visa_application"/>
+            <field name="groups" eval="[(4, ref('group_visa_ph_adult'))]"/>
+            <field name="domain_force">[('program_type_id.code', '=', 'PH_ADULT')]</field>
+        </record>
+
+        <record id="rule_visa_application_ph_kids" model="ir.rule">
+            <field name="name">Program: PH Kids</field>
+            <field name="model_id" ref="model_mng_visa_application"/>
+            <field name="groups" eval="[(4, ref('group_visa_ph_kids'))]"/>
+            <field name="domain_force">[('program_type_id.code', '=', 'PH_KIDS')]</field>
+        </record>
+
+        <record id="rule_visa_application_jp_student" model="ir.rule">
+            <field name="name">Program: Japan Student</field>
+            <field name="model_id" ref="model_mng_visa_application"/>
+            <field name="groups" eval="[(4, ref('group_visa_jp_student'))]"/>
+            <field name="domain_force">[('program_type_id.code', '=', 'JP_STUDENT')]</field>
+        </record>
+
+        <record id="rule_visa_application_jp_worker" model="ir.rule">
+            <field name="name">Program: Japan Worker</field>
+            <field name="model_id" ref="model_mng_visa_application"/>
+            <field name="groups" eval="[(4, ref('group_visa_jp_worker'))]"/>
+            <field name="domain_force">[('program_type_id.code', '=', 'JP_WORKER')]</field>
+        </record>
+
+        <record id="rule_visa_application_kr" model="ir.rule">
+            <field name="name">Program: Korea</field>
+            <field name="model_id" ref="model_mng_visa_application"/>
+            <field name="groups" eval="[(4, ref('group_visa_kr'))]"/>
+            <field name="domain_force">[('program_type_id.code', '=', 'KR')]</field>
+        </record>
+
+        <!-- General rule to prevent seeing everything if you have NO program group assigned -->
+        <!-- But wait, if we use groups in rules, Odoo only applies them to users in those groups. -->
+        <!-- Users NOT in any of these groups would see NOTHING on this model if there is at least one group-based rule, -->
+        <!-- UNLESS they are base Internal User and have model access. -->
+        <!-- Actually, in Odoo 17+, group-based rules are ORed with each other. -->
+        
+    </data>
+</odoo>
