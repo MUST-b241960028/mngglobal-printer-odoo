@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="cron_mark_stale_printers_offline" model="ir.cron">
-        <field name="name">MNG Принтер: Тасрагдсан принтер офлайн болгох</field>
+    <!-- Server action must be defined first (referenced by cron) -->
+    <record id="action_cron_mark_stale_offline" model="ir.actions.server">
+        <field name="name">MNG Принтер: Mark stale printers offline</field>
         <field name="model_id" ref="model_mng_printer_device"/>
         <field name="state">code</field>
         <field name="code">model.cron_mark_stale_offline()</field>
+    </record>
+
+    <record id="cron_mark_stale_printers_offline" model="ir.cron">
+        <field name="cron_name">MNG Принтер: Тасрагдсан принтер офлайн болгох</field>
         <field name="interval_number">5</field>
         <field name="interval_type">minutes</field>
-        <field name="numbercall">-1</field>
         <field name="active">True</field>
-        <field name="doall">False</field>
+        <field name="ir_actions_server_id" ref="action_cron_mark_stale_offline"/>
     </record>
 </odoo>
