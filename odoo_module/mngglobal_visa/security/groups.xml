@@ -8,53 +8,60 @@
         <field name="sequence">10</field>
     </record>
 
+    <!-- Privilege (New in Odoo 19) -->
+    <record id="privilege_visa_access" model="res.groups.privilege">
+        <field name="name">Visa Access</field>
+        <field name="category_id" ref="module_category_mng_visa"/>
+        <field name="sequence">10</field>
+    </record>
+
     <!-- General Groups -->
     <record id="group_visa_user" model="res.groups">
         <field name="name">Хэрэглэгч (Суурь)</field>
-        <field name="category_id" ref="module_category_mng_visa"/>
+        <field name="privilege_id" ref="privilege_visa_access"/>
         <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
     </record>
 
     <!-- Specific Program Groups -->
     <record id="group_visa_ph_adult" model="res.groups">
         <field name="name">Филиппин Насанд хүрэгч</field>
-        <field name="category_id" ref="module_category_mng_visa"/>
+        <field name="privilege_id" ref="privilege_visa_access"/>
         <field name="implied_ids" eval="[(4, ref('group_visa_user'))]"/>
     </record>
 
     <record id="group_visa_ph_kids" model="res.groups">
         <field name="name">Филиппин Хүүхэд</field>
-        <field name="category_id" ref="module_category_mng_visa"/>
+        <field name="privilege_id" ref="privilege_visa_access"/>
         <field name="implied_ids" eval="[(4, ref('group_visa_user'))]"/>
     </record>
 
     <record id="group_visa_jp_student" model="res.groups">
         <field name="name">Япон Оюутан</field>
-        <field name="category_id" ref="module_category_mng_visa"/>
+        <field name="privilege_id" ref="privilege_visa_access"/>
         <field name="implied_ids" eval="[(4, ref('group_visa_user'))]"/>
     </record>
 
     <record id="group_visa_jp_worker" model="res.groups">
         <field name="name">Япон Ажилтан</field>
-        <field name="category_id" ref="module_category_mng_visa"/>
+        <field name="privilege_id" ref="privilege_visa_access"/>
         <field name="implied_ids" eval="[(4, ref('group_visa_user'))]"/>
     </record>
 
     <record id="group_visa_kr" model="res.groups">
         <field name="name">Солонгос</field>
-        <field name="category_id" ref="module_category_mng_visa"/>
+        <field name="privilege_id" ref="privilege_visa_access"/>
         <field name="implied_ids" eval="[(4, ref('group_visa_user'))]"/>
     </record>
 
     <record id="group_visa_finance" model="res.groups">
         <field name="name">Санхүү</field>
-        <field name="category_id" ref="module_category_mng_visa"/>
+        <field name="privilege_id" ref="privilege_visa_access"/>
         <field name="implied_ids" eval="[(4, ref('group_visa_user'))]"/>
     </record>
 
     <record id="group_visa_manager" model="res.groups">
         <field name="name">Менежер (Бүх хандалт)</field>
-        <field name="category_id" ref="module_category_mng_visa"/>
+        <field name="privilege_id" ref="privilege_visa_access"/>
         <field name="implied_ids" eval="[(4, ref('group_visa_user'))]"/>
     </record>
 
