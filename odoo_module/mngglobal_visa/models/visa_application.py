@@ -44,9 +44,9 @@ class MngVisaApplication(models.Model):
         copy=False)
     priority = fields.Selection([
         ("0", "Энгийн"),
-        ("1", "⭐"),
-        ("2", "⭐⭐"),
-        ("3", "⭐⭐⭐ Яаралтай"),
+        ("1", "Чухал"),
+        ("2", "Өндөр"),
+        ("3", "Яаралтай"),
     ], string="Ач холбогдол", default="0", tracking=True)
     kanban_state = fields.Selection([
         ("normal", "Хэвийн"),
@@ -111,7 +111,7 @@ class MngVisaApplication(models.Model):
     checklist_ids = fields.One2many(
         "mng.visa.checklist.item", "application_id", string="Шалгах хуудас")
     checklist_progress = fields.Float(
-        string="Явц %", compute="_compute_checklist_progress")
+        string="Явц %", compute="_compute_checklist_progress", store=True)
 
     # Yellow card
     date_yellow_card = fields.Date(string="Шар хуудас гарсан огноо", tracking=True)
@@ -153,7 +153,7 @@ class MngVisaApplication(models.Model):
     def _compute_remaining(self):
         for rec in self:
             paid = sum(p.amount for p in rec.payment_ids if p.state == "paid")
-            rec.remaining_fee = rec.total_fee - paid
+            rec.remaining_fee = max(rec.total_fee - paid, 0)
 
     @api.depends("remaining_fee", "total_fee")
     def _compute_payment_status(self):
@@ -167,6 +167,7 @@ class MngVisaApplication(models.Model):
             else:
                 rec.payment_status = "unpaid"
 
+    @api.depends("invoice_ids")
     def _compute_invoice_count(self):
         for rec in self:
             rec.invoice_count = len(rec.invoice_ids)

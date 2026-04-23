@@ -51,8 +51,8 @@
                 <field name="program_type_id"/>
                 <field name="name"/>
                 <field name="fee_type"/>
-                <field name="percentage" invisible="fee_type != 'percentage'"/>
-                <field name="fixed_amount" invisible="fee_type != 'fixed'"/>
+                <field name="percentage"/>
+                <field name="fixed_amount"/>
                 <field name="currency_id"/>
                 <field name="payment_method"/>
             </list>
