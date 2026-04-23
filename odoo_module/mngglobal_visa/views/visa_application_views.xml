@@ -139,7 +139,8 @@
                         </group>
                     </group>
                     <!-- Kids program extra fields -->
-                    <group string="Хүүхдийн хөтөлбөр (PH Kids)">
+                    <group string="Хүүхдийн хөтөлбөр (PH Kids)"
+                           invisible="program_code != 'PH_KIDS'">
                         <group>
                             <field name="parent_name"/>
                             <field name="parent_phone"/>
@@ -148,6 +149,7 @@
                             <field name="teacher_id"/>
                         </group>
                     </group>
+                    <field name="program_code" invisible="1"/>
                     <notebook>
                         <page string="Шалгах хуудас">
                             <field name="checklist_progress" widget="progressbar"/>

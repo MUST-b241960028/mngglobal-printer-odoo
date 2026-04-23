@@ -37,6 +37,8 @@ class MngVisaApplication(models.Model):
     program_type_id = fields.Many2one(
         "mng.visa.program.type", string="Хөтөлбөр",
         required=True, tracking=True)
+    program_code = fields.Char(
+        related="program_type_id.code", string="Хөтөлбөрийн код", store=True)
     stage_id = fields.Many2one(
         "mng.visa.stage", string="Үе шат",
         tracking=True, group_expand="_read_group_stage_ids",
