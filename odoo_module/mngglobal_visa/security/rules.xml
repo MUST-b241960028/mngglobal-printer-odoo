@@ -158,5 +158,110 @@
             <field name="domain_force">[(0, '=', 1)]</field>
         </record>
 
+        <!-- ======================= -->
+        <!--  CHECKLIST TEMPLATES    -->
+        <!-- ======================= -->
+        <record id="rule_visa_checklist_tmpl_manager" model="ir.rule">
+            <field name="name">Manager: All Checklist Templates</field>
+            <field name="model_id" ref="model_mng_visa_checklist_template"/>
+            <field name="groups" eval="[(4, ref('group_visa_manager')), (4, ref('base.group_system'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <record id="rule_visa_checklist_tmpl_ph_adult" model="ir.rule">
+            <field name="name">Program: PH Adult (Checklist Templates)</field>
+            <field name="model_id" ref="model_mng_visa_checklist_template"/>
+            <field name="groups" eval="[(4, ref('group_visa_ph_adult'))]"/>
+            <field name="domain_force">[('program_type_id.code', '=', 'PH_ADULT')]</field>
+        </record>
+
+        <record id="rule_visa_checklist_tmpl_ph_kids" model="ir.rule">
+            <field name="name">Program: PH Kids (Checklist Templates)</field>
+            <field name="model_id" ref="model_mng_visa_checklist_template"/>
+            <field name="groups" eval="[(4, ref('group_visa_ph_kids'))]"/>
+            <field name="domain_force">[('program_type_id.code', '=', 'PH_KIDS')]</field>
+        </record>
+
+        <record id="rule_visa_checklist_tmpl_jp_student" model="ir.rule">
+            <field name="name">Program: Japan Student (Checklist Templates)</field>
+            <field name="model_id" ref="model_mng_visa_checklist_template"/>
+            <field name="groups" eval="[(4, ref('group_visa_jp_student'))]"/>
+            <field name="domain_force">[('program_type_id.code', '=', 'JP_STUDENT')]</field>
+        </record>
+
+        <record id="rule_visa_checklist_tmpl_jp_worker" model="ir.rule">
+            <field name="name">Program: Japan Worker (Checklist Templates)</field>
+            <field name="model_id" ref="model_mng_visa_checklist_template"/>
+            <field name="groups" eval="[(4, ref('group_visa_jp_worker'))]"/>
+            <field name="domain_force">[('program_type_id.code', '=', 'JP_WORKER')]</field>
+        </record>
+
+        <record id="rule_visa_checklist_tmpl_kr" model="ir.rule">
+            <field name="name">Program: Korea (Checklist Templates)</field>
+            <field name="model_id" ref="model_mng_visa_checklist_template"/>
+            <field name="groups" eval="[(4, ref('group_visa_kr'))]"/>
+            <field name="domain_force">[('program_type_id.code', '=', 'KR')]</field>
+        </record>
+
+        <record id="rule_visa_checklist_tmpl_prevent_leak" model="ir.rule">
+            <field name="name">Prevent Checklist Template Leak</field>
+            <field name="model_id" ref="model_mng_visa_checklist_template"/>
+            <field name="groups" eval="[(4, ref('group_visa_user'))]"/>
+            <field name="domain_force">[(0, '=', 1)]</field>
+        </record>
+
+        <!-- ======================= -->
+        <!--  FEE TEMPLATES          -->
+        <!-- ======================= -->
+        <record id="rule_visa_fee_tmpl_manager" model="ir.rule">
+            <field name="name">Manager: All Fee Templates</field>
+            <field name="model_id" ref="model_mng_visa_fee_template"/>
+            <field name="groups" eval="[(4, ref('group_visa_manager')), (4, ref('group_visa_finance')), (4, ref('base.group_system'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <record id="rule_visa_fee_tmpl_ph_adult" model="ir.rule">
+            <field name="name">Program: PH Adult (Fee Templates)</field>
+            <field name="model_id" ref="model_mng_visa_fee_template"/>
+            <field name="groups" eval="[(4, ref('group_visa_ph_adult'))]"/>
+            <field name="domain_force">[('program_type_id.code', '=', 'PH_ADULT')]</field>
+        </record>
+
+        <record id="rule_visa_fee_tmpl_ph_kids" model="ir.rule">
+            <field name="name">Program: PH Kids (Fee Templates)</field>
+            <field name="model_id" ref="model_mng_visa_fee_template"/>
+            <field name="groups" eval="[(4, ref('group_visa_ph_kids'))]"/>
+            <field name="domain_force">[('program_type_id.code', '=', 'PH_KIDS')]</field>
+        </record>
+
+        <record id="rule_visa_fee_tmpl_jp_student" model="ir.rule">
+            <field name="name">Program: Japan Student (Fee Templates)</field>
+            <field name="model_id" ref="model_mng_visa_fee_template"/>
+            <field name="groups" eval="[(4, ref('group_visa_jp_student'))]"/>
+            <field name="domain_force">[('program_type_id.code', '=', 'JP_STUDENT')]</field>
+        </record>
+
+        <record id="rule_visa_fee_tmpl_jp_worker" model="ir.rule">
+            <field name="name">Program: Japan Worker (Fee Templates)</field>
+            <field name="model_id" ref="model_mng_visa_fee_template"/>
+            <field name="groups" eval="[(4, ref('group_visa_jp_worker'))]"/>
+            <field name="domain_force">[('program_type_id.code', '=', 'JP_WORKER')]</field>
+        </record>
+
+        <record id="rule_visa_fee_tmpl_kr" model="ir.rule">
+            <field name="name">Program: Korea (Fee Templates)</field>
+            <field name="model_id" ref="model_mng_visa_fee_template"/>
+            <field name="groups" eval="[(4, ref('group_visa_kr'))]"/>
+            <field name="domain_force">[('program_type_id.code', '=', 'KR')]</field>
+        </record>
+
+        <record id="rule_visa_fee_tmpl_prevent_leak" model="ir.rule">
+            <field name="name">Prevent Fee Template Leak</field>
+            <field name="model_id" ref="model_mng_visa_fee_template"/>
+            <field name="groups" eval="[(4, ref('group_visa_user'))]"/>
+            <field name="domain_force">[(0, '=', 1)]</field>
+        </record>
+
     </data>
 </odoo>
+
