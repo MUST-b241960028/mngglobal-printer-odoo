@@ -22,31 +22,36 @@
               name="Филиппин Насанд хүрэгч"
               action="mng_visa_app_action_ph_adult"
               parent="mng_visa_apps_parent"
-              sequence="10"/>
+              sequence="10"
+              groups="mngglobal_visa.group_visa_ph_adult,mngglobal_visa.group_visa_manager"/>
 
     <menuitem id="mng_visa_ph_kids_menu"
               name="Филиппин Хүүхэд"
               action="mng_visa_app_action_ph_kids"
               parent="mng_visa_apps_parent"
-              sequence="20"/>
+              sequence="20"
+              groups="mngglobal_visa.group_visa_ph_kids,mngglobal_visa.group_visa_manager"/>
 
     <menuitem id="mng_visa_jp_student_menu"
               name="Япон Оюутан"
               action="mng_visa_app_action_jp_student"
               parent="mng_visa_apps_parent"
-              sequence="30"/>
+              sequence="30"
+              groups="mngglobal_visa.group_visa_jp_student,mngglobal_visa.group_visa_manager"/>
 
     <menuitem id="mng_visa_jp_worker_menu"
               name="Япон Ажилтан"
               action="mng_visa_app_action_jp_worker"
               parent="mng_visa_apps_parent"
-              sequence="40"/>
+              sequence="40"
+              groups="mngglobal_visa.group_visa_jp_worker,mngglobal_visa.group_visa_manager"/>
 
     <menuitem id="mng_visa_kr_menu"
               name="Солонгос"
               action="mng_visa_app_action_kr"
               parent="mng_visa_apps_parent"
-              sequence="50"/>
+              sequence="50"
+              groups="mngglobal_visa.group_visa_kr,mngglobal_visa.group_visa_manager"/>
 
     <menuitem id="mng_visa_finance_menu"
               name="Санхүү"
