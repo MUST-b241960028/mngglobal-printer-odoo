@@ -6,125 +6,171 @@
         <field name="model">mng.visa.dashboard</field>
         <field name="arch" type="xml">
             <form string="Удирдлагын самбар" create="0" edit="0" delete="0">
-                <field name="currency_id" invisible="1"/>
-                <sheet style="background: transparent; border: none; max-width: 1400px; padding: 0;">
+                <style>
+                    /* Premium Silicon Valley Dashboard Overrides */
+                    .o_form_view .o_form_sheet_bg { background: transparent !important; border: none !important; }
+                    .o_form_view .o_form_sheet { max-width: 1400px !important; margin: 0 auto !important; padding: 0 !important; border: none !important; box-shadow: none !important;}
                     
-                    <!-- Modern Title -->
-                    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
-                        <h2 class="fw-bold m-0" style="color: #0f172a;">
-                            MNG Global <span class="text-primary">•</span> Удирдлагын самбар
+                    .mng_card {
+                        background: #ffffff;
+                        border-radius: 20px;
+                        border: 1px solid rgba(0,0,0,0.05);
+                        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.025);
+                        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                        overflow: hidden;
+                    }
+                    .mng_card_hover { cursor: pointer; outline: none; display: block; width: 100%; text-align: left; padding: 1.5rem; }
+                    .mng_card_hover:hover {
+                        transform: translateY(-6px);
+                        box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+                    }
+                    
+                    /* Deep Premium Gradients */
+                    .mng_grad_primary { background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%); }
+                    .mng_grad_success { background: linear-gradient(135deg, #10b981 0%, #047857 100%); }
+                    .mng_grad_danger  { background: linear-gradient(135deg, #f43f5e 0%, #be123c 100%); }
+                    .mng_grad_warning { background: linear-gradient(135deg, #f59e0b 0%, #b45309 100%); }
+                    
+                    /* Forced Typography strictly overriding Odoo fields */
+                    .mng_val_xl span, .mng_val_xl div, .mng_val_xl .o_field_widget {
+                        font-size: 3rem !important;
+                        font-weight: 800 !important;
+                        letter-spacing: -1px !important;
+                        line-height: 1 !important;
+                        color: #ffffff !important;
+                    }
+                    .mng_val_lg span, .mng_val_lg div, .mng_val_lg .o_field_widget {
+                        font-size: 2.25rem !important;
+                        font-weight: 800 !important;
+                        line-height: 1 !important;
+                        color: #0f172a !important;
+                    }
+                    .mng_val_md span, .mng_val_md div, .mng_val_md .o_field_widget {
+                        font-size: 1.5rem !important;
+                        font-weight: 700 !important;
+                        color: inherit !important;
+                    }
+                    /* Special colored monetary fields */
+                    .mng_text_emerald span, .mng_text_emerald .o_field_widget { color: #059669 !important; }
+                    .mng_text_rose span, .mng_text_rose .o_field_widget { color: #e11d48 !important; }
+                    
+                    .mng_subtext { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.8; }
+                    .text-white-80 { color: rgba(255,255,255,0.8); }
+                    
+                    .mng_icon_box { width: 64px; height: 64px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 2rem; }
+                    .mng_icon_box.glass { background: rgba(255,255,255,0.2); color: #ffffff; border: 1px solid rgba(255,255,255,0.3); }
+                    
+                    .mng_btn_list { display: flex; align-items: center; padding: 1.25rem 1.5rem; border-radius: 14px; background: #f8fafc; border: 1px solid transparent; transition: all 0.2s; outline: none; width: 100%; text-align: left; }
+                    .mng_btn_list:hover { background: #ffffff; border-color: #cbd5e1; transform: translateX(8px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+                    .mng_btn_icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-right: 1.25rem; }
+                    
+                    .bg-indigo-subtle { background: #e0e7ff; color: #4f46e5; }
+                    .bg-emerald-subtle { background: #d1fae5; color: #059669; }
+                    .bg-amber-subtle { background: #fef3c7; color: #d97706; }
+                </style>
+                <field name="currency_id" invisible="1"/>
+                <sheet>
+                    
+                    <!-- Title -->
+                    <div class="d-flex justify-content-between align-items-center mb-4 pb-3" style="border-bottom: 2px solid #f1f5f9;">
+                        <h2 class="fw-bold m-0" style="color: #0f172a; font-size: 2rem; letter-spacing: -0.5px;">
+                            MNG Global <span style="color: #6366f1;">•</span> Удирдлагын самбар
                         </h2>
                     </div>
 
-                    <!-- ROW 1: Key Metrics (Global Overview) -->
+                    <!-- ROW 1: Hero KPIs -->
                     <div class="row g-4 mb-5">
-                        <!-- Active Applications -->
-                        <div class="col-md-3">
-                            <button type="object" name="action_open_applications" 
-                                    class="btn btn-light w-100 text-start border-0 shadow-sm rounded-4 p-4 d-flex align-items-center"
-                                    style="background-color: white; transition: transform 0.2s;">
-                                <div class="rounded-3 d-flex align-items-center justify-content-center" 
-                                     style="width: 60px; height: 60px; background-color: #e0e7ff; color: #4f46e5;">
-                                    <i class="fa fa-briefcase fa-2x"/>
-                                </div>
-                                <div class="ms-3 overflow-hidden">
-                                    <div class="text-muted text-uppercase fw-bold" style="font-size: 11px; letter-spacing: 0.5px;">Идэвхтэй өргөдөл</div>
-                                    <div class="fs-2 fw-bold text-dark mt-1" style="line-height: 1;"><field name="total_active" readonly="1"/></div>
+                        <div class="col-xl-3 col-md-6">
+                            <button type="object" name="action_open_applications" class="mng_card mng_card_hover mng_grad_primary border-0">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <div class="mng_subtext text-white-80 mb-2">Идэвхтэй өргөдөл</div>
+                                        <div class="mng_val_xl"><field name="total_active" readonly="1"/></div>
+                                    </div>
+                                    <div class="mng_icon_box glass"><i class="fa fa-briefcase"/></div>
                                 </div>
                             </button>
                         </div>
 
-                        <!-- Departures -->
-                        <div class="col-md-3">
-                            <button type="object" name="action_open_departures" 
-                                    class="btn btn-light w-100 text-start border-0 shadow-sm rounded-4 p-4 d-flex align-items-center"
-                                    style="background-color: white;">
-                                <div class="rounded-3 d-flex align-items-center justify-content-center" 
-                                     style="width: 60px; height: 60px; background-color: #d1fae5; color: #059669;">
-                                    <i class="fa fa-plane fa-2x"/>
-                                </div>
-                                <div class="ms-3 overflow-hidden">
-                                    <div class="text-muted text-uppercase fw-bold" style="font-size: 11px; letter-spacing: 0.5px;">Ойрын нисэлтүүд</div>
-                                    <div class="fs-2 fw-bold text-dark mt-1" style="line-height: 1;"><field name="departures_next_30" readonly="1"/></div>
+                        <div class="col-xl-3 col-md-6">
+                            <button type="object" name="action_open_departures" class="mng_card mng_card_hover mng_grad_success border-0">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <div class="mng_subtext text-white-80 mb-2">Ойрын нисэлтүүд</div>
+                                        <div class="mng_val_xl"><field name="departures_next_30" readonly="1"/></div>
+                                    </div>
+                                    <div class="mng_icon_box glass"><i class="fa fa-plane"/></div>
                                 </div>
                             </button>
                         </div>
 
-                        <!-- Overdue -->
-                        <div class="col-md-3" groups="mngglobal_visa.group_visa_finance,mngglobal_visa.group_visa_manager">
-                            <button type="object" name="action_open_overdue" 
-                                    class="btn btn-light w-100 text-start border-0 shadow-sm rounded-4 p-4 d-flex align-items-center"
-                                    style="background-color: white;">
-                                <div class="rounded-3 d-flex align-items-center justify-content-center" 
-                                     style="width: 60px; height: 60px; background-color: #ffe4e6; color: #e11d48;">
-                                    <i class="fa fa-exclamation-triangle fa-2x"/>
-                                </div>
-                                <div class="ms-3 overflow-hidden">
-                                    <div class="text-muted text-uppercase fw-bold" style="font-size: 11px; letter-spacing: 0.5px;">Төлбөр хэтэрсэн</div>
-                                    <div class="fs-2 fw-bold text-dark mt-1" style="line-height: 1;"><field name="overdue_payments" readonly="1"/></div>
+                        <div class="col-xl-3 col-md-6" groups="mngglobal_visa.group_visa_finance,mngglobal_visa.group_visa_manager">
+                            <button type="object" name="action_open_overdue" class="mng_card mng_card_hover mng_grad_danger border-0">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <div class="mng_subtext text-white-80 mb-2">Төлбөр хэтэрсэн</div>
+                                        <div class="mng_val_xl"><field name="overdue_payments" readonly="1"/></div>
+                                    </div>
+                                    <div class="mng_icon_box glass"><i class="fa fa-exclamation-triangle"/></div>
                                 </div>
                             </button>
                         </div>
 
-                        <!-- Insurance -->
-                        <div class="col-md-3">
-                            <button type="object" name="action_open_insurance" 
-                                    class="btn btn-light w-100 text-start border-0 shadow-sm rounded-4 p-4 d-flex align-items-center"
-                                    style="background-color: white;">
-                                <div class="rounded-3 d-flex align-items-center justify-content-center" 
-                                     style="width: 60px; height: 60px; background-color: #fef3c7; color: #d97706;">
-                                    <i class="fa fa-shield fa-2x"/>
-                                </div>
-                                <div class="ms-3 overflow-hidden">
-                                    <div class="text-muted text-uppercase fw-bold" style="font-size: 11px; letter-spacing: 0.5px;">Даатгал дуусах</div>
-                                    <div class="fs-2 fw-bold text-dark mt-1" style="line-height: 1;"><field name="insurance_due_soon" readonly="1"/></div>
+                        <div class="col-xl-3 col-md-6">
+                            <button type="object" name="action_open_insurance" class="mng_card mng_card_hover mng_grad_warning border-0">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <div class="mng_subtext text-white-80 mb-2">Даатгал дуусах</div>
+                                        <div class="mng_val_xl"><field name="insurance_due_soon" readonly="1"/></div>
+                                    </div>
+                                    <div class="mng_icon_box glass"><i class="fa fa-shield"/></div>
                                 </div>
                             </button>
                         </div>
                     </div>
 
                     <!-- ROW 2: Program Distribution -->
-                    <div class="card border-0 shadow-sm rounded-4 mb-5">
-                        <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
-                            <h5 class="fw-bold m-0" style="color: #1e293b;">
+                    <div class="mng_card mb-5">
+                        <div class="px-4 pt-4 pb-0">
+                            <h5 class="fw-bold m-0" style="color: #1e293b; font-size: 1.25rem;">
                                 <i class="fa fa-globe text-primary me-2"/> Хөтөлбөрийн хуваарилалт
                             </h5>
                         </div>
-                        <div class="card-body p-4">
+                        <div class="p-4">
                             <div class="row g-3">
                                 <div class="col">
-                                    <button type="object" name="action_open_ph_adult" class="btn btn-light w-100 border rounded-3 p-3 text-center" style="background-color: #f8fafc;">
-                                        <i class="fa fa-user fs-3 text-secondary mb-2"/>
-                                        <div class="fs-3 fw-bold text-dark"><field name="count_ph_adult" readonly="1"/></div>
-                                        <div class="text-muted fw-bold mt-1" style="font-size: 11px;">PH Насанд хүрэгч</div>
+                                    <button type="object" name="action_open_ph_adult" class="mng_card_hover rounded-4 text-center border" style="background:#f8fafc; padding:1.5rem;">
+                                        <i class="fa fa-user mb-3" style="font-size:2rem; color:#94a3b8;"/>
+                                        <div class="mng_val_lg"><field name="count_ph_adult" readonly="1"/></div>
+                                        <div class="mng_subtext text-secondary mt-2">PH Насанд хүрэгч</div>
                                     </button>
                                 </div>
                                 <div class="col">
-                                    <button type="object" name="action_open_ph_kids" class="btn btn-light w-100 border rounded-3 p-3 text-center" style="background-color: #f8fafc;">
-                                        <i class="fa fa-child fs-3 text-secondary mb-2"/>
-                                        <div class="fs-3 fw-bold text-dark"><field name="count_ph_kids" readonly="1"/></div>
-                                        <div class="text-muted fw-bold mt-1" style="font-size: 11px;">PH Хүүхэд</div>
+                                    <button type="object" name="action_open_ph_kids" class="mng_card_hover rounded-4 text-center border" style="background:#f8fafc; padding:1.5rem;">
+                                        <i class="fa fa-child mb-3" style="font-size:2rem; color:#94a3b8;"/>
+                                        <div class="mng_val_lg"><field name="count_ph_kids" readonly="1"/></div>
+                                        <div class="mng_subtext text-secondary mt-2">PH Хүүхэд</div>
                                     </button>
                                 </div>
                                 <div class="col">
-                                    <button type="object" name="action_open_jp_student" class="btn btn-light w-100 border rounded-3 p-3 text-center" style="background-color: #f8fafc;">
-                                        <i class="fa fa-graduation-cap fs-3 text-secondary mb-2"/>
-                                        <div class="fs-3 fw-bold text-dark"><field name="count_jp_student" readonly="1"/></div>
-                                        <div class="text-muted fw-bold mt-1" style="font-size: 11px;">JP Оюутан</div>
+                                    <button type="object" name="action_open_jp_student" class="mng_card_hover rounded-4 text-center border" style="background:#f8fafc; padding:1.5rem;">
+                                        <i class="fa fa-graduation-cap mb-3" style="font-size:2rem; color:#94a3b8;"/>
+                                        <div class="mng_val_lg"><field name="count_jp_student" readonly="1"/></div>
+                                        <div class="mng_subtext text-secondary mt-2">JP Оюутан</div>
                                     </button>
                                 </div>
                                 <div class="col">
-                                    <button type="object" name="action_open_jp_worker" class="btn btn-light w-100 border rounded-3 p-3 text-center" style="background-color: #f8fafc;">
-                                        <i class="fa fa-wrench fs-3 text-secondary mb-2"/>
-                                        <div class="fs-3 fw-bold text-dark"><field name="count_jp_worker" readonly="1"/></div>
-                                        <div class="text-muted fw-bold mt-1" style="font-size: 11px;">JP Ажилтан</div>
+                                    <button type="object" name="action_open_jp_worker" class="mng_card_hover rounded-4 text-center border" style="background:#f8fafc; padding:1.5rem;">
+                                        <i class="fa fa-wrench mb-3" style="font-size:2rem; color:#94a3b8;"/>
+                                        <div class="mng_val_lg"><field name="count_jp_worker" readonly="1"/></div>
+                                        <div class="mng_subtext text-secondary mt-2">JP Ажилтан</div>
                                     </button>
                                 </div>
                                 <div class="col">
-                                    <button type="object" name="action_open_kr" class="btn btn-light w-100 border rounded-3 p-3 text-center" style="background-color: #f8fafc;">
-                                        <i class="fa fa-book fs-3 text-secondary mb-2"/>
-                                        <div class="fs-3 fw-bold text-dark"><field name="count_kr" readonly="1"/></div>
-                                        <div class="text-muted fw-bold mt-1" style="font-size: 11px;">Солонгос</div>
+                                    <button type="object" name="action_open_kr" class="mng_card_hover rounded-4 text-center border" style="background:#f8fafc; padding:1.5rem;">
+                                        <i class="fa fa-book mb-3" style="font-size:2rem; color:#94a3b8;"/>
+                                        <div class="mng_val_lg"><field name="count_kr" readonly="1"/></div>
+                                        <div class="mng_subtext text-secondary mt-2">Солонгос</div>
                                     </button>
                                 </div>
                             </div>
@@ -133,84 +179,60 @@
 
                     <!-- ROW 3: Finance & Analytics -->
                     <div class="row g-4">
-                        <!-- Finance Summary -->
-                        <div class="col-md-7" groups="mngglobal_visa.group_visa_finance,mngglobal_visa.group_visa_manager">
-                            <div class="card border-0 shadow-sm rounded-4 h-100">
-                                <div class="card-header bg-white border-bottom-0 pt-4 pb-2 px-4">
-                                    <h5 class="fw-bold m-0" style="color: #1e293b;">
+                        <!-- Finance Component -->
+                        <div class="col-xl-7" groups="mngglobal_visa.group_visa_finance,mngglobal_visa.group_visa_manager">
+                            <div class="mng_card h-100">
+                                <div class="px-4 pt-4 pb-2 border-bottom" style="border-color:#f1f5f9 !important;">
+                                    <h5 class="fw-bold m-0" style="color: #1e293b; font-size: 1.25rem;">
                                         <i class="fa fa-money text-success me-2"/> Санхүүгийн тойм
                                     </h5>
                                 </div>
-                                <div class="card-body p-4 d-flex flex-column justify-content-center gap-4">
-                                    <!-- Total Fees -->
+                                <div class="p-4 d-flex flex-column justify-content-center gap-4 h-100">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <div class="text-muted text-uppercase fw-bold mb-1" style="font-size: 11px; letter-spacing: 0.5px;">Нийт нэхэмжилсэн хураамж</div>
-                                            <div class="fs-3 fw-bold" style="color: #0f172a;">
-                                                <field name="total_fees" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="1"/>
-                                            </div>
+                                            <div class="mng_subtext text-secondary mb-1">Нийт нэхэмжилсэн хураамж</div>
+                                            <div class="mng_val_lg" style="color:#0f172a;"><field name="total_fees" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="1"/></div>
                                         </div>
-                                        <div class="rounded-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; background-color: #dbeafe; color: #2563eb;">
-                                            <i class="fa fa-file-text-o fs-5"/>
-                                        </div>
+                                        <div class="mng_icon_box bg-indigo-subtle"><i class="fa fa-file-text-o"/></div>
                                     </div>
-                                    <!-- Collected -->
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <div class="text-muted text-uppercase fw-bold mb-1" style="font-size: 11px; letter-spacing: 0.5px;">Бодитоор цугласан орлого</div>
-                                            <div class="fs-3 fw-bold" style="color: #059669;">
-                                                <field name="total_collected" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="1"/>
-                                            </div>
+                                            <div class="mng_subtext text-secondary mb-1">Бодитоор цугласан орлого</div>
+                                            <div class="mng_val_lg mng_text_emerald"><field name="total_collected" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="1"/></div>
                                         </div>
-                                        <div class="rounded-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; background-color: #d1fae5; color: #059669;">
-                                            <i class="fa fa-check fs-5"/>
-                                        </div>
+                                        <div class="mng_icon_box bg-emerald-subtle"><i class="fa fa-check"/></div>
                                     </div>
-                                    <!-- Outstanding -->
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <div class="text-muted text-uppercase fw-bold mb-1" style="font-size: 11px; letter-spacing: 0.5px;">Цуглуулах шаардлагатай авлага</div>
-                                            <div class="fs-3 fw-bold" style="color: #e11d48;">
-                                                <field name="total_outstanding" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="1"/>
-                                            </div>
+                                            <div class="mng_subtext text-secondary mb-1">Цуглуулах шаардлагатай авлага</div>
+                                            <div class="mng_val_lg mng_text_rose"><field name="total_outstanding" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="1"/></div>
                                         </div>
-                                        <div class="rounded-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; background-color: #ffe4e6; color: #e11d48;">
-                                            <i class="fa fa-calculator fs-5"/>
-                                        </div>
+                                        <div class="mng_icon_box" style="background:#ffe4e6; color:#e11d48;"><i class="fa fa-calculator"/></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Strategic Analytics -->
-                        <div class="col-md-5">
-                            <div class="card border-0 shadow-sm rounded-4 h-100">
-                                <div class="card-header bg-white border-bottom-0 pt-4 pb-2 px-4">
-                                    <h5 class="fw-bold m-0" style="color: #1e293b;">
-                                        <i class="fa fa-bar-chart text-purple me-2" style="color: #8b5cf6;"/> Стратеги шинжилгээ
+                        <!-- Analytics Component -->
+                        <div class="col-xl-5">
+                            <div class="mng_card h-100">
+                                <div class="px-4 pt-4 pb-2 border-bottom" style="border-color:#f1f5f9 !important;">
+                                    <h5 class="fw-bold m-0" style="color: #1e293b; font-size: 1.25rem;">
+                                        <i class="fa fa-bar-chart me-2" style="color:#8b5cf6;"/> Стратеги шинжилгээ
                                     </h5>
                                 </div>
-                                <div class="card-body p-4 d-flex flex-column gap-3">
-                                    <button type="action" name="%(mngglobal_visa.mng_visa_app_action_chart_program)d" 
-                                            class="btn btn-light w-100 border text-start p-3 rounded-3 d-flex align-items-center" style="background-color: white;">
-                                        <div class="rounded-3 d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; background-color: #e0e7ff; color: #4f46e5;">
-                                            <i class="fa fa-pie-chart"/>
-                                        </div>
-                                        <span class="fw-bold text-dark">Хөтөлбөрийн нарийвчилсан тойм</span>
+                                <div class="p-4 d-flex flex-column gap-3">
+                                    <button type="action" name="%(mngglobal_visa.mng_visa_app_action_chart_program)d" class="mng_btn_list">
+                                        <div class="mng_btn_icon bg-indigo-subtle"><i class="fa fa-pie-chart"/></div>
+                                        <span class="fs-5 fw-bold" style="color:#1e293b;">Хөтөлбөрийн нарийвчилсан тойм</span>
                                     </button>
-                                    <button type="action" name="%(mngglobal_visa.mng_visa_app_action_chart_worker)d" 
-                                            class="btn btn-light w-100 border text-start p-3 rounded-3 d-flex align-items-center" style="background-color: white;">
-                                        <div class="rounded-3 d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; background-color: #d1fae5; color: #059669;">
-                                            <i class="fa fa-users"/>
-                                        </div>
-                                        <span class="fw-bold text-dark">Ажилтны ачаалал, гүйцэтгэл</span>
+                                    <button type="action" name="%(mngglobal_visa.mng_visa_app_action_chart_worker)d" class="mng_btn_list">
+                                        <div class="mng_btn_icon bg-emerald-subtle"><i class="fa fa-users"/></div>
+                                        <span class="fs-5 fw-bold" style="color:#1e293b;">Ажилтны ачаалал, гүйцэтгэл</span>
                                     </button>
-                                    <button type="action" name="%(mngglobal_visa.mng_visa_app_action_chart_stage)d" 
-                                            class="btn btn-light w-100 border text-start p-3 rounded-3 d-flex align-items-center" style="background-color: white;">
-                                        <div class="rounded-3 d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; background-color: #fef3c7; color: #d97706;">
-                                            <i class="fa fa-tasks"/>
-                                        </div>
-                                        <span class="fw-bold text-dark">Үе шатны дамжлагын хяналт</span>
+                                    <button type="action" name="%(mngglobal_visa.mng_visa_app_action_chart_stage)d" class="mng_btn_list">
+                                        <div class="mng_btn_icon bg-amber-subtle"><i class="fa fa-tasks"/></div>
+                                        <span class="fs-5 fw-bold" style="color:#1e293b;">Үе шатны дамжлагын хяналт</span>
                                     </button>
                                 </div>
                             </div>
