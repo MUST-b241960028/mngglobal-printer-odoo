@@ -8,7 +8,7 @@
         <field name="arch" type="xml">
             <kanban default_group_by="stage_id" class="o_kanban_small_column">
                 <field name="name"/>
-                <field name="partner_id"/>
+                <field name="client_name"/>
                 <field name="program_type_id"/>
                 <field name="stage_id"/>
                 <field name="assigned_to"/>
@@ -25,7 +25,7 @@
                             <div class="o_kanban_record_top">
                                 <div class="o_kanban_record_headings">
                                     <strong>
-                                        <field name="partner_id"/>
+                                        <field name="client_name"/>
                                     </strong>
                                     <div class="text-muted">
                                         <field name="name"/>
@@ -63,7 +63,7 @@
         <field name="arch" type="xml">
             <list decoration-muted="active == False">
                 <field name="name"/>
-                <field name="partner_id"/>
+                <field name="client_name"/>
                 <field name="client_phone"/>
                 <field name="program_type_id"/>
                 <field name="stage_id"/>
@@ -129,8 +129,7 @@
 
                     <group>
                         <group string="Үйлчлүүлэгч">
-                            <field name="partner_id"
-                                   options="{'no_create': False, 'no_quick_create': False, 'no_create_edit': False}"/>
+                            <field name="client_name"/>
                             <field name="client_phone"/>
                             <field name="client_email"/>
                             <field name="passport_number"/>
@@ -251,7 +250,7 @@
         <field name="arch" type="xml">
             <search>
                 <field name="name"/>
-                <field name="partner_id"/>
+                <field name="client_name"/>
                 <field name="client_phone"/>
                 <field name="passport_number"/>
                 <field name="program_type_id"/>

@@ -15,10 +15,10 @@ class MngVisaApplication(models.Model):
     display_name = fields.Char(
         compute="_compute_display_name", store=True)
 
-    @api.depends("name", "partner_id.name")
+    @api.depends("name", "client_name")
     def _compute_display_name(self):
         for rec in self:
-            client = rec.partner_id.name or "—"
+            client = rec.client_name or "—"
             rec.display_name = f"{rec.name} — {client}"
 
     @api.model_create_multi
@@ -57,15 +57,13 @@ class MngVisaApplication(models.Model):
     ], string="Kanban төлөв", default="normal")
     active = fields.Boolean(default=True)
 
-    # Client (res.partner)
+    # Client info (plain text — no contact database)
+    client_name = fields.Char(
+        string="Үйлчлүүлэгч", required=True, tracking=True)
     partner_id = fields.Many2one(
-        "res.partner", string="Үйлчлүүлэгч",
-        required=True, tracking=True,
-        domain="[('user_ids', '=', False)]")
-    client_phone = fields.Char(
-        related="partner_id.phone", string="Утас", readonly=False)
-    client_email = fields.Char(
-        related="partner_id.email", string="Имэйл", readonly=False)
+        "res.partner", string="Холбоостой харилцагч")
+    client_phone = fields.Char(string="Утас", tracking=True)
+    client_email = fields.Char(string="Имэйл")
     passport_number = fields.Char(string="Паспортын дугаар", tracking=True)
     passport_expiry = fields.Date(string="Паспорт дуусах")
     date_of_birth = fields.Date(string="Төрсөн он")
