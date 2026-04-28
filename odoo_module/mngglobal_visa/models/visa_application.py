@@ -251,14 +251,34 @@ class MngVisaApplication(models.Model):
 
     # Actions
 
+    def _get_or_create_partner(self):
+        """Auto-create a minimal res.partner from client_name for invoicing.
+        Odoo invoices require a partner_id — this creates one transparently."""
+        self.ensure_one()
+        if self.partner_id:
+            return self.partner_id
+        # Try to find existing partner by name
+        partner = self.env["res.partner"].search(
+            [("name", "=", self.client_name)], limit=1)
+        if not partner:
+            partner = self.env["res.partner"].create({
+                "name": self.client_name,
+                "phone": self.client_phone or False,
+                "email": self.client_email or False,
+                "company_type": "person",
+            })
+        self.partner_id = partner
+        return partner
+
     def action_create_invoice(self):
         """Create an invoice for this application."""
         self.ensure_one()
+        partner = self._get_or_create_partner()
         invoice = self.env["account.move"].create({
             "move_type": "out_invoice",
-            "partner_id": self.partner_id.id,
+            "partner_id": partner.id,
             "invoice_line_ids": [(0, 0, {
-                "name": f"Зуучлалын хураамж — {self.name}",
+                "name": f"Зуучлалын хураамж — {self.client_name} — {self.name}",
                 "quantity": 1,
                 "price_unit": self.remaining_fee or self.total_fee,
             })],
