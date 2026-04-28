@@ -10,7 +10,7 @@
 
     <record id="cron_mark_stale_printers_offline" model="ir.cron">
         <field name="cron_name">MNG Принтер: Тасрагдсан принтер офлайн болгох</field>
-        <field name="interval_number">5</field>
+        <field name="interval_number">1</field>
         <field name="interval_type">minutes</field>
         <field name="active">True</field>
         <field name="ir_actions_server_id" ref="action_cron_mark_stale_offline"/>
