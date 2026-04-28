@@ -33,17 +33,30 @@ class MngVisaDashboard(models.TransientModel):
     def _compute_all(self):
         App = self.env["mng.visa.application"]
         Payment = self.env["mng.visa.payment"]
+        Stage = self.env["mng.visa.stage"]
         today = fields.Date.today()
         in_30 = today + timedelta(days=30)
         in_7 = today + timedelta(days=7)
 
-        done_stages = self.env["mng.visa.stage"].search([("is_done", "=", True)]).ids
-        failed_stages = self.env["mng.visa.stage"].search([("is_failed", "=", True)]).ids
+        done_stages = Stage.search([("is_done", "=", True)]).ids
+        failed_stages = Stage.search([("is_failed", "=", True)]).ids
         terminal = done_stages + failed_stages
+
+        # Inquiry-only (first) stage per program — excluded from finance totals
+        first_stage_ids = set()
+        for pt in self.env["mng.visa.program.type"].search([]):
+            first = Stage.search(
+                [("program_type_id", "=", pt.id)], order="sequence", limit=1
+            )
+            if first:
+                first_stage_ids.add(first.id)
 
         active_apps = App.search([("active", "=", True)])
         pipeline_apps = active_apps.filtered(
             lambda a: a.stage_id.id not in terminal)
+        finance_apps = active_apps.filtered(
+            lambda a: a.stage_id.id not in first_stage_ids)
+        finance_app_ids = finance_apps.ids
 
         by_code = {}
         for a in pipeline_apps:
@@ -51,11 +64,11 @@ class MngVisaDashboard(models.TransientModel):
 
         paid = sum(Payment.search([
             ("state", "=", "paid"),
-            ("application_id.active", "=", True),
+            ("application_id", "in", finance_app_ids),
         ]).mapped("amount"))
         pending = sum(Payment.search([
             ("state", "in", ["pending", "overdue"]),
-            ("application_id.active", "=", True),
+            ("application_id", "in", finance_app_ids),
         ]).mapped("amount"))
 
         for rec in self:
@@ -66,11 +79,14 @@ class MngVisaDashboard(models.TransientModel):
             rec.count_jp_worker = by_code.get("JP_WORKER", 0)
             rec.count_kr = by_code.get("KR", 0)
 
-            rec.total_fees = sum(active_apps.mapped("total_fee"))
+            rec.total_fees = sum(finance_apps.mapped("total_fee"))
             rec.total_collected = paid
             rec.total_outstanding = pending
 
-            rec.overdue_payments = Payment.search_count([("state", "=", "overdue")])
+            rec.overdue_payments = Payment.search_count([
+                ("state", "=", "overdue"),
+                ("application_id", "in", finance_app_ids),
+            ])
             rec.insurance_due_soon = len(active_apps.filtered(
                 lambda a: (
                     not a.insurance_done

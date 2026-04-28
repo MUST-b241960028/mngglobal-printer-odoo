@@ -90,6 +90,14 @@
               parent="mng_visa_reports_menu"
               sequence="30"/>
 
+    <!-- Restrict standard Odoo Accounting/Invoicing app to finance group only -->
+    <record id="account.menu_finance" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [
+            ref('mngglobal_visa.group_visa_finance'),
+            ref('base.group_system'),
+        ])]"/>
+    </record>
+
     <menuitem id="mng_visa_config_menu"
               name="Тохиргоо"
               parent="mng_visa_root_menu"
