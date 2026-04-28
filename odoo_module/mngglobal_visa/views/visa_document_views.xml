@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Document Form View -->
+    <record id="mng_visa_document_form" model="ir.ui.view">
+        <field name="name">mng.visa.document.form</field>
+        <field name="model">mng.visa.document</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_preview"
+                            string="👁 Урьдчилан харах"
+                            type="object" class="oe_highlight"
+                            invisible="not file"/>
+                    <button name="action_download"
+                            string="⬇ Татах"
+                            type="object"
+                            invisible="not file"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group string="Баримтын мэдээлэл">
+                            <field name="name"/>
+                            <field name="document_type"/>
+                            <field name="application_id"/>
+                            <field name="upload_date"/>
+                            <field name="uploaded_by"/>
+                        </group>
+                        <group string="Файл">
+                            <field name="file" filename="file_name"/>
+                            <field name="file_name" invisible="1"/>
+                            <field name="notes"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Document List View -->
+    <record id="mng_visa_document_list" model="ir.ui.view">
+        <field name="name">mng.visa.document.list</field>
+        <field name="model">mng.visa.document</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="sequence" widget="handle"/>
+                <field name="document_type"/>
+                <field name="name"/>
+                <field name="file_name"/>
+                <field name="upload_date"/>
+                <field name="uploaded_by"/>
+                <button name="action_preview" type="object"
+                        string="👁" title="Урьдчилан харах"
+                        class="btn-link"/>
+                <button name="action_download" type="object"
+                        string="⬇" title="Татах"
+                        class="btn-link"/>
+            </list>
+        </field>
+    </record>
+
+</odoo>

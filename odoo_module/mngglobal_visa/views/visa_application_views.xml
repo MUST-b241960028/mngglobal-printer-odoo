@@ -233,6 +233,12 @@
                                     <field name="upload_date"/>
                                     <field name="uploaded_by"/>
                                     <field name="notes" optional="hide"/>
+                                    <button name="action_preview" type="object"
+                                            string="👁" title="Урьдчилан харах"
+                                            class="btn-link"/>
+                                    <button name="action_download" type="object"
+                                            string="⬇" title="Татах"
+                                            class="btn-link"/>
                                 </list>
                             </field>
                         </page>
