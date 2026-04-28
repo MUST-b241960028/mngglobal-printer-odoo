@@ -23,6 +23,20 @@ class MngPrinterDevice(models.Model):
     last_seen = fields.Datetime(string="Сүүлд холбогдсон", readonly=True)
     port = fields.Char(string="Порт")
 
+    job_ids = fields.One2many("mng.print.queue", "printer_id", string="Хэвлэх ажлууд")
+    last_job_state = fields.Selection(
+        selection=[
+            ("pending", "Хүлээгдэж буй"),
+            ("printed", "Хэвлэгдсэн"),
+            ("failed", "Амжилтгүй"),
+            ("cancelled", "Цуцлагдсан"),
+        ],
+        compute="_compute_job_stats",
+        string="Сүүлчийн ажил",
+    )
+    last_printed_at = fields.Datetime(compute="_compute_job_stats", string="Сүүлд хэвлэсэн")
+    pending_job_count = fields.Integer(compute="_compute_job_stats", string="Хүлээгдэж буй ажил")
+
     _unique_printer_per_client = models.Constraint(
         "unique(name, client_name)",
         "Энэ компьютерт ижил нэртэй принтер бүртгэгдсэн байна!",
@@ -37,6 +51,15 @@ class MngPrinterDevice(models.Model):
             if rec.is_default:
                 parts.append("★")
             rec.display_name = " ".join(parts)
+
+    @api.depends("job_ids.state", "job_ids.create_date", "job_ids.printed_at")
+    def _compute_job_stats(self):
+        for rec in self:
+            jobs = rec.job_ids.sorted("create_date", reverse=True)
+            rec.last_job_state = jobs[0].state if jobs else False
+            printed = rec.job_ids.filtered(lambda j: j.state == "printed").sorted("printed_at", reverse=True)
+            rec.last_printed_at = printed[0].printed_at if printed else False
+            rec.pending_job_count = len(rec.job_ids.filtered(lambda j: j.state == "pending"))
 
     @api.model
     def register_printers(self, client_name, printers):

@@ -218,9 +218,21 @@
                 <field name="name"/>
                 <field name="client_name"/>
                 <field name="is_default" widget="boolean_toggle"/>
-                <field name="is_online" widget="boolean"/>
-                <field name="port" optional="hide"/>
+                <field name="is_online" widget="badge"
+                       decoration-success="is_online == True"
+                       decoration-danger="is_online == False"/>
                 <field name="last_seen"/>
+                <field name="pending_job_count" string="Хүлээгдэж буй"
+                       decoration-warning="pending_job_count &gt; 0"
+                       optional="show"/>
+                <field name="last_job_state" string="Сүүлчийн ажил"
+                       widget="badge"
+                       decoration-success="last_job_state == 'printed'"
+                       decoration-danger="last_job_state == 'failed'"
+                       decoration-info="last_job_state == 'pending'"
+                       decoration-muted="last_job_state == 'cancelled'"
+                       optional="show"/>
+                <field name="last_printed_at" string="Сүүлд хэвлэсэн" optional="show"/>
             </list>
         </field>
     </record>
@@ -241,8 +253,19 @@
                             <field name="port"/>
                         </group>
                         <group string="Төлөв">
-                            <field name="is_online"/>
+                            <field name="is_online" widget="badge"
+                                   decoration-success="is_online == True"
+                                   decoration-danger="is_online == False"/>
                             <field name="last_seen"/>
+                        </group>
+                        <group string="Хэвлэлтийн мэдээлэл">
+                            <field name="pending_job_count" string="Хүлээгдэж буй ажил"/>
+                            <field name="last_job_state" string="Сүүлчийн ажил" widget="badge"
+                                   decoration-success="last_job_state == 'printed'"
+                                   decoration-danger="last_job_state == 'failed'"
+                                   decoration-info="last_job_state == 'pending'"
+                                   decoration-muted="last_job_state == 'cancelled'"/>
+                            <field name="last_printed_at" string="Сүүлд амжилттай хэвлэсэн"/>
                         </group>
                     </group>
                 </sheet>
