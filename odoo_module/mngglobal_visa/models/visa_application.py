@@ -29,8 +29,8 @@ class MngVisaApplication(models.Model):
                     "mng.visa.application") or "New"
         records = super().create(vals_list)
         for rec in records:
-            if rec.program_type_id and rec.stage_id:
-                rec._populate_checklist_from_template(rec.stage_id)
+            if rec.program_type_id:
+                rec._populate_all_checklists()
         return records
 
     # Program & Stage
@@ -213,20 +213,15 @@ class MngVisaApplication(models.Model):
             if stage.is_yellow_card:
                 vals.setdefault("date_yellow_card", today)
         result = super().write(vals)
-        if "stage_id" in vals:
-            stage = self.env["mng.visa.stage"].browse(vals["stage_id"])
-            for rec in self:
-                rec._populate_checklist_from_template(stage)
         return result
 
-    def _populate_checklist_from_template(self, stage):
-        """Add checklist items from template for the given stage (skips duplicates)."""
+    def _populate_all_checklists(self):
+        """Load ALL checklist items for this program at once (skips duplicates)."""
         self.ensure_one()
         if not self.program_type_id:
             return
         templates = self.env["mng.visa.checklist.template"].search([
             ("program_type_id", "=", self.program_type_id.id),
-            ("stage_id", "=", stage.id),
         ], order="sequence")
         if not templates:
             return
@@ -242,7 +237,7 @@ class MngVisaApplication(models.Model):
 
     @api.onchange("program_type_id")
     def _onchange_program_type(self):
-        """Set first stage when program type changes."""
+        """Set first stage and populate all checklists when program type changes."""
         if self.program_type_id:
             first = self.env["mng.visa.stage"].search(
                 [("program_type_id", "=", self.program_type_id.id)],
