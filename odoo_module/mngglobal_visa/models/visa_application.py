@@ -114,6 +114,12 @@ class MngVisaApplication(models.Model):
     document_count = fields.Integer(
         compute="_compute_document_count", string="Бичиг баримт")
 
+    # Meetings
+    meeting_ids = fields.Many2many(
+        "calendar.event", string="Уулзалтууд", copy=False)
+    meeting_count = fields.Integer(
+        compute="_compute_meeting_count", string="Уулзалт")
+
     # Checklist
     checklist_ids = fields.One2many(
         "mng.visa.checklist.item", "application_id", string="Шалгах хуудас")
@@ -182,6 +188,38 @@ class MngVisaApplication(models.Model):
     def _compute_document_count(self):
         for rec in self:
             rec.document_count = len(rec.document_ids)
+
+    def _compute_meeting_count(self):
+        for rec in self:
+            rec.meeting_count = len(rec.meeting_ids)
+
+    def action_schedule_meeting(self):
+        """Open calendar event form pre-filled with client info."""
+        self.ensure_one()
+        return {
+            "type": "ir.actions.act_window",
+            "res_model": "calendar.event",
+            "view_mode": "form",
+            "target": "new",
+            "context": {
+                "default_name": f"Уулзалт — {self.client_name or ''} ({self.name})",
+                "default_user_id": self.env.uid,
+            },
+        }
+
+    def action_open_meetings(self):
+        """Open list of meetings linked to this application."""
+        self.ensure_one()
+        return {
+            "type": "ir.actions.act_window",
+            "res_model": "calendar.event",
+            "name": "Уулзалтууд",
+            "view_mode": "list,form,calendar",
+            "domain": [("id", "in", self.meeting_ids.ids)],
+            "context": {
+                "default_name": f"Уулзалт — {self.client_name or ''} ({self.name})",
+            },
+        }
 
     @api.depends("checklist_ids", "checklist_ids.is_done")
     def _compute_checklist_progress(self):

@@ -14,7 +14,7 @@
     "author": "MNG Global",
     "website": "https://mngglobal.mn",
     "license": "LGPL-3",
-    "depends": ["base", "mail", "contacts", "account"],
+    "depends": ["base", "mail", "contacts", "account", "calendar"],
     "data": [
         "security/groups.xml",
         "security/ir.model.access.csv",

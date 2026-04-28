@@ -95,6 +95,9 @@
                             string="Нэхэмжлэл үүсгэх"
                             type="object" class="oe_highlight"
                             groups="mngglobal_visa.group_visa_finance,mngglobal_visa.group_visa_manager"/>
+                    <button name="action_schedule_meeting"
+                            string="📅 Уулзалт товлох"
+                            type="object"/>
                     <field name="stage_id" widget="statusbar"
                            options="{'clickable': '1'}"/>
                 </header>
@@ -112,6 +115,11 @@
                                 type="object" name="action_open_documents">
                             <field name="document_count" widget="statinfo"
                                    string="Баримт"/>
+                        </button>
+                        <button class="oe_stat_button" icon="fa-calendar"
+                                type="object" name="action_open_meetings">
+                            <field name="meeting_count" widget="statinfo"
+                                   string="Уулзалт"/>
                         </button>
                     </div>
                     <div class="oe_title">
@@ -370,6 +378,24 @@
         <field name="search_view_id" ref="mng_visa_app_search"/>
     </record>
 
+    <!-- Calendar View -->
+    <record id="mng_visa_app_calendar" model="ir.ui.view">
+        <field name="name">mng.visa.application.calendar</field>
+        <field name="model">mng.visa.application</field>
+        <field name="arch" type="xml">
+            <calendar string="Нисэх хуваарь"
+                      date_start="departure_date"
+                      color="program_type_id"
+                      quick_create="0"
+                      event_open_popup="1">
+                <field name="client_name"/>
+                <field name="program_type_id"/>
+                <field name="stage_id"/>
+                <field name="assigned_to"/>
+            </calendar>
+        </field>
+    </record>
+
     <!-- Per-program actions -->
     <record id="mng_visa_app_action_all" model="ir.actions.act_window">
         <field name="name">Бүх өргөдлүүд</field>
@@ -381,7 +407,7 @@
     <record id="mng_visa_app_action_ph_adult" model="ir.actions.act_window">
         <field name="name">Филиппин Насанд хүрэгч</field>
         <field name="res_model">mng.visa.application</field>
-        <field name="view_mode">kanban,list,form</field>
+        <field name="view_mode">kanban,list,calendar,form</field>
         <field name="domain">[('program_type_id.code', '=', 'PH_ADULT')]</field>
         <field name="context" eval="{'default_program_type_id': ref('mngglobal_visa.prog_ph_adult')}"/>
     </record>
@@ -389,7 +415,7 @@
     <record id="mng_visa_app_action_ph_kids" model="ir.actions.act_window">
         <field name="name">Филиппин Хүүхэд</field>
         <field name="res_model">mng.visa.application</field>
-        <field name="view_mode">kanban,list,form</field>
+        <field name="view_mode">kanban,list,calendar,form</field>
         <field name="domain">[('program_type_id.code', '=', 'PH_KIDS')]</field>
         <field name="context" eval="{'default_program_type_id': ref('mngglobal_visa.prog_ph_kids')}"/>
     </record>
@@ -397,7 +423,7 @@
     <record id="mng_visa_app_action_jp_student" model="ir.actions.act_window">
         <field name="name">Япон Оюутан</field>
         <field name="res_model">mng.visa.application</field>
-        <field name="view_mode">kanban,list,form</field>
+        <field name="view_mode">kanban,list,calendar,form</field>
         <field name="domain">[('program_type_id.code', '=', 'JP_STUDENT')]</field>
         <field name="context" eval="{'default_program_type_id': ref('mngglobal_visa.prog_jp_student')}"/>
     </record>
@@ -405,7 +431,7 @@
     <record id="mng_visa_app_action_jp_worker" model="ir.actions.act_window">
         <field name="name">Япон Ажилтан</field>
         <field name="res_model">mng.visa.application</field>
-        <field name="view_mode">kanban,list,form</field>
+        <field name="view_mode">kanban,list,calendar,form</field>
         <field name="domain">[('program_type_id.code', '=', 'JP_WORKER')]</field>
         <field name="context" eval="{'default_program_type_id': ref('mngglobal_visa.prog_jp_worker')}"/>
     </record>
@@ -413,7 +439,7 @@
     <record id="mng_visa_app_action_kr" model="ir.actions.act_window">
         <field name="name">Солонгос</field>
         <field name="res_model">mng.visa.application</field>
-        <field name="view_mode">kanban,list,form</field>
+        <field name="view_mode">kanban,list,calendar,form</field>
         <field name="domain">[('program_type_id.code', '=', 'KR')]</field>
         <field name="context" eval="{'default_program_type_id': ref('mngglobal_visa.prog_kr')}"/>
     </record>
