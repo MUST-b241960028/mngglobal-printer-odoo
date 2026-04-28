@@ -49,8 +49,14 @@ class MngVisaDashboard(models.TransientModel):
         for a in pipeline_apps:
             by_code[a.program_type_id.code] = by_code.get(a.program_type_id.code, 0) + 1
 
-        paid = sum(Payment.search([("state", "=", "paid")]).mapped("amount"))
-        pending = sum(Payment.search([("state", "in", ["pending", "overdue"])]).mapped("amount"))
+        paid = sum(Payment.search([
+            ("state", "=", "paid"),
+            ("application_id.active", "=", True),
+        ]).mapped("amount"))
+        pending = sum(Payment.search([
+            ("state", "in", ["pending", "overdue"]),
+            ("application_id.active", "=", True),
+        ]).mapped("amount"))
 
         for rec in self:
             rec.total_active = len(pipeline_apps)
