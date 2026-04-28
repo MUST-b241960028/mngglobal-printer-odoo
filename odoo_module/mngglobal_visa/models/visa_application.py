@@ -221,12 +221,37 @@ class MngVisaApplication(models.Model):
             },
         }
 
-    @api.depends("checklist_ids", "checklist_ids.is_done")
+    @api.depends("stage_id", "stage_id.sequence", "program_type_id", "checklist_ids", "checklist_ids.is_done")
     def _compute_checklist_progress(self):
+        Stage = self.env["mng.visa.stage"]
+        stage_cache = {}
         for rec in self:
-            total = len(rec.checklist_ids)
-            done = len(rec.checklist_ids.filtered("is_done"))
-            rec.checklist_progress = (done / total * 100) if total else 0
+            if not rec.program_type_id or not rec.stage_id:
+                rec.checklist_progress = 0.0
+                continue
+
+            pid = rec.program_type_id.id
+            if pid not in stage_cache:
+                stage_cache[pid] = Stage.search(
+                    [("program_type_id", "=", pid)], order="sequence"
+                ).ids
+
+            all_ids = stage_cache[pid]
+            total_stages = len(all_ids)
+            if not total_stages:
+                rec.checklist_progress = 0.0
+                continue
+
+            try:
+                stage_index = all_ids.index(rec.stage_id.id)
+            except ValueError:
+                stage_index = 0
+
+            total_checks = len(rec.checklist_ids)
+            done_checks = len(rec.checklist_ids.filtered("is_done"))
+            checklist_fraction = (done_checks / total_checks) if total_checks else 1.0
+
+            rec.checklist_progress = (stage_index + checklist_fraction) / total_stages * 100
 
     @api.model
     def _read_group_stage_ids(self, stages, domain):
