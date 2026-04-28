@@ -60,7 +60,8 @@ class MngVisaApplication(models.Model):
     # Client (res.partner)
     partner_id = fields.Many2one(
         "res.partner", string="Үйлчлүүлэгч",
-        required=True, tracking=True)
+        required=True, tracking=True,
+        domain="[('user_ids', '=', False)]")
     client_phone = fields.Char(
         related="partner_id.phone", string="Утас", readonly=False)
     client_email = fields.Char(
