@@ -15,6 +15,7 @@ class MngVisaDocument(models.Model):
 
     document_type = fields.Selection([
         ("passport", "Паспорт"),
+        ("national_id", "Иргэний үнэмлэх"),
         ("photo", "Зураг"),
         ("diploma", "Диплом / Боловсролын гэрчилгээ"),
         ("birth_cert", "Төрсний гэрчилгээ"),
