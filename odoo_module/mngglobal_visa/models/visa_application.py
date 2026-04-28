@@ -109,6 +109,12 @@ class MngVisaApplication(models.Model):
     invoice_count = fields.Integer(
         compute="_compute_invoice_count")
 
+    # Documents
+    document_ids = fields.One2many(
+        "mng.visa.document", "application_id", string="Бичиг баримтууд")
+    document_count = fields.Integer(
+        compute="_compute_document_count", string="Бичиг баримт")
+
     # Checklist
     checklist_ids = fields.One2many(
         "mng.visa.checklist.item", "application_id", string="Шалгах хуудас")
@@ -173,6 +179,10 @@ class MngVisaApplication(models.Model):
     def _compute_invoice_count(self):
         for rec in self:
             rec.invoice_count = len(rec.invoice_ids)
+
+    def _compute_document_count(self):
+        for rec in self:
+            rec.document_count = len(rec.document_ids)
 
     @api.depends("checklist_ids", "checklist_ids.is_done")
     def _compute_checklist_progress(self):
@@ -272,6 +282,18 @@ class MngVisaApplication(models.Model):
             "name": "Нэхэмжлэлүүд",
             "view_mode": "list,form",
             "domain": [("id", "in", self.invoice_ids.ids)],
+        }
+
+    def action_open_documents(self):
+        """Open attached documents for this application."""
+        self.ensure_one()
+        return {
+            "type": "ir.actions.act_window",
+            "res_model": "mng.visa.document",
+            "name": "Бичиг баримтууд",
+            "view_mode": "list,form",
+            "domain": [("application_id", "=", self.id)],
+            "context": {"default_application_id": self.id},
         }
 
     def action_generate_fee_schedule(self):
