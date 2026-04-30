@@ -96,7 +96,7 @@
                             type="object" class="oe_highlight"
                             groups="mngglobal_visa.group_visa_finance,mngglobal_visa.group_visa_manager"/>
                     <button name="action_schedule_meeting"
-                            string="📅 Уулзалт товлох"
+                            string="Уулзалт товлох"
                             type="object"/>
                     <field name="stage_id" widget="statusbar"
                            options="{'clickable': '1'}"/>
