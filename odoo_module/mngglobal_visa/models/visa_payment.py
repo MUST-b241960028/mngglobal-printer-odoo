@@ -7,7 +7,7 @@ class MngVisaPayment(models.Model):
     _order = "date_due, id"
 
     application_id = fields.Many2one(
-        "mng.visa.application", string="Өргөдөл",
+        "mng.visa.application", string="Гэрээ",
         required=True, ondelete="cascade")
     name = fields.Char(
         string="Тайлбар", required=True,

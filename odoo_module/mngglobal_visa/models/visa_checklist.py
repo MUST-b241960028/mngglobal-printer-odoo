@@ -7,7 +7,7 @@ class MngVisaChecklistItem(models.Model):
     _order = "sequence, id"
 
     application_id = fields.Many2one(
-        "mng.visa.application", string="Өргөдөл",
+        "mng.visa.application", string="Гэрээ",
         required=True, ondelete="cascade")
     name = fields.Char(string="Даалгавар", required=True)
     sequence = fields.Integer(default=10)

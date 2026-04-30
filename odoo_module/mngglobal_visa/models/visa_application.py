@@ -3,7 +3,7 @@ from odoo import models, fields, api
 
 class MngVisaApplication(models.Model):
     _name = "mng.visa.application"
-    _description = "Зуучлалын өргөдөл"
+    _description = "Зуучлалын гэрээ"
     _inherit = ["mail.thread", "mail.activity.mixin"]
     _order = "priority desc, create_date desc"
     _rec_name = "display_name"

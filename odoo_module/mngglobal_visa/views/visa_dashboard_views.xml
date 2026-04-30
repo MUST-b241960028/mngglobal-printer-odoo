@@ -84,7 +84,7 @@
                             <button type="object" name="action_open_applications" class="mng_card mng_card_hover mng_grad_primary border-0">
                                 <div class="d-flex justify-content-between align-items-start">
                                     <div>
-                                        <div class="mng_subtext text-white-80 mb-2">Идэвхтэй өргөдөл</div>
+                                        <div class="mng_subtext text-white-80 mb-2">Идэвхтэй гэрээ</div>
                                         <div class="mng_val_xl"><field name="total_active" readonly="1"/></div>
                                     </div>
                                     <div class="mng_icon_box glass"><i class="fa fa-briefcase"/></div>
