@@ -37,7 +37,7 @@
         </field>
     </record>
 
-    <!-- Document List View (active documents) -->
+    <!-- Document List View -->
     <record id="mng_visa_document_list" model="ir.ui.view">
         <field name="name">mng.visa.document.list</field>
         <field name="model">mng.visa.document</field>
@@ -57,46 +57,9 @@
                         class="btn-link"/>
                 <button name="action_delete_document" type="object"
                         icon="fa-trash" title="Устгах"
-                        confirm="Энэ баримтыг устгахдаа итгэлтэй байна уу? Баримт 7 хоногийн турш сэргээх боломжтой хогийн сагсанд хадгалагдана."
+                        confirm="Энэ баримтыг устгахдаа итгэлтэй байна уу? Энэ үйлдлийг буцааж болохгүй."
                         class="btn-link text-danger"/>
             </list>
-        </field>
-    </record>
-
-    <!-- Document Trash List View (soft-deleted documents) -->
-    <record id="mng_visa_document_trash_list" model="ir.ui.view">
-        <field name="name">mng.visa.document.trash.list</field>
-        <field name="model">mng.visa.document</field>
-        <field name="arch" type="xml">
-            <list delete="0" create="0" edit="0"
-                  decoration-muted="1 == 1">
-                <field name="document_type"/>
-                <field name="name"/>
-                <field name="file_name"/>
-                <field name="application_id" string="Гэрээ"/>
-                <field name="deleted_at" string="Устгасан огноо"/>
-                <field name="deleted_by" string="Устгасан хэрэглэгч"/>
-                <button name="action_restore_document" type="object"
-                        string="Сэргээх" icon="fa-undo"
-                        title="Сэргээх"
-                        class="btn-link text-success"/>
-            </list>
-        </field>
-    </record>
-
-    <!-- Trash standalone action -->
-    <record id="mng_visa_document_trash_action" model="ir.actions.act_window">
-        <field name="name">Устгасан баримтууд (Хогийн сагс)</field>
-        <field name="res_model">mng.visa.document</field>
-        <field name="view_mode">list,form</field>
-        <field name="view_id" ref="mng_visa_document_trash_list"/>
-        <field name="domain">[("active", "=", False)]</field>
-        <field name="context">{"active_test": False}</field>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                Устгасан баримт байхгүй байна.
-            </p>
-            <p>7 хоног өнгөрсний дараа баримтууд автоматаар бүрмөсөн устгагдана.</p>
         </field>
     </record>
 

@@ -113,8 +113,6 @@ class MngVisaApplication(models.Model):
         "mng.visa.document", "application_id", string="Бичиг баримтууд")
     document_count = fields.Integer(
         compute="_compute_document_count", string="Бичиг баримт")
-    deleted_document_count = fields.Integer(
-        compute="_compute_deleted_document_count", string="Устгасан баримт")
 
     # Meetings
     meeting_ids = fields.Many2many(
@@ -190,25 +188,6 @@ class MngVisaApplication(models.Model):
     def _compute_document_count(self):
         for rec in self:
             rec.document_count = len(rec.document_ids)
-
-    def _compute_deleted_document_count(self):
-        Doc = self.env["mng.visa.document"].with_context(active_test=False)
-        for rec in self:
-            rec.deleted_document_count = Doc.search_count([
-                ("application_id", "=", rec.id),
-                ("active", "=", False),
-            ])
-
-    def action_open_deleted_documents(self):
-        self.ensure_one()
-        return {
-            "type": "ir.actions.act_window",
-            "name": "Устгасан баримтууд",
-            "res_model": "mng.visa.document",
-            "view_mode": "list,form",
-            "domain": [("application_id", "=", self.id), ("active", "=", False)],
-            "context": {"active_test": False, "default_application_id": self.id},
-        }
 
     def _compute_meeting_count(self):
         for rec in self:

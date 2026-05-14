@@ -21,7 +21,6 @@
         "security/rules.xml",
         "data/program_data.xml",
         "data/template_data.xml",
-        "data/cron_data.xml",
         "views/visa_application_views.xml",
         "views/visa_document_views.xml",
         "views/visa_config_views.xml",

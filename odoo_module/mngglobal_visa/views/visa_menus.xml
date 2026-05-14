@@ -103,13 +103,6 @@
               parent="mng_visa_root_menu"
               sequence="100"/>
 
-    <menuitem id="mng_visa_document_trash_menu"
-              name="🗑 Устгасан баримтууд"
-              action="mngglobal_visa.mng_visa_document_trash_action"
-              parent="mng_visa_config_menu"
-              sequence="90"
-              groups="mngglobal_visa.group_visa_manager,base.group_system"/>
-
     <menuitem id="mng_visa_checklist_tmpl_menu"
               name="Шалгах хуудасны загвар"
               action="mng_visa_checklist_tmpl_action"
