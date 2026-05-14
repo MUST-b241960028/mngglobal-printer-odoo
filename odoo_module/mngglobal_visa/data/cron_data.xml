@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_cron_purge_deleted_documents" model="ir.actions.server">
+        <field name="name">MNG Виза: Устгасан баримтуудыг бүрмөсөн устгах</field>
+        <field name="model_id" ref="model_mng_visa_document"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_purge_deleted_documents()</field>
+    </record>
+
+    <record id="cron_purge_deleted_documents" model="ir.cron">
+        <field name="cron_name">MNG Виза: 7 хоног өнгөрсөн устгасан баримтуудыг бүрмөсөн устгах</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active">True</field>
+        <field name="ir_actions_server_id" ref="action_cron_purge_deleted_documents"/>
+    </record>
+</odoo>
