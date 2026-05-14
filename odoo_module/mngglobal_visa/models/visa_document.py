@@ -83,3 +83,7 @@ class MngVisaDocument(models.Model):
                 "url": f"/web/content/{attachment.id}?download=true",
                 "target": "new",
             }
+
+    def action_delete_document(self):
+        """Delete this document record (called after UI confirmation dialog)."""
+        self.unlink()
