@@ -120,3 +120,23 @@ class MngVisaDocument(models.Model):
 
     def action_delete_document(self):
         self.unlink()
+
+    def _sync_attachment_name(self):
+        for rec in self:
+            if not rec.file_name:
+                continue
+            att = rec._get_attachment()
+            if att and att.name != rec.file_name:
+                att.sudo().write({"name": rec.file_name})
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        records = super().create(vals_list)
+        records._sync_attachment_name()
+        return records
+
+    def write(self, vals):
+        res = super().write(vals)
+        if "file_name" in vals or "file" in vals:
+            self._sync_attachment_name()
+        return res
