@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List view of mail.message filtered for visa models -->
+    <record id="mng_visa_audit_list" model="ir.ui.view">
+        <field name="name">mng.visa.audit.list</field>
+        <field name="model">mail.message</field>
+        <field name="arch" type="xml">
+            <list string="Үйл ажиллагааны түүх"
+                  create="0" edit="0" delete="0"
+                  default_order="date desc">
+                <field name="date" string="Огноо"/>
+                <field name="author_id" string="Хэрэглэгч"/>
+                <field name="model" string="Төрөл"/>
+                <field name="record_name" string="Объект"/>
+                <field name="body" string="Өөрчлөлт" widget="html"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search view: filters by user, model, date -->
+    <record id="mng_visa_audit_search" model="ir.ui.view">
+        <field name="name">mng.visa.audit.search</field>
+        <field name="model">mail.message</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="author_id"/>
+                <field name="record_name"/>
+                <field name="body"/>
+                <separator/>
+                <filter string="Гэрээ" name="filter_app"
+                        domain="[('model', '=', 'mng.visa.application')]"/>
+                <filter string="Бичиг баримт" name="filter_doc"
+                        domain="[('model', '=', 'mng.visa.document')]"/>
+                <separator/>
+                <filter string="Өнөөдөр" name="filter_today"
+                        domain="[('date', '&gt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="7 хоног" name="filter_week"
+                        domain="[('date', '&gt;=', (context_today() - relativedelta(days=7)).strftime('%Y-%m-%d'))]"/>
+                <filter string="30 хоног" name="filter_month"
+                        domain="[('date', '&gt;=', (context_today() - relativedelta(days=30)).strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter string="Хэрэглэгч" name="group_user"
+                        context="{'group_by': 'author_id'}"/>
+                <filter string="Төрөл" name="group_model"
+                        context="{'group_by': 'model'}"/>
+                <filter string="Огноо" name="group_date"
+                        context="{'group_by': 'date:day'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action: only show messages from our visa models -->
+    <record id="mng_visa_audit_action" model="ir.actions.act_window">
+        <field name="name">Үйл ажиллагааны түүх</field>
+        <field name="res_model">mail.message</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="mng_visa_audit_list"/>
+        <field name="search_view_id" ref="mng_visa_audit_search"/>
+        <field name="domain">[
+            ('model', 'in', ['mng.visa.application', 'mng.visa.document']),
+            ('message_type', 'in', ['notification', 'comment'])
+        ]</field>
+        <field name="context">{'search_default_filter_week': 1}</field>
+    </record>
+
+</odoo>

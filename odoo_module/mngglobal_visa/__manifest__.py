@@ -25,6 +25,7 @@
         "views/visa_document_views.xml",
         "views/visa_config_views.xml",
         "views/visa_dashboard_views.xml",
+        "views/visa_audit_views.xml",
         "views/visa_menus.xml",
     ],
     "assets": {

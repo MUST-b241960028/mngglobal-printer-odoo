@@ -90,6 +90,13 @@
               parent="mng_visa_reports_menu"
               sequence="30"/>
 
+    <menuitem id="mng_visa_audit_menu"
+              name="Үйл ажиллагааны түүх"
+              action="mng_visa_audit_action"
+              parent="mng_visa_reports_menu"
+              sequence="40"
+              groups="mngglobal_visa.group_visa_manager,base.group_system"/>
+
     <!-- Restrict standard Odoo Accounting/Invoicing app to finance group only -->
     <record id="account.menu_finance" model="ir.ui.menu">
         <field name="group_ids" eval="[(6, 0, [
