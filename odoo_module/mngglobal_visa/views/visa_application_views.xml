@@ -244,6 +244,9 @@
                                     <button name="action_preview" type="object"
                                             string="👁" title="Урьдчилан харах"
                                             class="btn-link"/>
+                                    <button name="action_edit" type="object"
+                                            string="✏" title="Засах"
+                                            class="btn-link"/>
                                     <button name="action_download" type="object"
                                             string="⬇" title="Татах"
                                             class="btn-link"/>

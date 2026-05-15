@@ -12,6 +12,10 @@
                             string="👁 Урьдчилан харах"
                             type="object" class="oe_highlight"
                             invisible="not file"/>
+                    <button name="action_edit"
+                            string="✏ Засах"
+                            type="object"
+                            invisible="not file"/>
                     <button name="action_download"
                             string="⬇ Татах"
                             type="object"
@@ -51,6 +55,9 @@
                 <field name="uploaded_by"/>
                 <button name="action_preview" type="object"
                         string="👁" title="Урьдчилан харах"
+                        class="btn-link"/>
+                <button name="action_edit" type="object"
+                        string="✏" title="Засах"
                         class="btn-link"/>
                 <button name="action_download" type="object"
                         string="⬇" title="Татах"

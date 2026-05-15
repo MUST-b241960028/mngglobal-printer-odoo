@@ -65,23 +65,41 @@ class MngVisaDocument(models.Model):
         "pdf",
     )
 
-    def action_preview(self):
-        self.ensure_one()
-        attachment = self.env["ir.attachment"].search([
+    def _get_attachment(self):
+        return self.env["ir.attachment"].search([
             ("res_model", "=", "mng.visa.document"),
             ("res_id", "=", self.id),
             ("res_field", "=", "file"),
         ], limit=1)
+
+    def action_preview(self):
+        self.ensure_one()
+        attachment = self._get_attachment()
         if not attachment:
             return
         ext = (self.file_name or "").rsplit(".", 1)[-1].lower()
         if ext in self.ONLYOFFICE_EXTS:
-            url = f"/onlyoffice/editor/{attachment.id}"
+            from urllib.parse import quote
+            url = (
+                f"/onlyoffice/preview?url=/onlyoffice/file/content/{attachment.id}"
+                f"&title={quote(self.file_name or 'document')}"
+            )
         else:
             url = f"/web/content/{attachment.id}"
         return {
             "type": "ir.actions.act_url",
             "url": url,
+            "target": "new",
+        }
+
+    def action_edit(self):
+        self.ensure_one()
+        attachment = self._get_attachment()
+        if not attachment:
+            return
+        return {
+            "type": "ir.actions.act_url",
+            "url": f"/onlyoffice/editor/{attachment.id}",
             "target": "new",
         }
 
