@@ -58,14 +58,30 @@ class MngVisaDocument(models.Model):
             else:
                 rec.preview_url = False
 
+    ONLYOFFICE_EXTS = (
+        "docx", "doc", "odt", "rtf", "txt",
+        "xlsx", "xls", "ods", "csv",
+        "pptx", "ppt", "odp",
+        "pdf",
+    )
+
     def action_preview(self):
-        """Open the document in a new browser tab for preview."""
         self.ensure_one()
-        if not self.preview_url:
+        attachment = self.env["ir.attachment"].search([
+            ("res_model", "=", "mng.visa.document"),
+            ("res_id", "=", self.id),
+            ("res_field", "=", "file"),
+        ], limit=1)
+        if not attachment:
             return
+        ext = (self.file_name or "").rsplit(".", 1)[-1].lower()
+        if ext in self.ONLYOFFICE_EXTS:
+            url = f"/onlyoffice/editor/{attachment.id}"
+        else:
+            url = f"/web/content/{attachment.id}"
         return {
             "type": "ir.actions.act_url",
-            "url": self.preview_url,
+            "url": url,
             "target": "new",
         }
 
