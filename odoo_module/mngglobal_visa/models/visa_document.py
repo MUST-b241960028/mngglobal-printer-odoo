@@ -1,4 +1,5 @@
 from odoo import models, fields, api
+from odoo.exceptions import UserError
 
 
 class MngVisaDocument(models.Model):
@@ -64,6 +65,15 @@ class MngVisaDocument(models.Model):
         "pptx", "ppt", "odp",
         "pdf",
     )
+    ONLYOFFICE_EDITABLE_EXTS = (
+        "docx", "doc", "odt", "rtf", "txt",
+        "xlsx", "xls", "ods", "csv",
+        "pptx", "ppt", "odp",
+        "pdf",
+    )
+
+    def _file_ext(self):
+        return (self.file_name or "").rsplit(".", 1)[-1].lower()
 
     def _get_attachment(self):
         return self.env["ir.attachment"].search([
@@ -97,6 +107,12 @@ class MngVisaDocument(models.Model):
         attachment = self._get_attachment()
         if not attachment:
             return
+        if self._file_ext() not in self.ONLYOFFICE_EDITABLE_EXTS:
+            raise UserError(
+                "Энэ төрлийн файлыг засах боломжгүй. "
+                "Зөвхөн урьдчилан харах, татах боломжтой.\n\n"
+                "(Зөвхөн Word, Excel, PowerPoint, PDF, текст файлуудыг засах боломжтой.)"
+            )
         return {
             "type": "ir.actions.act_url",
             "url": f"/onlyoffice/editor/{attachment.id}",
