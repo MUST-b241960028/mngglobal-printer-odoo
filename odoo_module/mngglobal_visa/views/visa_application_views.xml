@@ -240,6 +240,8 @@
                                     <field name="file_name" column_invisible="1"/>
                                     <field name="upload_date"/>
                                     <field name="uploaded_by"/>
+                                    <field name="last_edited_by" optional="show"/>
+                                    <field name="last_edited_at" optional="show"/>
                                     <field name="notes" optional="hide"/>
                                     <button name="action_preview" type="object"
                                             string="👁" title="Урьдчилан харах"

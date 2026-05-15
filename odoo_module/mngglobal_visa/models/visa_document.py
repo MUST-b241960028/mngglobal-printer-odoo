@@ -6,12 +6,13 @@ class MngVisaDocument(models.Model):
     _name = "mng.visa.document"
     _description = "Бичиг баримт"
     _order = "sequence, id"
+    _inherit = ["mail.thread"]
 
     application_id = fields.Many2one(
         "mng.visa.application", string="Гэрээ",
         required=True, ondelete="cascade")
 
-    name = fields.Char(string="Нэр", required=True,
+    name = fields.Char(string="Нэр", required=True, tracking=True,
         help="Жишээ: Паспорт, Зураг 3x4, Диплом, Гэрчилгээ")
 
     document_type = fields.Selection([
@@ -27,21 +28,39 @@ class MngVisaDocument(models.Model):
         ("invitation", "Урилга"),
         ("insurance", "Даатгал"),
         ("other", "Бусад"),
-    ], string="Төрөл", default="other", required=True)
+    ], string="Төрөл", default="other", required=True, tracking=True)
 
     file = fields.Binary(string="Файл", required=True, attachment=True)
-    file_name = fields.Char(string="Файлын нэр")
+    file_name = fields.Char(string="Файлын нэр", tracking=True)
 
     # Preview URL — computed from the underlying ir.attachment
     preview_url = fields.Char(
         string="Урьдчилан харах", compute="_compute_preview_url")
 
+    last_edited_by = fields.Many2one(
+        "res.users", string="Сүүлд засварласан",
+        compute="_compute_last_edited", store=False)
+    last_edited_at = fields.Datetime(
+        string="Засварласан огноо",
+        compute="_compute_last_edited", store=False)
+
     sequence = fields.Integer(default=10)
-    notes = fields.Text(string="Тэмдэглэл")
+    notes = fields.Text(string="Тэмдэглэл", tracking=True)
     upload_date = fields.Date(string="Огноо", default=fields.Date.today)
     uploaded_by = fields.Many2one(
         "res.users", string="Оруулсан",
         default=lambda self: self.env.user)
+
+    @api.depends("file")
+    def _compute_last_edited(self):
+        for rec in self:
+            att = rec._get_attachment() if rec.id else None
+            if att:
+                rec.last_edited_by = att.write_uid
+                rec.last_edited_at = att.write_date
+            else:
+                rec.last_edited_by = False
+                rec.last_edited_at = False
 
     @api.depends("file")
     def _compute_preview_url(self):
@@ -147,6 +166,9 @@ class MngVisaDocument(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
+        for vals in vals_list:
+            if not vals.get("name") and vals.get("file_name"):
+                vals["name"] = vals["file_name"].rsplit(".", 1)[0]
         records = super().create(vals_list)
         records._sync_attachment_name()
         return records
@@ -156,3 +178,8 @@ class MngVisaDocument(models.Model):
         if "file_name" in vals or "file" in vals:
             self._sync_attachment_name()
         return res
+
+    @api.onchange("file_name")
+    def _onchange_file_name_set_name(self):
+        if self.file_name and not self.name:
+            self.name = self.file_name.rsplit(".", 1)[0]

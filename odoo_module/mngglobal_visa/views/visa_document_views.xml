@@ -29,6 +29,8 @@
                             <field name="application_id"/>
                             <field name="upload_date"/>
                             <field name="uploaded_by"/>
+                            <field name="last_edited_by" readonly="1"/>
+                            <field name="last_edited_at" readonly="1"/>
                         </group>
                         <group string="Файл">
                             <field name="file" filename="file_name"/>
@@ -37,6 +39,7 @@
                         </group>
                     </group>
                 </sheet>
+                <chatter/>
             </form>
         </field>
     </record>
@@ -53,6 +56,8 @@
                 <field name="file_name"/>
                 <field name="upload_date"/>
                 <field name="uploaded_by"/>
+                <field name="last_edited_by" optional="show"/>
+                <field name="last_edited_at" optional="show"/>
                 <button name="action_preview" type="object"
                         string="👁" title="Урьдчилан харах"
                         class="btn-link"/>
