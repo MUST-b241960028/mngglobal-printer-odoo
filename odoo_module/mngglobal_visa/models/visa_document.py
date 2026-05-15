@@ -52,7 +52,7 @@ class MngVisaDocument(models.Model):
                     ("res_field", "=", "file"),
                 ], limit=1)
                 if attachment:
-                    rec.preview_url = f"/web/content/{attachment.id}?download=false"
+                    rec.preview_url = f"/web/content/{attachment.id}"
                 else:
                     rec.preview_url = False
             else:
@@ -83,3 +83,6 @@ class MngVisaDocument(models.Model):
                 "url": f"/web/content/{attachment.id}?download=true",
                 "target": "new",
             }
+
+    def action_delete_document(self):
+        self.unlink()

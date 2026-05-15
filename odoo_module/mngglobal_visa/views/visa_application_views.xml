@@ -232,7 +232,7 @@
                         </page>
                         <page string="Бичиг баримт">
                             <field name="document_ids">
-                                <list editable="bottom">
+                                <list editable="bottom" delete="0">
                                     <field name="sequence" widget="handle"/>
                                     <field name="document_type"/>
                                     <field name="name"/>
@@ -247,6 +247,10 @@
                                     <button name="action_download" type="object"
                                             string="⬇" title="Татах"
                                             class="btn-link"/>
+                                    <button name="action_delete_document" type="object"
+                                            string="🗑" title="Устгах"
+                                            class="btn-link text-danger"
+                                            confirm="Энэ баримтыг устгахдаа итгэлтэй байна уу? Энэ үйлдлийг буцааж болохгүй."/>
                                 </list>
                             </field>
                         </page>

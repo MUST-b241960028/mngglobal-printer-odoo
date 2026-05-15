@@ -42,7 +42,7 @@
         <field name="name">mng.visa.document.list</field>
         <field name="model">mng.visa.document</field>
         <field name="arch" type="xml">
-            <list>
+            <list delete="0">
                 <field name="sequence" widget="handle"/>
                 <field name="document_type"/>
                 <field name="name"/>
@@ -55,6 +55,10 @@
                 <button name="action_download" type="object"
                         string="⬇" title="Татах"
                         class="btn-link"/>
+                <button name="action_delete_document" type="object"
+                        string="🗑" title="Устгах"
+                        class="btn-link text-danger"
+                        confirm="Энэ баримтыг устгахдаа итгэлтэй байна уу? Энэ үйлдлийг буцааж болохгүй."/>
             </list>
         </field>
     </record>

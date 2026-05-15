@@ -30,6 +30,12 @@ python-installer.exe
 # Generated icon
 *.ico
 
+# Docker local dev — volumes and dumps are never committed
+postgres-data/
+odoo-filestore/
+*.dump
+odoo.conf
+
 # IDE
 .vscode/
 .idea/
