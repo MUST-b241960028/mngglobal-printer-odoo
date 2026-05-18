@@ -44,3 +44,8 @@ def migrate(cr, version):
               'access_visa_lead_mgr'
           )
     """)
+
+    # Drop orphan view/action rows pointing at the now-deleted model (xmlid cleanup
+    # above only removes the external ID registry, not the actual records).
+    cr.execute("DELETE FROM ir_ui_view WHERE model = 'mng.visa.lead'")
+    cr.execute("DELETE FROM ir_act_window WHERE res_model = 'mng.visa.lead'")
