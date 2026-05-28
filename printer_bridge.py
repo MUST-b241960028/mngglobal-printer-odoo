@@ -65,7 +65,7 @@ def app_dir():
 # ──────────────────────────────────────────────────────────────────────
 
 APP_NAME = "MNG Printer Bridge"
-APP_VERSION = "1.2.1"
+APP_VERSION = "1.3.0"
 CONFIG_FILE = os.path.join(app_dir(), "config.ini")
 LOG_FILE = os.path.join(app_dir(), "printer_bridge.log")
 ICON_FILE = "icon.png"  # resolved via resource_path()
@@ -519,7 +519,9 @@ class OdooConnection:
             return []
         return self.execute("mng.print.queue", "read", ids,
                             fields=["id", "name", "pdf_data", "pdf_filename",
-                                    "copies", "printer_id", "create_date"])
+                                    "copies", "printer_id", "create_date",
+                                    "pages", "page_subset", "duplex",
+                                    "orientation", "color_mode", "scaling"])
 
     def register_printers(self, printers):
         """Register local printers with Odoo so users can choose them."""
@@ -554,6 +556,39 @@ class OdooConnection:
 # Printer
 # ──────────────────────────────────────────────────────────────────────
 
+def build_print_settings(job):
+    """Translate a print-queue job's options into a SumatraPDF -print-settings
+    string. Anything left at the printer default is omitted. Copies are handled
+    separately (loop in print_pdf), so they're not included here."""
+    tokens = []
+
+    pages = (job.get("pages") or "").replace(" ", "")
+    if pages:
+        tokens.append(pages)
+
+    subset = job.get("page_subset")
+    if subset in ("odd", "even"):
+        tokens.append(subset)
+
+    duplex = job.get("duplex")
+    if duplex in ("simplex", "duplexlong", "duplexshort"):
+        tokens.append(duplex)
+
+    orientation = job.get("orientation")
+    if orientation in ("portrait", "landscape"):
+        tokens.append(orientation)
+
+    color = job.get("color_mode")
+    if color in ("color", "monochrome"):
+        tokens.append(color)
+
+    scaling = job.get("scaling")
+    if scaling in ("fit", "shrink", "noscale"):
+        tokens.append(scaling)
+
+    return ",".join(tokens)
+
+
 class Printer:
     def __init__(self, sumatra_path="", printer_name="", temp_folder="temp_prints"):
         self.printer_name = printer_name.strip()
@@ -567,7 +602,7 @@ class Printer:
         else:
             self.sumatra_path = _get_bundled_sumatra() or sp
 
-    def print_pdf(self, pdf_data_b64, filename, copies=1):
+    def print_pdf(self, pdf_data_b64, filename, copies=1, print_settings=""):
         try:
             pdf_bytes = base64.b64decode(pdf_data_b64)
         except Exception as e:
@@ -592,7 +627,7 @@ class Printer:
         for i in range(num_copies):
             if i > 0:
                 log.info(f"→ Printing copy {i+1} of {num_copies}...")
-            if not self._send_to_printer(file_path):
+            if not self._send_to_printer(file_path, print_settings):
                 success = False
                 break
             # Small delay between copies to avoid printer queue congestion
@@ -606,23 +641,26 @@ class Printer:
             pass
         return success
 
-    def _send_to_printer(self, path):
+    def _send_to_printer(self, path, print_settings=""):
         if self.sumatra_path and os.path.exists(self.sumatra_path):
-            return self._print_sumatra(path)
+            return self._print_sumatra(path, print_settings)
         if sys.platform == "win32":
             return self._print_shell(path)
         # Linux — try lp/lpr
         return self._print_cups(path)
 
-    def _print_sumatra(self, path):
+    def _print_sumatra(self, path, print_settings=""):
         try:
             cmd = [self.sumatra_path]
             if self.printer_name:
                 cmd += ["-print-to", self.printer_name]
             else:
                 cmd += ["-print-to-default"]
+            if print_settings:
+                cmd += ["-print-settings", print_settings]
             cmd += ["-silent", path]
-            log.info(f"Printing: {os.path.basename(path)}")
+            log.info(f"Printing: {os.path.basename(path)}"
+                     + (f" [{print_settings}]" if print_settings else ""))
             r = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
             if r.returncode == 0:
                 log.info(f"✓ Printed: {os.path.basename(path)}")
@@ -855,10 +893,13 @@ class BridgeEngine:
 
             printer = self._get_printer_for_job(job)
             copies = job.get("copies", 1) or 1
+            print_settings = build_print_settings(job)
             if printer.printer_name:
                 self._emit("log", f"→ Using printer: {printer.printer_name} ({copies} copies)")
+            if print_settings:
+                self._emit("log", f"→ Print options: {print_settings}")
 
-            if printer.print_pdf(data, name, copies=copies):
+            if printer.print_pdf(data, name, copies=copies, print_settings=print_settings):
                 if self.odoo.mark_printed(job_id):
                     self.jobs_printed += 1
                     copy_str = f" ({copies} copies)" if copies > 1 else ""

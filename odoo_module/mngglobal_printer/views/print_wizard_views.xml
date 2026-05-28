@@ -6,8 +6,18 @@
         <field name="arch" type="xml">
             <form string="Хэвлэх тохиргоо">
                 <group>
-                    <field name="printer_id" options="{'no_create': True, 'no_open': True}"/>
-                    <field name="copies"/>
+                    <group string="Үндсэн">
+                        <field name="printer_id" options="{'no_create': True, 'no_open': True}"/>
+                        <field name="copies"/>
+                        <field name="pages" placeholder="ж: 1-3,5,8"/>
+                        <field name="page_subset"/>
+                    </group>
+                    <group string="Тохиргоо">
+                        <field name="duplex"/>
+                        <field name="orientation"/>
+                        <field name="color_mode"/>
+                        <field name="scaling"/>
+                    </group>
                     <field name="res_model" invisible="1"/>
                     <field name="res_id" invisible="1"/>
                 </group>

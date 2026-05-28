@@ -11,8 +11,39 @@ class MngPrintWizard(models.TransientModel):
         domain="[('is_online', '=', True)]",
         help="Хоосон орхивол тухайн принтер дээрх үндсэн принтерээр хэвлэнэ."
     )
-    copies = fields.Integer(string="Хуулбар тоо", default=1, min=1)
-    
+    copies = fields.Integer(string="Хуулбар тоо", default=1)
+
+    pages = fields.Char(
+        string="Хуудас",
+        help="Хэвлэх хуудсууд, ж: 1-3,5,8. Хоосон бол бүх хуудас.")
+    page_subset = fields.Selection([
+        ("all", "Бүх хуудас"),
+        ("odd", "Сондгой хуудас"),
+        ("even", "Тэгш хуудас"),
+    ], string="Хуудасны багц", default="all")
+    duplex = fields.Selection([
+        ("default", "Принтерийн үндсэн"),
+        ("simplex", "Нэг талд"),
+        ("duplexlong", "Хоёр талд (урт ирмэг)"),
+        ("duplexshort", "Хоёр талд (богино ирмэг)"),
+    ], string="Хэвлэх тал", default="default")
+    orientation = fields.Selection([
+        ("default", "Үндсэн"),
+        ("portrait", "Босоо"),
+        ("landscape", "Хэвтээ"),
+    ], string="Чиглэл", default="default")
+    color_mode = fields.Selection([
+        ("default", "Үндсэн"),
+        ("color", "Өнгөт"),
+        ("monochrome", "Хар цагаан"),
+    ], string="Өнгө", default="default")
+    scaling = fields.Selection([
+        ("default", "Үндсэн"),
+        ("fit", "Хуудсанд багтаах"),
+        ("shrink", "Багасгаж багтаах"),
+        ("noscale", "Жинхэнэ хэмжээ"),
+    ], string="Хэмжээ", default="default")
+
     res_model = fields.Char(string="Эх загвар")
     res_id = fields.Integer(string="Эх бичлэгийн ID")
 
@@ -40,6 +71,12 @@ class MngPrintWizard(models.TransientModel):
             "source_id": self.res_id,
             "printer_id": self.printer_id.id,
             "copies": self.copies,
+            "pages": self.pages,
+            "page_subset": self.page_subset,
+            "duplex": self.duplex,
+            "orientation": self.orientation,
+            "color_mode": self.color_mode,
+            "scaling": self.scaling,
             "state": "pending",
         })
 

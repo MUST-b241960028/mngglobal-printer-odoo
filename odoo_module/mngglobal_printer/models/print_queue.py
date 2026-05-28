@@ -23,6 +23,38 @@ class MngPrintQueue(models.Model):
     printer_id = fields.Many2one("mng.printer.device", string="Принтер",
                                   domain="[('is_online', '=', True)]",
                                   help="Хэвлэх принтерээ сонгоно уу. Хоосон бол үндсэн принтерээр хэвлэнэ.")
+
+    # ── Print options (applied by the bridge via SumatraPDF -print-settings) ──
+    pages = fields.Char(
+        string="Хуудас",
+        help="Хэвлэх хуудсууд, ж: 1-3,5,8. Хоосон бол бүх хуудас.")
+    page_subset = fields.Selection([
+        ("all", "Бүх хуудас"),
+        ("odd", "Сондгой хуудас"),
+        ("even", "Тэгш хуудас"),
+    ], string="Хуудасны багц", default="all")
+    duplex = fields.Selection([
+        ("default", "Принтерийн үндсэн"),
+        ("simplex", "Нэг талд"),
+        ("duplexlong", "Хоёр талд (урт ирмэг)"),
+        ("duplexshort", "Хоёр талд (богино ирмэг)"),
+    ], string="Хэвлэх тал", default="default")
+    orientation = fields.Selection([
+        ("default", "Үндсэн"),
+        ("portrait", "Босоо"),
+        ("landscape", "Хэвтээ"),
+    ], string="Чиглэл", default="default")
+    color_mode = fields.Selection([
+        ("default", "Үндсэн"),
+        ("color", "Өнгөт"),
+        ("monochrome", "Хар цагаан"),
+    ], string="Өнгө", default="default")
+    scaling = fields.Selection([
+        ("default", "Үндсэн"),
+        ("fit", "Хуудсанд багтаах"),
+        ("shrink", "Багасгаж багтаах"),
+        ("noscale", "Жинхэнэ хэмжээ"),
+    ], string="Хэмжээ", default="default")
     source_model = fields.Char(string="Эх загвар")
     source_id = fields.Integer(string="Эх бичлэгийн ID")
     source_ref = fields.Char(string="Эх сурвалж", compute="_compute_source_ref")
