@@ -65,7 +65,7 @@ def app_dir():
 # ──────────────────────────────────────────────────────────────────────
 
 APP_NAME = "MNG Printer Bridge"
-APP_VERSION = "1.1.0"
+APP_VERSION = "1.2.0"
 CONFIG_FILE = os.path.join(app_dir(), "config.ini")
 LOG_FILE = os.path.join(app_dir(), "printer_bridge.log")
 ICON_FILE = "icon.png"  # resolved via resource_path()
@@ -110,6 +110,120 @@ def setup_logging():
     return logger
 
 log = setup_logging()
+
+# ──────────────────────────────────────────────────────────────────────
+# Self-update — pull latest .exe from GitHub Releases
+# ──────────────────────────────────────────────────────────────────────
+
+UPDATE_REPO = "MUST-b241960028/mngglobal-printer-odoo"
+UPDATE_ASSET = "MNG_Printer_Bridge.exe"
+UPDATE_API = f"https://api.github.com/repos/{UPDATE_REPO}/releases/latest"
+UPDATE_CHECK_INTERVAL = 6 * 3600  # seconds between background checks
+
+
+def _parse_version(s):
+    """'v1.2.0' / '1.2.0' -> (1, 2, 0). Non-numeric parts are ignored."""
+    s = (s or "").strip().lstrip("vV")
+    parts = []
+    for chunk in s.split("."):
+        num = "".join(c for c in chunk if c.isdigit())
+        parts.append(int(num) if num else 0)
+    return tuple(parts) if parts else (0,)
+
+
+def _fetch_latest_release():
+    """Return (version_str, download_url) of the latest release, or None on any failure."""
+    import json
+    import urllib.request
+    try:
+        req = urllib.request.Request(
+            UPDATE_API,
+            headers={"User-Agent": f"{APP_NAME}/{APP_VERSION}",
+                     "Accept": "application/vnd.github+json"},
+        )
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+        tag = data.get("tag_name", "")
+        url = None
+        for asset in data.get("assets", []):
+            if asset.get("name") == UPDATE_ASSET:
+                url = asset.get("browser_download_url")
+                break
+        if tag and url:
+            return tag, url
+    except Exception as e:
+        log.debug(f"Update check failed: {e}")
+    return None
+
+
+def _download_file(url, dest):
+    import urllib.request
+    req = urllib.request.Request(url, headers={"User-Agent": f"{APP_NAME}/{APP_VERSION}"})
+    with urllib.request.urlopen(req, timeout=120) as resp, open(dest, "wb") as f:
+        shutil.copyfileobj(resp, f)
+
+
+def apply_self_update(download_url):
+    """Download the new .exe and hand off to a batch script that swaps it in
+    once this process exits, then relaunches. Returns True if handoff started.
+    Windows + frozen only."""
+    if not (_is_frozen() and sys.platform == "win32"):
+        return False
+    try:
+        cur_exe = sys.executable
+        new_exe = os.path.join(app_dir(), f"{UPDATE_ASSET}.new")
+        log.info(f"Downloading update to {new_exe} ...")
+        _download_file(download_url, new_exe)
+        if not os.path.exists(new_exe) or os.path.getsize(new_exe) < 100000:
+            log.error("Downloaded update looks invalid; aborting.")
+            return False
+
+        bat_path = os.path.join(app_dir(), "_mng_update.bat")
+        # move /Y retries until the running .exe releases its file lock (i.e. we exit),
+        # then relaunches minimized (tray) and deletes itself.
+        bat = (
+            "@echo off\r\n"
+            "timeout /t 2 /nobreak >NUL\r\n"
+            ":retry\r\n"
+            f'move /Y "{new_exe}" "{cur_exe}" >NUL 2>&1\r\n'
+            "if errorlevel 1 (\r\n"
+            "    timeout /t 1 /nobreak >NUL\r\n"
+            "    goto retry\r\n"
+            ")\r\n"
+            f'start "" "{cur_exe}" --minimized\r\n'
+            'del "%~f0"\r\n'
+        )
+        with open(bat_path, "w") as f:
+            f.write(bat)
+
+        log.info("Launching updater and exiting for swap...")
+        subprocess.Popen(
+            ["cmd", "/c", bat_path],
+            creationflags=(getattr(subprocess, "CREATE_NO_WINDOW", 0)
+                           | getattr(subprocess, "DETACHED_PROCESS", 0)),
+            close_fds=True,
+        )
+        return True
+    except Exception as e:
+        log.error(f"Self-update failed: {e}")
+        return False
+
+
+def check_for_update():
+    """Check GitHub for a newer release. If found, download + relaunch.
+    Returns True if an update was started (caller should exit)."""
+    if not _is_frozen():
+        return False  # running from source — never self-update
+    latest = _fetch_latest_release()
+    if not latest:
+        return False
+    tag, url = latest
+    if _parse_version(tag) > _parse_version(APP_VERSION):
+        log.info(f"Update available: {APP_VERSION} -> {tag}")
+        return apply_self_update(url)
+    log.debug(f"Up to date (current {APP_VERSION}, latest {tag})")
+    return False
+
 
 # ──────────────────────────────────────────────────────────────────────
 # Printer Discovery — auto-detect ALL installed printers
@@ -657,6 +771,7 @@ class BridgeEngine:
 
         poll_count = 0
         consecutive_errors = 0
+        last_update_check = time.time()
         while self.running:
             # Re-register printers every 30 polls (~5 min at 10s interval)
             if poll_count > 0 and poll_count % 30 == 0:
@@ -670,6 +785,13 @@ class BridgeEngine:
             try:
                 self._check_for_jobs()
                 consecutive_errors = 0
+                # Idle moment (jobs done synchronously above): safe to self-update.
+                if time.time() - last_update_check >= UPDATE_CHECK_INTERVAL:
+                    last_update_check = time.time()
+                    if check_for_update():
+                        self._emit("log", "Шинэчлэл татаж байна — програм дахин эхэлнэ...")
+                        time.sleep(1)
+                        os._exit(0)  # updater .bat swaps the .exe and relaunches
             except xmlrpc.client.Fault as e:
                 consecutive_errors += 1
                 self._emit("error", f"Odoo API error: {e.faultString}")
@@ -1521,7 +1643,19 @@ def main():
     parser.add_argument("--headless", action="store_true", help="No GUI")
     parser.add_argument("--minimized", action="store_true",
                         help="Start minimized to tray (used for auto-start on boot)")
+    parser.add_argument("--no-update", action="store_true",
+                        help="Skip the startup self-update check")
     args = parser.parse_args()
+
+    # Self-update on startup (frozen .exe only). If an update is found it
+    # downloads, launches the swap-and-relaunch helper, and we exit here.
+    if not args.test and not args.no_update:
+        try:
+            if check_for_update():
+                log.info("Update started — exiting so the new version can launch.")
+                return
+        except Exception as e:
+            log.debug(f"Startup update check skipped: {e}")
 
     if args.test:
         run_test(args.config)
