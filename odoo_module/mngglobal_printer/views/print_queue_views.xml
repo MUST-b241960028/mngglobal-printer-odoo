@@ -220,6 +220,7 @@
                 <field name="is_default" widget="boolean_toggle"/>
                 <field name="is_online" widget="boolean"/>
                 <field name="last_seen"/>
+                <field name="client_version" string="Хувилбар" optional="show"/>
                 <field name="pending_job_count" string="Хүлээгдэж буй"
                        decoration-warning="pending_job_count &gt; 0"
                        optional="show"/>
@@ -253,6 +254,7 @@
                         <group string="Төлөв">
                             <field name="is_online" widget="boolean"/>
                             <field name="last_seen"/>
+                            <field name="client_version"/>
                         </group>
                         <group string="Хэвлэлтийн мэдээлэл">
                             <field name="pending_job_count" string="Хүлээгдэж буй ажил"/>

@@ -22,6 +22,8 @@ class MngPrinterDevice(models.Model):
     is_online = fields.Boolean(string="Онлайн", default=False, readonly=True)
     last_seen = fields.Datetime(string="Сүүлд холбогдсон", readonly=True)
     port = fields.Char(string="Порт")
+    client_version = fields.Char(string="Клиентийн хувилбар", readonly=True,
+                                  help="Тухайн компьютер дээрх хэвлэх програмын хувилбар")
 
     job_ids = fields.One2many("mng.print.queue", "printer_id", string="Хэвлэх ажлууд")
     last_job_state = fields.Selection(
@@ -62,12 +64,13 @@ class MngPrinterDevice(models.Model):
             rec.pending_job_count = len(rec.job_ids.filtered(lambda j: j.state == "pending"))
 
     @api.model
-    def register_printers(self, client_name, printers):
+    def register_printers(self, client_name, printers, client_version=None):
         """
         Клиент програмаас дуудагдана. Принтерийн жагсаалтыг шинэчилнэ.
 
         :param client_name: str — компьютерийн нэр
         :param printers: list of dict — [{"name": "...", "default": bool, "port": "..."}, ...]
+        :param client_version: str | None — хэвлэх програмын хувилбар (сонголтоор)
         :returns: list of dict — бүртгэгдсэн принтерүүд [{"id": int, "name": str}, ...]
         """
         now = fields.Datetime.now()
@@ -96,6 +99,8 @@ class MngPrinterDevice(models.Model):
                 "last_seen": now,
                 "port": p.get("port", ""),
             }
+            if client_version:
+                vals["client_version"] = client_version
 
             if device:
                 device.write(vals)
