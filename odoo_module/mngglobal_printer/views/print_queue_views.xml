@@ -35,6 +35,14 @@
                             <field name="copies"/>
                             <field name="note" placeholder="Нэмэлт тэмдэглэл..."/>
                         </group>
+                        <group string="Хэвлэх тохиргоо">
+                            <field name="pages" placeholder="ж: 1-3,5,8"/>
+                            <field name="page_subset"/>
+                            <field name="duplex"/>
+                            <field name="orientation"/>
+                            <field name="color_mode"/>
+                            <field name="scaling"/>
+                        </group>
                         <group string="Мэдээлэл">
                             <field name="user_id"/>
                             <field name="source_ref"/>
