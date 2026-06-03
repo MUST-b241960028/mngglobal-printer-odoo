@@ -43,3 +43,4 @@ odoo.conf
 # OS
 .DS_Store
 Thumbs.db
+temp_pdf/
