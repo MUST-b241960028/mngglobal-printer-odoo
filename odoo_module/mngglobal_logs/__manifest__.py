@@ -22,8 +22,8 @@
         "views/daily_log_views.xml",
         "views/menus.xml",
     ],
-    "application": False,
+    "application": True,
     "installable": True,
     "auto_install": False,
-    "sequence": 10,
+    "sequence": 6,
 }

@@ -1,27 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- Add to MNG Виза app menu, between Хөтөлбөрүүд and Санхүү -->
+    <!-- ═════════════════════ APP ROOT ═════════════════════ -->
+
+    <menuitem id="mng_daily_log_root_menu"
+              name="MNG Лог"
+              web_icon="mngglobal_logs,static/description/icon.png"
+              sequence="6"/>
+
+    <!-- ═════════════════════ ENTRIES ═════════════════════ -->
 
     <menuitem id="mng_daily_report_menu"
               name="Өдрийн тайлан"
               action="mng_daily_report_action"
-              parent="mngglobal_visa.mng_visa_root_menu"
-              sequence="15"/>
+              parent="mng_daily_log_root_menu"
+              sequence="10"/>
 
     <menuitem id="mng_daily_plan_menu"
               name="Өдрийн төлөвлөгөө"
               action="mng_daily_plan_action"
-              parent="mngglobal_visa.mng_visa_root_menu"
-              sequence="16"/>
+              parent="mng_daily_log_root_menu"
+              sequence="20"/>
 
-    <!-- Add MNG Log config under Тохиргоо -->
+    <!-- ═════════════════════ CONFIG ═════════════════════ -->
+
+    <menuitem id="mng_daily_log_config_root_menu"
+              name="Тохиргоо"
+              parent="mng_daily_log_root_menu"
+              sequence="100"
+              groups="mngglobal_visa.group_visa_manager,base.group_system"/>
 
     <menuitem id="mng_daily_log_config_menu"
-              name="Өдөр тутмын лог"
+              name="Засварлах хугацаа"
               action="mng_daily_log_config_action"
-              parent="mngglobal_visa.mng_visa_config_menu"
-              sequence="50"
+              parent="mng_daily_log_config_root_menu"
+              sequence="10"
               groups="mngglobal_visa.group_visa_manager,base.group_system"/>
 
 </odoo>
