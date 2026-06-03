@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_daily_report_user,daily.report user,model_mng_daily_report,base.group_user,1,1,1,0
+access_daily_report_manager,daily.report manager,model_mng_daily_report,mngglobal_visa.group_visa_manager,1,1,1,1
+access_daily_plan_user,daily.plan user,model_mng_daily_plan,base.group_user,1,1,1,0
+access_daily_plan_manager,daily.plan manager,model_mng_daily_plan,mngglobal_visa.group_visa_manager,1,1,1,1

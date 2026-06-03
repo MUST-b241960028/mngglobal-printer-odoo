@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Add to MNG Виза app menu, between Хөтөлбөрүүд and Санхүү -->
+
+    <menuitem id="mng_daily_report_menu"
+              name="Өдрийн тайлан"
+              action="mng_daily_report_action"
+              parent="mngglobal_visa.mng_visa_root_menu"
+              sequence="15"/>
+
+    <menuitem id="mng_daily_plan_menu"
+              name="Өдрийн төлөвлөгөө"
+              action="mng_daily_plan_action"
+              parent="mngglobal_visa.mng_visa_root_menu"
+              sequence="16"/>
+
+    <!-- Add MNG Log config under Тохиргоо -->
+
+    <menuitem id="mng_daily_log_config_menu"
+              name="Өдөр тутмын лог"
+              action="mng_daily_log_config_action"
+              parent="mngglobal_visa.mng_visa_config_menu"
+              sequence="50"
+              groups="mngglobal_visa.group_visa_manager,base.group_system"/>
+
+</odoo>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ═══════════════════ DAILY REPORT ═══════════════════ -->
+
+    <record id="rule_daily_report_own" model="ir.rule">
+        <field name="name">Тайлан: өөрийн бүртгэл</field>
+        <field name="model_id" ref="model_mng_daily_report"/>
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <record id="rule_daily_report_manager_all" model="ir.rule">
+        <field name="name">Тайлан: бүгд (менежер)</field>
+        <field name="model_id" ref="model_mng_daily_report"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('mngglobal_visa.group_visa_manager'))]"/>
+    </record>
+
+    <!-- ═══════════════════ DAILY PLAN ═══════════════════ -->
+
+    <record id="rule_daily_plan_own" model="ir.rule">
+        <field name="name">Төлөвлөгөө: өөрийн бүртгэл</field>
+        <field name="model_id" ref="model_mng_daily_plan"/>
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <record id="rule_daily_plan_manager_all" model="ir.rule">
+        <field name="name">Төлөвлөгөө: бүгд (менежер)</field>
+        <field name="model_id" ref="model_mng_daily_plan"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('mngglobal_visa.group_visa_manager'))]"/>
+    </record>
+
+</odoo>

@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <!-- ӨДРИЙН ТАЙЛАН — REPORTS                                       -->
+    <!-- ════════════════════════════════════════════════════════════ -->
+
+    <record id="mng_daily_report_list" model="ir.ui.view">
+        <field name="name">mng.daily.report.list</field>
+        <field name="model">mng.daily.report</field>
+        <field name="arch" type="xml">
+            <list default_order="log_date desc, time_slot, id desc"
+                  decoration-muted="not active">
+                <field name="log_date"/>
+                <field name="time_slot"/>
+                <field name="user_id" widget="many2one_avatar_user"/>
+                <field name="description"/>
+                <field name="can_edit_now" string="Засварлах боломжтой"
+                       widget="boolean" optional="hide"/>
+                <field name="active" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="mng_daily_report_form" model="ir.ui.view">
+        <field name="name">mng.daily.report.form</field>
+        <field name="model">mng.daily.report</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="toggle_active" type="object"
+                            string="Архивлах" class="btn-secondary"
+                            invisible="not active or not can_edit_now"/>
+                    <button name="toggle_active" type="object"
+                            string="Сэргээх" class="btn-secondary"
+                            invisible="active"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Архивлагдсан"
+                            bg_color="text-bg-danger" invisible="active"/>
+                    <div class="alert alert-warning" role="alert"
+                         invisible="can_edit_now">
+                        Энэ бүртгэлийг засварлах хугацаа дууссан. Менежертэй холбогдоно уу.
+                    </div>
+                    <group>
+                        <group>
+                            <field name="log_date" readonly="not can_edit_now"/>
+                            <field name="time_slot"
+                                   placeholder="ж: 10:00-11:30"
+                                   readonly="not can_edit_now"/>
+                            <field name="user_id" widget="many2one_avatar_user"
+                                   readonly="1" force_save="1"/>
+                        </group>
+                    </group>
+                    <group string="Юу хийсэн?">
+                        <field name="description" nolabel="1"
+                               placeholder="Өнөөдөр юу хийснээ дэлгэрэнгүй бичээрэй..."
+                               readonly="not can_edit_now"/>
+                    </group>
+                    <field name="active" invisible="1"/>
+                    <field name="can_edit_now" invisible="1"/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="mng_daily_report_calendar" model="ir.ui.view">
+        <field name="name">mng.daily.report.calendar</field>
+        <field name="model">mng.daily.report</field>
+        <field name="arch" type="xml">
+            <calendar string="Өдрийн тайлан"
+                      date_start="log_date"
+                      color="user_id"
+                      mode="month"
+                      quick_create="0"
+                      event_open_popup="1">
+                <field name="user_id"/>
+                <field name="time_slot"/>
+                <field name="description"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="mng_daily_report_pivot" model="ir.ui.view">
+        <field name="name">mng.daily.report.pivot</field>
+        <field name="model">mng.daily.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Тайлангийн матриц">
+                <field name="log_date" type="row" interval="day"/>
+                <field name="user_id" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="mng_daily_report_search" model="ir.ui.view">
+        <field name="name">mng.daily.report.search</field>
+        <field name="model">mng.daily.report</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="description"/>
+                <field name="user_id"/>
+                <field name="log_date"/>
+                <separator/>
+                <filter string="Миний бүртгэл" name="mine"
+                        domain="[('user_id', '=', uid)]"/>
+                <filter string="Өнөөдөр" name="today"
+                        domain="[('log_date', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="7 хоног" name="last_week"
+                        domain="[('log_date', '&gt;=', (context_today() - relativedelta(days=7)).strftime('%Y-%m-%d'))]"/>
+                <filter string="30 хоног" name="last_month"
+                        domain="[('log_date', '&gt;=', (context_today() - relativedelta(days=30)).strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter string="Архивлагдсан" name="archived"
+                        domain="[('active', '=', False)]"/>
+                <separator/>
+                <filter string="Хэрэглэгч" name="group_user"
+                        context="{'group_by': 'user_id'}"/>
+                <filter string="Огноо" name="group_date"
+                        context="{'group_by': 'log_date:day'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="mng_daily_report_action" model="ir.actions.act_window">
+        <field name="name">Өдрийн тайлан</field>
+        <field name="res_model">mng.daily.report</field>
+        <field name="view_mode">list,form,calendar,pivot</field>
+        <field name="search_view_id" ref="mng_daily_report_search"/>
+        <field name="context">{'search_default_last_week': 1}</field>
+    </record>
+
+
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <!-- ӨДРИЙН ТӨЛӨВЛӨГӨӨ — PLANS                                     -->
+    <!-- ════════════════════════════════════════════════════════════ -->
+
+    <record id="mng_daily_plan_list" model="ir.ui.view">
+        <field name="name">mng.daily.plan.list</field>
+        <field name="model">mng.daily.plan</field>
+        <field name="arch" type="xml">
+            <list default_order="log_date asc, time_slot, id desc"
+                  decoration-muted="not active">
+                <field name="log_date"/>
+                <field name="time_slot"/>
+                <field name="user_id" widget="many2one_avatar_user"/>
+                <field name="description"/>
+                <field name="can_edit_now" string="Засварлах боломжтой"
+                       widget="boolean" optional="hide"/>
+                <field name="active" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="mng_daily_plan_form" model="ir.ui.view">
+        <field name="name">mng.daily.plan.form</field>
+        <field name="model">mng.daily.plan</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="toggle_active" type="object"
+                            string="Архивлах" class="btn-secondary"
+                            invisible="not active or not can_edit_now"/>
+                    <button name="toggle_active" type="object"
+                            string="Сэргээх" class="btn-secondary"
+                            invisible="active"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Архивлагдсан"
+                            bg_color="text-bg-danger" invisible="active"/>
+                    <div class="alert alert-warning" role="alert"
+                         invisible="can_edit_now">
+                        Энэ төлөвлөгөөг засварлах хугацаа дууссан. Менежертэй холбогдоно уу.
+                    </div>
+                    <group>
+                        <group>
+                            <field name="log_date" readonly="not can_edit_now"/>
+                            <field name="time_slot"
+                                   placeholder="ж: 14:00-16:00"
+                                   readonly="not can_edit_now"/>
+                            <field name="user_id" widget="many2one_avatar_user"
+                                   readonly="1" force_save="1"/>
+                        </group>
+                    </group>
+                    <group string="Юу хийхээр төлөвлөж байна?">
+                        <field name="description" nolabel="1"
+                               placeholder="Хийхээр төлөвлөж буй ажлаа дэлгэрэнгүй бичээрэй..."
+                               readonly="not can_edit_now"/>
+                    </group>
+                    <field name="active" invisible="1"/>
+                    <field name="can_edit_now" invisible="1"/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="mng_daily_plan_calendar" model="ir.ui.view">
+        <field name="name">mng.daily.plan.calendar</field>
+        <field name="model">mng.daily.plan</field>
+        <field name="arch" type="xml">
+            <calendar string="Өдрийн төлөвлөгөө"
+                      date_start="log_date"
+                      color="user_id"
+                      mode="month"
+                      quick_create="0"
+                      event_open_popup="1">
+                <field name="user_id"/>
+                <field name="time_slot"/>
+                <field name="description"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="mng_daily_plan_pivot" model="ir.ui.view">
+        <field name="name">mng.daily.plan.pivot</field>
+        <field name="model">mng.daily.plan</field>
+        <field name="arch" type="xml">
+            <pivot string="Төлөвлөгөөний матриц">
+                <field name="log_date" type="row" interval="day"/>
+                <field name="user_id" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="mng_daily_plan_search" model="ir.ui.view">
+        <field name="name">mng.daily.plan.search</field>
+        <field name="model">mng.daily.plan</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="description"/>
+                <field name="user_id"/>
+                <field name="log_date"/>
+                <separator/>
+                <filter string="Миний бүртгэл" name="mine"
+                        domain="[('user_id', '=', uid)]"/>
+                <filter string="Өнөөдөр" name="today"
+                        domain="[('log_date', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="Энэ долоо хоног" name="this_week"
+                        domain="[('log_date', '&gt;=', context_today().strftime('%Y-%m-%d')),
+                                 ('log_date', '&lt;=', (context_today() + relativedelta(days=7)).strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter string="Архивлагдсан" name="archived"
+                        domain="[('active', '=', False)]"/>
+                <separator/>
+                <filter string="Хэрэглэгч" name="group_user"
+                        context="{'group_by': 'user_id'}"/>
+                <filter string="Огноо" name="group_date"
+                        context="{'group_by': 'log_date:day'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="mng_daily_plan_action" model="ir.actions.act_window">
+        <field name="name">Өдрийн төлөвлөгөө</field>
+        <field name="res_model">mng.daily.plan</field>
+        <field name="view_mode">list,form,calendar,pivot</field>
+        <field name="search_view_id" ref="mng_daily_plan_search"/>
+        <field name="context">{'search_default_this_week': 1}</field>
+    </record>
+
+</odoo>

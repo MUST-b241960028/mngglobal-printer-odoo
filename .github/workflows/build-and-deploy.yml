@@ -66,7 +66,7 @@ jobs:
             ADDON_PATH="${{ secrets.ODOO_ADDON_PATH }}"
 
             # Remove old modules (git history is our backup)
-            for MODULE in mngglobal_printer mngglobal_visa; do
+            for MODULE in mngglobal_printer mngglobal_visa mngglobal_logs; do
               rm -rf "$ADDON_PATH/$MODULE"
             done
 
@@ -79,7 +79,7 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          source: "odoo_module/mngglobal_printer,odoo_module/mngglobal_visa"
+          source: "odoo_module/mngglobal_printer,odoo_module/mngglobal_visa,odoo_module/mngglobal_logs"
           target: ${{ secrets.ODOO_ADDON_PATH }}
           strip_components: 1
 
@@ -99,7 +99,8 @@ jobs:
             sudo -u odoo19 /opt/odoo19/odoo19-venv/bin/python3 /opt/odoo19/odoo19/odoo-bin \
               -c /etc/odoo19.conf \
               -d ${{ secrets.ODOO_DB }} \
-              -u mngglobal_printer,mngglobal_visa \
+              -i mngglobal_logs \
+              -u mngglobal_printer,mngglobal_visa,mngglobal_logs \
               --stop-after-init > "$UPGRADE_LOG" 2>&1
             UPGRADE_EXIT=$?
 

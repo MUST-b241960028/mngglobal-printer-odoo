@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="mng_daily_log_config_settings_form" model="ir.ui.view">
+        <field name="name">res.config.settings.mngglobal_logs</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app string="MNG Лог" name="mngglobal_logs"
+                     logo="/mngglobal_logs/static/description/icon.png"
+                     groups="mngglobal_visa.group_visa_manager,base.group_system">
+                    <block id="mng_daily_log_edit_block"
+                           title="Өдөр тутмын лог">
+                        <setting string="Засварлах хугацааны хязгаар"
+                                 help="Үүсгэснээс хойш энэ хэдэн цагийн дотор ажилтан өөрийн бүртгэлийг засварлана. Дараа нь зөвхөн менежер засварлана. 0 = шууд цоожлох.">
+                            <div class="content-group">
+                                <div class="row mt8">
+                                    <field name="daily_log_edit_cutoff_hours"
+                                           class="col-lg-3"/>
+                                    <span class="col-lg-3 o_form_label">цаг</span>
+                                </div>
+                            </div>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="mng_daily_log_config_action" model="ir.actions.act_window">
+        <field name="name">MNG Логийн тохиргоо</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+        <field name="context">{'module': 'mngglobal_logs'}</field>
+    </record>
+
+</odoo>
