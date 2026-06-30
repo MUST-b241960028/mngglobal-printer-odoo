@@ -437,10 +437,6 @@
             }
         }
 
-        .o_mng_matrix__list_btn_label {
-            display: none; // icon-only on mobile, tooltip still explains it
-        }
-
         // ── Stats becomes an overlay drawer instead of a sidebar ──
         .o_mng_matrix__body {
             position: relative;

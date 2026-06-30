@@ -45,11 +45,6 @@
                         <t t-if="state.model === 'mng.daily.report'"> Төлөвлөгөө</t>
                         <t t-else=""> Тайлан</t>
                     </button>
-                    <button class="btn btn-light" t-on-click="openListView"
-                            title="Жагсаалт, шүүлтүүр, экспорт">
-                        <i class="fa fa-list"/>
-                        <span class="o_mng_matrix__list_btn_label"> Жагсаалт</span>
-                    </button>
                 </div>
             </div>
 

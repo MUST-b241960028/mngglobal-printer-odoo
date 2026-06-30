@@ -112,14 +112,6 @@ export class MonthlyMatrix extends Component {
         await this.loadMatrix();
     }
 
-    async openListView() {
-        // open the standard list/form/calendar/pivot action for power users
-        const actionRef = this.state.model === "mng.daily.report"
-            ? "mngglobal_logs.mng_daily_report_action"
-            : "mngglobal_logs.mng_daily_plan_action";
-        await this.actionService.doAction(actionRef);
-    }
-
     // ────── Cell helpers ──────
 
     getEntry(iso, userId) {

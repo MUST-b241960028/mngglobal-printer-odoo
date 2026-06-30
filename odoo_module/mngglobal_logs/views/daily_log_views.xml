@@ -140,6 +140,23 @@
         <field name="context">{'search_default_last_week': 1}</field>
     </record>
 
+    <record id="mng_daily_report_archived_action" model="ir.actions.act_window">
+        <field name="name">Архивлагдсан тайлан</field>
+        <field name="res_model">mng.daily.report</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="mng_daily_report_search"/>
+        <field name="domain">[('active', '=', False)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Архивлагдсан тайлан алга
+            </p>
+            <p>
+                Ажилтан өөрийн бичлэгийг архивлахад энд харагдана.
+                Сэргээх боломжтой бөгөөд бичлэг бүрэн устгагдахгүй.
+            </p>
+        </field>
+    </record>
+
 
     <!-- ════════════════════════════════════════════════════════════ -->
     <!-- ӨДРИЙН ТӨЛӨВЛӨГӨӨ — PLANS                                     -->
@@ -277,6 +294,23 @@
         <field name="view_mode">list,form,calendar,pivot</field>
         <field name="search_view_id" ref="mng_daily_plan_search"/>
         <field name="context">{'search_default_this_week': 1}</field>
+    </record>
+
+    <record id="mng_daily_plan_archived_action" model="ir.actions.act_window">
+        <field name="name">Архивлагдсан төлөвлөгөө</field>
+        <field name="res_model">mng.daily.plan</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="mng_daily_plan_search"/>
+        <field name="domain">[('active', '=', False)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Архивлагдсан төлөвлөгөө алга
+            </p>
+            <p>
+                Ажилтан өөрийн бичлэгийг архивлахад энд харагдана.
+                Сэргээх боломжтой бөгөөд бичлэг бүрэн устгагдахгүй.
+            </p>
+        </field>
     </record>
 
     <!-- ════════════════════════════════════════════════════════════ -->

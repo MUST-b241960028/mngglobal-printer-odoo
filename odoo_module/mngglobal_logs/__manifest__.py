@@ -1,6 +1,6 @@
 {
     "name": "MNG Лог — Өдөр тутмын тайлан/төлөвлөгөө",
-    "version": "1.3.0",
+    "version": "1.4.0",
     "category": "Human Resources",
     "summary": "Ажилчдын өдөр тутмын тайлан болон төлөвлөгөөний бүртгэл",
     "description": """
