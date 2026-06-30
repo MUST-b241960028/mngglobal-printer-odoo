@@ -36,8 +36,8 @@
                 <div class="o_mng_matrix__actions">
                     <button class="btn btn-primary" t-on-click="toggleModel">
                         <i class="fa fa-exchange"/>
-                        <t t-if="state.model === 'mng.daily.report'">→ Төлөвлөгөө</t>
-                        <t t-else="">→ Тайлан</t>
+                        <t t-if="state.model === 'mng.daily.report'"> Төлөвлөгөө</t>
+                        <t t-else=""> Тайлан</t>
                     </button>
                     <button class="btn btn-light" t-on-click="openListView" title="Жагсаалт">
                         <i class="fa fa-list"/>
