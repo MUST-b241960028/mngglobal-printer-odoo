@@ -170,9 +170,12 @@
         left: 0;
         z-index: 2;
         background: white;
+        width: 7rem;
         min-width: 7rem;
+        max-width: 7rem;
         padding: 0.5rem 0.8rem;
         border-right: 1px solid #e3e6ed;
+        box-sizing: border-box;
     }
 
     &__th_date {

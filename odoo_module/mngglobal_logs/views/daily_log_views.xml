@@ -40,7 +40,7 @@
                             bg_color="text-bg-danger" invisible="active"/>
                     <div class="alert alert-warning" role="alert"
                          invisible="can_edit_now">
-                        Энэ бүртгэлийг засварлах хугацаа дууссан. Менежертэй холбогдоно уу.
+                        Энэ бүртгэлийг засварлах хугацаа дууссан. Админтай холбогдоно уу.
                     </div>
                     <group>
                         <group>
@@ -180,7 +180,7 @@
                             bg_color="text-bg-danger" invisible="active"/>
                     <div class="alert alert-warning" role="alert"
                          invisible="can_edit_now">
-                        Энэ төлөвлөгөөг засварлах хугацаа дууссан. Менежертэй холбогдоно уу.
+                        Энэ төлөвлөгөөг засварлах хугацаа дууссан. Админтай холбогдоно уу.
                     </div>
                     <group>
                         <group>
@@ -284,13 +284,13 @@
     <!-- ════════════════════════════════════════════════════════════ -->
 
     <record id="mng_daily_report_matrix_action" model="ir.actions.client">
-        <field name="name">Өдрийн тайлан — Сарын ширээ</field>
+        <field name="name">Сарын тайлан</field>
         <field name="tag">mngglobal_logs.monthly_matrix</field>
         <field name="params" eval="{'model': 'mng.daily.report'}"/>
     </record>
 
     <record id="mng_daily_plan_matrix_action" model="ir.actions.client">
-        <field name="name">Өдрийн төлөвлөгөө — Сарын ширээ</field>
+        <field name="name">Сарын төлөвлөгөө</field>
         <field name="tag">mngglobal_logs.monthly_matrix</field>
         <field name="params" eval="{'model': 'mng.daily.plan'}"/>
     </record>
