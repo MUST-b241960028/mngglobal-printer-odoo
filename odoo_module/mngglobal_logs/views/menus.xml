@@ -12,13 +12,13 @@
 
     <menuitem id="mng_daily_report_menu"
               name="Өдрийн тайлан"
-              action="mng_daily_report_action"
+              action="mng_daily_report_matrix_action"
               parent="mng_daily_log_root_menu"
               sequence="10"/>
 
     <menuitem id="mng_daily_plan_menu"
               name="Өдрийн төлөвлөгөө"
-              action="mng_daily_plan_action"
+              action="mng_daily_plan_matrix_action"
               parent="mng_daily_log_root_menu"
               sequence="20"/>
 

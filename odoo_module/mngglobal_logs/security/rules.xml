@@ -3,11 +3,28 @@
 
     <!-- ═══════════════════ DAILY REPORT ═══════════════════ -->
 
-    <record id="rule_daily_report_own" model="ir.rule">
-        <field name="name">Тайлан: өөрийн бүртгэл</field>
+    <!-- Workers READ everyone (matrix/Sheets-style transparency) -->
+    <record id="rule_daily_report_read_all" model="ir.rule">
+        <field name="name">Тайлан: бүх ажилтны бүртгэл харах</field>
+        <field name="model_id" ref="model_mng_daily_report"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- …but only WRITE/CREATE on their own (defenses still apply) -->
+    <record id="rule_daily_report_modify_own" model="ir.rule">
+        <field name="name">Тайлан: өөрийн бүртгэлийг засах</field>
         <field name="model_id" ref="model_mng_daily_report"/>
         <field name="domain_force">[('user_id', '=', user.id)]</field>
         <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
     </record>
 
     <record id="rule_daily_report_manager_all" model="ir.rule">
@@ -19,11 +36,26 @@
 
     <!-- ═══════════════════ DAILY PLAN ═══════════════════ -->
 
-    <record id="rule_daily_plan_own" model="ir.rule">
-        <field name="name">Төлөвлөгөө: өөрийн бүртгэл</field>
+    <record id="rule_daily_plan_read_all" model="ir.rule">
+        <field name="name">Төлөвлөгөө: бүх ажилтны бүртгэл харах</field>
+        <field name="model_id" ref="model_mng_daily_plan"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_daily_plan_modify_own" model="ir.rule">
+        <field name="name">Төлөвлөгөө: өөрийн бүртгэлийг засах</field>
         <field name="model_id" ref="model_mng_daily_plan"/>
         <field name="domain_force">[('user_id', '=', user.id)]</field>
         <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
     </record>
 
     <record id="rule_daily_plan_manager_all" model="ir.rule">

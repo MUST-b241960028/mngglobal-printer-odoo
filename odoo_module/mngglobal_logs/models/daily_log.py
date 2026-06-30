@@ -1,3 +1,6 @@
+import calendar
+import datetime
+
 from odoo import models, fields, api, _
 from odoo.exceptions import AccessError, UserError, ValidationError
 
@@ -73,6 +76,106 @@ class MngDailyLogMixin(models.AbstractModel):
             else:
                 vals.setdefault("user_id", self.env.user.id)
         return super().create(vals_list)
+
+    @api.model
+    def get_monthly_matrix(self, year, month):
+        """Build a (date × user) matrix for the given month.
+
+        Returns:
+            {
+                "year": int, "month": int,
+                "month_label": "2026 он 06 сар",
+                "users": [{id, name, login, color}, ...],
+                "dates": [{iso, day, label, weekday, is_weekend, is_today}, ...],
+                "entries": {"<iso>_<uid>": {id, description, time_slot, can_edit, ...}, ...},
+                "stats": {"<uid>": int_count},
+                "is_manager": bool,
+                "current_uid": int,
+                "cutoff_hours": int,
+            }
+        """
+        year = int(year)
+        month = int(month)
+        _, ndays = calendar.monthrange(year, month)
+        start = datetime.date(year, month, 1)
+        end = datetime.date(year, month, ndays)
+        today = datetime.date.today()
+
+        # All employee-like users (non-shared, active)
+        users = self.env["res.users"].sudo().search(
+            [("active", "=", True), ("share", "=", False)],
+            order="name",
+        )
+        users_data = [
+            {"id": u.id, "name": u.name or u.login, "login": u.login,
+             "color": (u.id * 7) % 360}  # stable hue per user
+            for u in users
+        ]
+
+        is_manager = self.env.user.has_group(MANAGER_GROUP)
+        current_uid = self.env.user.id
+        cutoff_hours = self._get_edit_cutoff_hours()
+        now_dt = fields.Datetime.now()
+
+        entries = self.search([
+            ("log_date", ">=", start),
+            ("log_date", "<=", end),
+        ])
+        entries_data = {}
+        stats = {u["id"]: 0 for u in users_data}
+        for e in entries:
+            iso = e.log_date.isoformat()
+            key = f"{iso}_{e.user_id.id}"
+            # compute can_edit (matches write() guard logic)
+            if is_manager:
+                can_edit = True
+            elif e.user_id.id != current_uid:
+                can_edit = False
+            elif cutoff_hours <= 0:
+                can_edit = False
+            elif e.create_date:
+                elapsed = (now_dt - e.create_date).total_seconds() / 3600.0
+                can_edit = elapsed < cutoff_hours
+            else:
+                can_edit = True
+            entries_data[key] = {
+                "id": e.id,
+                "description": e.description or "",
+                "time_slot": e.time_slot or "",
+                "user_id": e.user_id.id,
+                "log_date": iso,
+                "can_edit": can_edit,
+                "active": e.active,
+            }
+            if e.user_id.id in stats:
+                stats[e.user_id.id] += 1
+
+        # Mongolian weekday short names
+        weekday_mn = ["Дав", "Мяг", "Лха", "Пүр", "Баа", "Бям", "Ням"]
+        dates_data = []
+        for day in range(1, ndays + 1):
+            d = datetime.date(year, month, day)
+            dates_data.append({
+                "iso": d.isoformat(),
+                "day": day,
+                "label": f"{weekday_mn[d.weekday()]} {day:02d}",
+                "weekday": d.weekday(),
+                "is_weekend": d.weekday() >= 5,
+                "is_today": d == today,
+            })
+
+        return {
+            "year": year,
+            "month": month,
+            "month_label": f"{year} он {month:02d} сар",
+            "users": users_data,
+            "dates": dates_data,
+            "entries": entries_data,
+            "stats": stats,
+            "is_manager": is_manager,
+            "current_uid": current_uid,
+            "cutoff_hours": cutoff_hours,
+        }
 
     def write(self, vals):
         if not vals:

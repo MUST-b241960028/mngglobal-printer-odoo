@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="mngglobal_logs.MonthlyMatrix">
+        <div class="o_mng_matrix" t-att-class="state.meta.themeClass">
+
+            <!-- ═══════════ HEADER BAR ═══════════ -->
+            <div class="o_mng_matrix__toolbar">
+                <div class="o_mng_matrix__title">
+                    <span class="o_mng_matrix__icon">
+                        <i t-if="state.model === 'mng.daily.report'" class="fa fa-pencil-square-o"/>
+                        <i t-else="" class="fa fa-calendar-check-o"/>
+                    </span>
+                    <h2 t-esc="state.meta.title"/>
+                    <span t-if="state.data?.is_manager"
+                          class="o_mng_matrix__badge o_mng_matrix__badge--manager">
+                        Менежер
+                    </span>
+                </div>
+
+                <div class="o_mng_matrix__nav">
+                    <button class="btn btn-light" t-on-click="prevMonth" title="Өмнөх сар">
+                        <i class="fa fa-chevron-left"/>
+                    </button>
+                    <span class="o_mng_matrix__month_label"
+                          t-esc="state.data?.month_label or '...'"/>
+                    <button class="btn btn-light" t-on-click="nextMonth" title="Дараагийн сар">
+                        <i class="fa fa-chevron-right"/>
+                    </button>
+                    <button class="btn btn-secondary o_mng_matrix__today_btn"
+                            t-on-click="goToday">
+                        <i class="fa fa-calendar-o"/> Өнөөдөр
+                    </button>
+                </div>
+
+                <div class="o_mng_matrix__actions">
+                    <button class="btn btn-primary" t-on-click="toggleModel">
+                        <i class="fa fa-exchange"/>
+                        <t t-if="state.model === 'mng.daily.report'">→ Төлөвлөгөө</t>
+                        <t t-else="">→ Тайлан</t>
+                    </button>
+                    <button class="btn btn-light" t-on-click="openListView" title="Жагсаалт">
+                        <i class="fa fa-list"/>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ═══════════ LOADING ═══════════ -->
+            <div t-if="state.loading" class="o_mng_matrix__loading">
+                <i class="fa fa-spinner fa-spin"/> Ачаалж байна...
+            </div>
+
+            <!-- ═══════════ MAIN MATRIX ═══════════ -->
+            <div t-if="!state.loading and state.data" class="o_mng_matrix__body">
+
+                <!-- Stats sidebar -->
+                <div class="o_mng_matrix__stats">
+                    <div class="o_mng_matrix__stats_title">
+                        Энэ сарын тоо
+                    </div>
+                    <div class="o_mng_matrix__stats_list">
+                        <div t-foreach="state.data.users" t-as="user" t-key="user.id"
+                             class="o_mng_matrix__stats_row">
+                            <span class="o_mng_matrix__stats_dot"
+                                  t-attf-style="background: hsl({{user.color}}, 65%, 55%);"/>
+                            <span class="o_mng_matrix__stats_name" t-esc="user.name"/>
+                            <span class="o_mng_matrix__stats_count"
+                                  t-esc="state.data.stats[user.id] || 0"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Matrix grid -->
+                <div class="o_mng_matrix__grid_wrap">
+                    <table class="o_mng_matrix__grid">
+                        <thead>
+                            <tr>
+                                <th class="o_mng_matrix__th_date">Огноо</th>
+                                <th t-foreach="state.data.users" t-as="user" t-key="user.id"
+                                    class="o_mng_matrix__th_user"
+                                    t-attf-style="border-bottom: 3px solid hsl({{user.color}}, 65%, 55%);">
+                                    <div class="o_mng_matrix__th_user_inner">
+                                        <span class="o_mng_matrix__th_user_avatar"
+                                              t-attf-style="background: hsl({{user.color}}, 65%, 55%);"
+                                              t-esc="user.name.slice(0,1).toUpperCase()"/>
+                                        <span class="o_mng_matrix__th_user_name"
+                                              t-esc="user.name"/>
+                                        <span t-if="user.id === state.data.current_uid"
+                                              class="o_mng_matrix__th_user_self">Та</span>
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="state.data.dates" t-as="date" t-key="date.iso"
+                                t-att-class="rowClass(date)">
+                                <td class="o_mng_matrix__td_date">
+                                    <span class="o_mng_matrix__td_date_label" t-esc="date.label"/>
+                                    <span t-if="date.is_today"
+                                          class="o_mng_matrix__td_date_today_badge">Өнөөдөр</span>
+                                </td>
+                                <td t-foreach="state.data.users" t-as="user" t-key="user.id"
+                                    t-att-class="cellClass(date, user)"
+                                    t-on-click="() => this.onCellClick(date, user)">
+                                    <t t-set="entry" t-value="getEntry(date.iso, user.id)"/>
+                                    <t t-if="entry">
+                                        <div class="o_mng_matrix__cell_content"
+                                             t-att-title="entry.description">
+                                            <span t-if="entry.time_slot"
+                                                  class="o_mng_matrix__cell_time"
+                                                  t-esc="entry.time_slot"/>
+                                            <span class="o_mng_matrix__cell_text"
+                                                  t-esc="entry.description"/>
+                                        </div>
+                                        <span t-if="!entry.can_edit"
+                                              class="o_mng_matrix__cell_lock"
+                                              title="Засварлах боломжгүй">
+                                            <i class="fa fa-lock"/>
+                                        </span>
+                                    </t>
+                                    <t t-elif="canCreateHere(user.id) and !date.is_weekend">
+                                        <span class="o_mng_matrix__cell_hint">+</span>
+                                    </t>
+                                    <t t-else="">
+                                        <span class="o_mng_matrix__cell_dash">—</span>
+                                    </t>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </t>
+
+</templates>

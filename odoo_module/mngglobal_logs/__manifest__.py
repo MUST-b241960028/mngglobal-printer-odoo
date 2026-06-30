@@ -1,6 +1,6 @@
 {
     "name": "MNG Лог — Өдөр тутмын тайлан/төлөвлөгөө",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "category": "Human Resources",
     "summary": "Ажилчдын өдөр тутмын тайлан болон төлөвлөгөөний бүртгэл",
     "description": """
@@ -22,6 +22,13 @@
         "views/daily_log_views.xml",
         "views/menus.xml",
     ],
+    "assets": {
+        "web.assets_backend": [
+            "mngglobal_logs/static/src/scss/monthly_matrix.scss",
+            "mngglobal_logs/static/src/js/monthly_matrix.js",
+            "mngglobal_logs/static/src/xml/monthly_matrix.xml",
+        ],
+    },
     "application": True,
     "installable": True,
     "auto_install": False,

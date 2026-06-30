@@ -1,0 +1,379 @@
+.o_mng_matrix {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: #f6f7fa;
+    font-size: 0.9rem;
+
+    // ──────── Toolbar ────────
+    &__toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 1rem 1.25rem;
+        background: white;
+        border-bottom: 1px solid #e3e6ed;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        flex-wrap: wrap;
+    }
+
+    &__title {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+
+        h2 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+    }
+
+    &__icon {
+        font-size: 1.4rem;
+        color: #6366f1;
+    }
+
+    &__badge {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.55rem;
+        border-radius: 999px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+
+        &--manager {
+            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+            color: white;
+        }
+    }
+
+    &__nav {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+
+        .btn {
+            padding: 0.35rem 0.6rem;
+        }
+    }
+
+    &__month_label {
+        font-size: 1rem;
+        font-weight: 600;
+        padding: 0 0.8rem;
+        min-width: 8rem;
+        text-align: center;
+    }
+
+    &__today_btn {
+        margin-left: 0.4rem;
+    }
+
+    &__actions {
+        display: flex;
+        gap: 0.4rem;
+
+        .btn {
+            padding: 0.35rem 0.8rem;
+        }
+    }
+
+    // ──────── Loading ────────
+    &__loading {
+        padding: 3rem;
+        text-align: center;
+        color: #94a3b8;
+        font-size: 1rem;
+
+        .fa-spinner {
+            margin-right: 0.5rem;
+        }
+    }
+
+    // ──────── Body layout ────────
+    &__body {
+        display: flex;
+        flex: 1;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    // ──────── Stats sidebar ────────
+    &__stats {
+        width: 13rem;
+        padding: 1rem;
+        background: white;
+        border-right: 1px solid #e3e6ed;
+        overflow-y: auto;
+        flex-shrink: 0;
+    }
+
+    &__stats_title {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #64748b;
+        margin-bottom: 0.75rem;
+    }
+
+    &__stats_row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.35rem 0;
+        font-size: 0.85rem;
+    }
+
+    &__stats_dot {
+        width: 0.6rem;
+        height: 0.6rem;
+        border-radius: 999px;
+        flex-shrink: 0;
+    }
+
+    &__stats_name {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &__stats_count {
+        font-variant-numeric: tabular-nums;
+        font-weight: 600;
+        color: #475569;
+    }
+
+    // ──────── Matrix grid ────────
+    &__grid_wrap {
+        flex: 1;
+        overflow: auto;
+        padding: 1rem;
+    }
+
+    &__grid {
+        border-collapse: separate;
+        border-spacing: 0;
+        background: white;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        width: max-content;
+        min-width: 100%;
+    }
+
+    &__th_date,
+    &__td_date {
+        position: sticky;
+        left: 0;
+        z-index: 2;
+        background: white;
+        min-width: 7rem;
+        padding: 0.5rem 0.8rem;
+        border-right: 1px solid #e3e6ed;
+    }
+
+    &__th_date {
+        z-index: 3;
+        top: 0;
+        background: #f8fafc;
+        font-weight: 700;
+        font-size: 0.75rem;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    &__th_user {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: white;
+        padding: 0.6rem 0.5rem;
+        min-width: 11rem;
+        max-width: 11rem;
+        border-right: 1px solid #f1f5f9;
+    }
+
+    &__th_user_inner {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    &__th_user_avatar {
+        width: 1.6rem;
+        height: 1.6rem;
+        border-radius: 999px;
+        color: white;
+        font-weight: 600;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    &__th_user_name {
+        font-weight: 600;
+        color: #1e293b;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        flex: 1;
+    }
+
+    &__th_user_self {
+        font-size: 0.65rem;
+        background: #6366f1;
+        color: white;
+        padding: 0.15rem 0.4rem;
+        border-radius: 999px;
+        font-weight: 600;
+    }
+
+    // ──────── Rows ────────
+    &__row {
+        &--weekend {
+            background: #f8fafc;
+            color: #94a3b8;
+        }
+
+        &--today &__td_date,
+        &--today td {
+            box-shadow: inset 0 1px 0 #6366f1, inset 0 -1px 0 #6366f1;
+        }
+    }
+
+    &__td_date {
+        font-weight: 500;
+        color: #475569;
+        font-size: 0.85rem;
+        padding: 0.6rem 0.8rem;
+        border-bottom: 1px solid #f1f5f9;
+        white-space: nowrap;
+    }
+
+    &__td_date_label {
+        font-variant-numeric: tabular-nums;
+    }
+
+    &__td_date_today_badge {
+        display: inline-block;
+        margin-left: 0.4rem;
+        font-size: 0.65rem;
+        background: #6366f1;
+        color: white;
+        padding: 0.1rem 0.4rem;
+        border-radius: 999px;
+        font-weight: 600;
+        vertical-align: middle;
+    }
+
+    // ──────── Cells ────────
+    &__cell {
+        padding: 0.5rem 0.6rem;
+        border-bottom: 1px solid #f1f5f9;
+        border-right: 1px solid #f8fafc;
+        vertical-align: top;
+        min-width: 11rem;
+        max-width: 11rem;
+        position: relative;
+        cursor: default;
+        transition: background-color 0.12s ease, transform 0.08s ease;
+
+        &--weekend {
+            background: rgba(241,245,249,0.45);
+        }
+
+        &--filled {
+            cursor: pointer;
+        }
+
+        &--filled:hover {
+            background: #eff6ff;
+        }
+
+        &--creatable {
+            cursor: pointer;
+        }
+
+        &--creatable:hover {
+            background: #f0fdf4;
+        }
+
+        &--mine.o_mng_matrix__cell--filled {
+            box-shadow: inset 3px 0 0 #6366f1;
+        }
+
+        &--readonly {
+            cursor: default;
+            opacity: 0.5;
+        }
+    }
+
+    &__cell_content {
+        font-size: 0.82rem;
+        line-height: 1.35;
+        color: #0f172a;
+        max-height: 4.6rem;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 4;
+        -webkit-box-orient: vertical;
+        word-break: break-word;
+    }
+
+    &__cell_time {
+        display: block;
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: #6366f1;
+        margin-bottom: 0.15rem;
+    }
+
+    &__cell_text {
+        white-space: pre-wrap;
+    }
+
+    &__cell_lock {
+        position: absolute;
+        top: 0.3rem;
+        right: 0.4rem;
+        color: #94a3b8;
+        font-size: 0.7rem;
+    }
+
+    &__cell_hint {
+        color: #cbd5e1;
+        font-size: 1.2rem;
+        font-weight: 300;
+        display: block;
+        text-align: center;
+        line-height: 1;
+        padding: 0.5rem 0;
+        transition: color 0.12s ease, transform 0.12s ease;
+    }
+
+    .o_mng_matrix__cell--creatable:hover &__cell_hint {
+        color: #16a34a;
+        transform: scale(1.4);
+    }
+
+    &__cell_dash {
+        color: #e2e8f0;
+        display: block;
+        text-align: center;
+    }
+
+    // ──────── Theme variants ────────
+    &--plan &__icon {
+        color: #10b981;
+    }
+
+    &--plan &__cell_time {
+        color: #10b981;
+    }
+}

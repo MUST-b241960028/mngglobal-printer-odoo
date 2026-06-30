@@ -259,4 +259,20 @@
         <field name="context">{'search_default_this_week': 1}</field>
     </record>
 
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <!-- MONTHLY MATRIX CLIENT ACTIONS                                -->
+    <!-- ════════════════════════════════════════════════════════════ -->
+
+    <record id="mng_daily_report_matrix_action" model="ir.actions.client">
+        <field name="name">Өдрийн тайлан — Сарын ширээ</field>
+        <field name="tag">mngglobal_logs.monthly_matrix</field>
+        <field name="params" eval="{'model': 'mng.daily.report'}"/>
+    </record>
+
+    <record id="mng_daily_plan_matrix_action" model="ir.actions.client">
+        <field name="name">Өдрийн төлөвлөгөө — Сарын ширээ</field>
+        <field name="tag">mngglobal_logs.monthly_matrix</field>
+        <field name="params" eval="{'model': 'mng.daily.plan'}"/>
+    </record>
+
 </odoo>
