@@ -37,4 +37,11 @@
               sequence="10"
               groups="mngglobal_visa.group_visa_manager,base.group_system"/>
 
+    <menuitem id="mng_daily_log_users_menu"
+              name="Харагдах ажилтнууд"
+              action="mng_daily_log_users_action"
+              parent="mng_daily_log_config_root_menu"
+              sequence="20"
+              groups="mngglobal_visa.group_visa_manager,base.group_system"/>
+
 </odoo>

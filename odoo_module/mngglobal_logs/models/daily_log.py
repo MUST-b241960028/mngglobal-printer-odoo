@@ -18,10 +18,36 @@ class MngDailyLogMixin(models.AbstractModel):
         string="Огноо", required=True, tracking=True, index=True,
         default=fields.Date.context_today,
     )
-    time_slot = fields.Char(
-        string="Цаг", tracking=True,
-        help="Жишээ: 10:00-11:30 (заавал биш)",
+    start_time = fields.Float(
+        string="Эхэлсэн", tracking=True,
+        help="Цаг (HH:MM)",
     )
+    end_time = fields.Float(
+        string="Дуусах", tracking=True,
+        help="Цаг (HH:MM)",
+    )
+    # legacy free-text field; kept for backward-compat with existing rows
+    time_slot = fields.Char(
+        string="Цаг (хуучин)", tracking=True,
+    )
+    time_display = fields.Char(
+        string="Цаг", compute="_compute_time_display",
+    )
+
+    @api.depends("start_time", "end_time", "time_slot")
+    def _compute_time_display(self):
+        for rec in self:
+            if rec.start_time or rec.end_time:
+                def fmt(v):
+                    h = int(v)
+                    m = int(round((v - h) * 60))
+                    return f"{h:02d}:{m:02d}"
+                if rec.end_time and rec.end_time != rec.start_time:
+                    rec.time_display = f"{fmt(rec.start_time)}–{fmt(rec.end_time)}"
+                else:
+                    rec.time_display = fmt(rec.start_time)
+            else:
+                rec.time_display = rec.time_slot or ""
     user_id = fields.Many2one(
         "res.users", string="Хэрэглэгч", required=True, tracking=True,
         default=lambda self: self.env.user, index=True,
@@ -101,9 +127,10 @@ class MngDailyLogMixin(models.AbstractModel):
         end = datetime.date(year, month, ndays)
         today = datetime.date.today()
 
-        # All employee-like users (non-shared, active)
+        # All employee-like users (non-shared, active, not hidden from logs)
         users = self.env["res.users"].sudo().search(
-            [("active", "=", True), ("share", "=", False)],
+            [("active", "=", True), ("share", "=", False),
+             ("show_in_daily_logs", "=", True)],
             order="name",
         )
         users_data = [
@@ -141,7 +168,7 @@ class MngDailyLogMixin(models.AbstractModel):
             entries_data[key] = {
                 "id": e.id,
                 "description": e.description or "",
-                "time_slot": e.time_slot or "",
+                "time_slot": e.time_display or "",
                 "user_id": e.user_id.id,
                 "log_date": iso,
                 "can_edit": can_edit,

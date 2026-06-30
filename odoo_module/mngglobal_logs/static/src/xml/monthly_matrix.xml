@@ -59,8 +59,9 @@
                         Энэ сарын тоо
                     </div>
                     <div class="o_mng_matrix__stats_list">
-                        <div t-foreach="state.data.users" t-as="user" t-key="user.id"
-                             class="o_mng_matrix__stats_row">
+                        <div t-foreach="sortedStatsUsers" t-as="user" t-key="user.id"
+                             class="o_mng_matrix__stats_row"
+                             t-att-class="{'o_mng_matrix__stats_row--zero': !(state.data.stats[user.id] || 0)}">
                             <span class="o_mng_matrix__stats_dot"
                                   t-attf-style="background: hsl({{user.color}}, 65%, 55%);"/>
                             <span class="o_mng_matrix__stats_name" t-esc="user.name"/>

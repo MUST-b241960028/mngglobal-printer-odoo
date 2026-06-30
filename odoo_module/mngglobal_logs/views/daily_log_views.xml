@@ -45,20 +45,30 @@
                     <group>
                         <group>
                             <field name="log_date" readonly="not can_edit_now"/>
-                            <field name="time_slot"
-                                   placeholder="ж: 10:00-11:30"
-                                   readonly="not can_edit_now"/>
                             <field name="user_id" widget="many2one_avatar_user"
                                    readonly="1" force_save="1"/>
                         </group>
+                        <group>
+                            <label for="start_time" string="Цагийн зурвас"/>
+                            <div class="o_row">
+                                <field name="start_time" widget="float_time"
+                                       readonly="not can_edit_now" nolabel="1"
+                                       class="oe_inline" style="width: 5rem"/>
+                                <span class="mx-2">–</span>
+                                <field name="end_time" widget="float_time"
+                                       readonly="not can_edit_now" nolabel="1"
+                                       class="oe_inline" style="width: 5rem"/>
+                            </div>
+                        </group>
                     </group>
-                    <group string="Юу хийсэн?">
-                        <field name="description" nolabel="1"
-                               placeholder="Өнөөдөр юу хийснээ дэлгэрэнгүй бичээрэй..."
-                               readonly="not can_edit_now"/>
-                    </group>
+                    <separator string="Юу хийсэн?"/>
+                    <field name="description" nolabel="1"
+                           placeholder="Өнөөдөр юу хийснээ дэлгэрэнгүй бичээрэй..."
+                           readonly="not can_edit_now"
+                           class="o_mng_log_description"/>
                     <field name="active" invisible="1"/>
                     <field name="can_edit_now" invisible="1"/>
+                    <field name="time_slot" invisible="1"/>
                 </sheet>
                 <chatter/>
             </form>
@@ -175,20 +185,30 @@
                     <group>
                         <group>
                             <field name="log_date" readonly="not can_edit_now"/>
-                            <field name="time_slot"
-                                   placeholder="ж: 14:00-16:00"
-                                   readonly="not can_edit_now"/>
                             <field name="user_id" widget="many2one_avatar_user"
                                    readonly="1" force_save="1"/>
                         </group>
+                        <group>
+                            <label for="start_time" string="Цагийн зурвас"/>
+                            <div class="o_row">
+                                <field name="start_time" widget="float_time"
+                                       readonly="not can_edit_now" nolabel="1"
+                                       class="oe_inline" style="width: 5rem"/>
+                                <span class="mx-2">–</span>
+                                <field name="end_time" widget="float_time"
+                                       readonly="not can_edit_now" nolabel="1"
+                                       class="oe_inline" style="width: 5rem"/>
+                            </div>
+                        </group>
                     </group>
-                    <group string="Юу хийхээр төлөвлөж байна?">
-                        <field name="description" nolabel="1"
-                               placeholder="Хийхээр төлөвлөж буй ажлаа дэлгэрэнгүй бичээрэй..."
-                               readonly="not can_edit_now"/>
-                    </group>
+                    <separator string="Юу хийхээр төлөвлөж байна?"/>
+                    <field name="description" nolabel="1"
+                           placeholder="Хийхээр төлөвлөж буй ажлаа дэлгэрэнгүй бичээрэй..."
+                           readonly="not can_edit_now"
+                           class="o_mng_log_description"/>
                     <field name="active" invisible="1"/>
                     <field name="can_edit_now" invisible="1"/>
+                    <field name="time_slot" invisible="1"/>
                 </sheet>
                 <chatter/>
             </form>
@@ -273,6 +293,42 @@
         <field name="name">Өдрийн төлөвлөгөө — Сарын ширээ</field>
         <field name="tag">mngglobal_logs.monthly_matrix</field>
         <field name="params" eval="{'model': 'mng.daily.plan'}"/>
+    </record>
+
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <!-- USER VISIBILITY MANAGEMENT (managers toggle who shows up)    -->
+    <!-- ════════════════════════════════════════════════════════════ -->
+
+    <record id="mng_daily_log_users_list" model="ir.ui.view">
+        <field name="name">mng.daily.log.users.list</field>
+        <field name="model">res.users</field>
+        <field name="arch" type="xml">
+            <list editable="bottom" create="0" delete="0"
+                  decoration-muted="not show_in_daily_logs"
+                  default_order="show_in_daily_logs desc, name">
+                <field name="name" readonly="1"/>
+                <field name="login" readonly="1"/>
+                <field name="show_in_daily_logs" widget="boolean_toggle"
+                       string="Матриц дээр харагдах"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="mng_daily_log_users_action" model="ir.actions.act_window">
+        <field name="name">Лог дээр харагдах ажилтнууд</field>
+        <field name="res_model">res.users</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="mng_daily_log_users_list"/>
+        <field name="domain">[('active', '=', True), ('share', '=', False)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Ажилтны бүртгэл олдсонгүй
+            </p>
+            <p>
+                Ажилтнаа лог матриц дээр харуулахгүй бол "Матриц дээр харагдах"
+                чагтыг авна. Хэрэв хэрэгцээтэй болбол дахин чагтална.
+            </p>
+        </field>
     </record>
 
 </odoo>

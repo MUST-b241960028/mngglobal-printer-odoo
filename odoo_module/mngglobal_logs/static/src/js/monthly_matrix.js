@@ -120,6 +120,17 @@ export class MonthlyMatrix extends Component {
         return this.state.data?.entries[`${iso}_${userId}`] || null;
     }
 
+    // Sidebar stats sorted by count desc, then name asc (most active on top)
+    get sortedStatsUsers() {
+        if (!this.state.data) return [];
+        const stats = this.state.data.stats || {};
+        return [...this.state.data.users].sort((a, b) => {
+            const diff = (stats[b.id] || 0) - (stats[a.id] || 0);
+            if (diff !== 0) return diff;
+            return (a.name || "").localeCompare(b.name || "");
+        });
+    }
+
     canCreateHere(userId) {
         if (!this.state.data) return false;
         return this.state.data.is_manager || userId === this.state.data.current_uid;
