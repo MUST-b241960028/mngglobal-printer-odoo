@@ -26,6 +26,7 @@ export class MonthlyMatrix extends Component {
         this.orm = useService("orm");
         this.actionService = useService("action");
         this.notification = useService("notification");
+        this.ui = useService("ui"); // reactive { isSmall, size } — same one used by Odoo's own responsive views
 
         const params = this.props.action?.params || {};
         const today = new Date();
@@ -40,11 +41,16 @@ export class MonthlyMatrix extends Component {
             month_input: today.getMonth() + 1,
             data: null,
             loading: true,
+            statsOpen: false, // collapsed by default on mobile
         });
 
         onWillStart(async () => {
             await this.loadMatrix();
         });
+    }
+
+    toggleStats() {
+        this.state.statsOpen = !this.state.statsOpen;
     }
 
     async loadMatrix() {

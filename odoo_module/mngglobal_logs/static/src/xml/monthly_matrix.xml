@@ -2,7 +2,8 @@
 <templates xml:space="preserve">
 
     <t t-name="mngglobal_logs.MonthlyMatrix">
-        <div class="o_mng_matrix" t-att-class="state.meta.themeClass">
+        <div class="o_mng_matrix"
+             t-att-class="{[state.meta.themeClass]: true, 'o_mng_matrix--mobile': ui.isSmall}">
 
             <!-- ═══════════ HEADER BAR ═══════════ -->
             <div class="o_mng_matrix__toolbar">
@@ -28,19 +29,26 @@
                         <i class="fa fa-chevron-right"/>
                     </button>
                     <button class="btn btn-secondary o_mng_matrix__today_btn"
-                            t-on-click="goToday">
-                        <i class="fa fa-calendar-o"/> Өнөөдөр
+                            t-on-click="goToday" title="Өнөөдөр">
+                        <i class="fa fa-calendar-o"/>
+                        <span class="o_mng_matrix__today_btn_label"> Өнөөдөр</span>
                     </button>
                 </div>
 
                 <div class="o_mng_matrix__actions">
+                    <button t-if="ui.isSmall" class="btn btn-light"
+                            t-on-click="toggleStats" title="Энэ сарын тоо">
+                        <i class="fa fa-bar-chart"/>
+                    </button>
                     <button class="btn btn-primary" t-on-click="toggleModel">
                         <i class="fa fa-exchange"/>
                         <t t-if="state.model === 'mng.daily.report'"> Төлөвлөгөө</t>
                         <t t-else=""> Тайлан</t>
                     </button>
-                    <button class="btn btn-light" t-on-click="openListView" title="Жагсаалт">
+                    <button class="btn btn-light" t-on-click="openListView"
+                            title="Жагсаалт, шүүлтүүр, экспорт">
                         <i class="fa fa-list"/>
+                        <span class="o_mng_matrix__list_btn_label"> Жагсаалт</span>
                     </button>
                 </div>
             </div>
@@ -53,10 +61,13 @@
             <!-- ═══════════ MAIN MATRIX ═══════════ -->
             <div t-if="!state.loading and state.data" class="o_mng_matrix__body">
 
-                <!-- Stats sidebar -->
-                <div class="o_mng_matrix__stats">
+                <!-- Stats sidebar (collapsible drawer on mobile) -->
+                <div class="o_mng_matrix__stats"
+                     t-att-class="{'o_mng_matrix__stats--collapsed': ui.isSmall and !state.statsOpen}">
                     <div class="o_mng_matrix__stats_title">
                         Энэ сарын тоо
+                        <button t-if="ui.isSmall" class="btn-close o_mng_matrix__stats_close"
+                                t-on-click="toggleStats" aria-label="Хаах"/>
                     </div>
                     <div class="o_mng_matrix__stats_list">
                         <div t-foreach="sortedStatsUsers" t-as="user" t-key="user.id"

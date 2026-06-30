@@ -383,6 +383,155 @@
     &__stats_row--zero {
         opacity: 0.5;
     }
+
+    // ════════════════════════════════════════════════════════════
+    // MOBILE — compact table, collapsible stats drawer
+    // Scoped to .o_mng_matrix--mobile, driven by Odoo's ui.isSmall
+    // (same reactive flag Odoo's own list/kanban views use).
+    // ════════════════════════════════════════════════════════════
+    &.o_mng_matrix--mobile {
+        font-size: 0.78rem;
+
+        .o_mng_matrix__toolbar {
+            padding: 0.6rem 0.7rem;
+            gap: 0.5rem;
+        }
+
+        .o_mng_matrix__title h2 {
+            font-size: 1rem;
+        }
+
+        .o_mng_matrix__icon {
+            font-size: 1.1rem;
+        }
+
+        .o_mng_matrix__badge {
+            font-size: 0.6rem;
+            padding: 0.15rem 0.4rem;
+        }
+
+        .o_mng_matrix__nav {
+            gap: 0.2rem;
+
+            .btn {
+                padding: 0.3rem 0.45rem;
+            }
+        }
+
+        .o_mng_matrix__month_label {
+            font-size: 0.82rem;
+            min-width: 5.5rem;
+            padding: 0 0.3rem;
+        }
+
+        .o_mng_matrix__today_btn_label {
+            display: none; // icon-only on mobile
+        }
+
+        .o_mng_matrix__actions {
+            gap: 0.3rem;
+
+            .btn {
+                padding: 0.3rem 0.55rem;
+                font-size: 0.78rem;
+            }
+        }
+
+        .o_mng_matrix__list_btn_label {
+            display: none; // icon-only on mobile, tooltip still explains it
+        }
+
+        // ── Stats becomes an overlay drawer instead of a sidebar ──
+        .o_mng_matrix__body {
+            position: relative;
+        }
+
+        .o_mng_matrix__stats {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            width: auto;
+            max-height: 60vh;
+            overflow-y: auto;
+            border-right: none;
+            border-bottom: 1px solid #e3e6ed;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+
+        .o_mng_matrix__stats--collapsed {
+            display: none;
+        }
+
+        .o_mng_matrix__stats_title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .o_mng_matrix__stats_close {
+            font-size: 0.7rem;
+        }
+
+        // ── Compact grid: smaller cells, smaller text ──
+        .o_mng_matrix__grid_wrap {
+            padding: 0.5rem;
+        }
+
+        .o_mng_matrix__th_date,
+        .o_mng_matrix__td_date {
+            width: 4.2rem;
+            min-width: 4.2rem;
+            max-width: 4.2rem;
+            padding: 0.4rem 0.4rem;
+            font-size: 0.72rem;
+        }
+
+        .o_mng_matrix__td_date_today_badge {
+            display: block;
+            margin-left: 0;
+            margin-top: 0.2rem;
+            font-size: 0.55rem;
+        }
+
+        .o_mng_matrix__th_user,
+        .o_mng_matrix__cell {
+            min-width: 7rem;
+            max-width: 7rem;
+            padding: 0.4rem 0.45rem;
+        }
+
+        .o_mng_matrix__th_user_avatar {
+            width: 1.3rem;
+            height: 1.3rem;
+            font-size: 0.7rem;
+        }
+
+        .o_mng_matrix__th_user_name {
+            font-size: 0.78rem;
+        }
+
+        .o_mng_matrix__th_user_self {
+            font-size: 0.58rem;
+            padding: 0.1rem 0.3rem;
+        }
+
+        .o_mng_matrix__cell_content {
+            font-size: 0.72rem;
+            max-height: 3.4rem;
+            -webkit-line-clamp: 3;
+        }
+
+        .o_mng_matrix__cell_time {
+            font-size: 0.62rem;
+        }
+
+        .o_mng_matrix__cell_hint {
+            font-size: 1rem;
+            padding: 0.3rem 0;
+        }
+    }
 }
 
 // ──────── Description field polish (form view) ────────
