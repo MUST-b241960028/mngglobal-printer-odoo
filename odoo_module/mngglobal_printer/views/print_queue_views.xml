@@ -33,7 +33,7 @@
 
                             <!-- Big Clickable Upload Box (Shown when no file uploaded) -->
                             <div class="mb-3 o_mng_big_dropzone" invisible="pdf_data">
-                                <field name="pdf_data" filename="pdf_filename" widget="binary" string="📁  Баримтаа Энд Дарж Байршуулна уу&#10;.pdf, .docx, .xlsx, .pptx, .jpg баримтууд дэмжигдэнэ"/>
+                                <field name="pdf_data" filename="pdf_filename" widget="binary" string="Баримтаа Энд Дарж Байршуулна уу"/>
                             </div>
 
                             <!-- Small edit bar (Shown when file is uploaded) -->

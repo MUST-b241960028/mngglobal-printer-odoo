@@ -1,21 +1,49 @@
-.o_mng_big_dropzone .o_select_file_button {
+.o_mng_big_dropzone {
     display: block !important;
     width: 100% !important;
-    min-height: 220px !important;
+}
+
+.o_mng_big_dropzone .o_select_file_button {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    min-height: 280px !important;
     border: 2px dashed #714B67 !important;
     border-radius: 12px !important;
     background-color: #FAF8FA !important;
     color: #714B67 !important;
-    font-size: 20px !important;
-    font-weight: bold !important;
+    font-size: 22px !important;
+    font-weight: 700 !important;
     text-align: center !important;
-    padding: 60px 20px !important;
+    padding: 50px 20px !important;
     cursor: pointer !important;
-    white-space: pre-wrap !important;
-    box-shadow: none !important;
+    box-shadow: 0 4px 12px rgba(113, 75, 103, 0.05) !important;
+    transition: all 0.25s ease-in-out !important;
+    outline: none !important;
+}
+
+.o_mng_big_dropzone .o_select_file_button::before {
+    content: "📁" !important;
+    font-size: 64px !important;
+    display: block !important;
+    margin-bottom: 14px !important;
+    line-height: 1 !important;
+}
+
+.o_mng_big_dropzone .o_select_file_button::after {
+    content: ".pdf, .docx, .xlsx, .pptx, .jpg, .png файлууд дэмжигдэнэ" !important;
+    font-size: 13px !important;
+    font-weight: 400 !important;
+    color: #666666 !important;
+    display: block !important;
+    margin-top: 10px !important;
 }
 
 .o_mng_big_dropzone .o_select_file_button:hover {
     background-color: #F3EBF1 !important;
     border-color: #58334E !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(113, 75, 103, 0.1) !important;
 }
