@@ -65,7 +65,7 @@ def app_dir():
 # ──────────────────────────────────────────────────────────────────────
 
 APP_NAME = "MNG Printer Bridge"
-APP_VERSION = "1.3.1"
+APP_VERSION = "1.3.2"
 CONFIG_FILE = os.path.join(app_dir(), "config.ini")
 LOG_FILE = os.path.join(app_dir(), "printer_bridge.log")
 ICON_FILE = "icon.png"  # resolved via resource_path()
@@ -649,6 +649,7 @@ class Printer:
         self.printer_name = printer_name.strip()
         self.temp_folder = os.path.join(app_dir(), temp_folder)
         os.makedirs(self.temp_folder, exist_ok=True)
+        self.last_error = ""
 
         # Resolve SumatraPDF: user-specified > bundled > system
         sp = sumatra_path.strip()
@@ -658,10 +659,12 @@ class Printer:
             self.sumatra_path = _get_bundled_sumatra() or sp
 
     def print_pdf(self, pdf_data_b64, filename, copies=1, print_settings=""):
+        self.last_error = ""
         try:
             pdf_bytes = base64.b64decode(pdf_data_b64)
         except Exception as e:
-            log.error(f"Failed to decode PDF: {e}")
+            self.last_error = f"Failed to decode base64 file data: {e}"
+            log.error(self.last_error)
             return False
 
         safe_name = "".join(c for c in filename if c.isalnum() or c in "._- ").strip()
@@ -674,7 +677,8 @@ class Printer:
                 f.write(pdf_bytes)
             log.info(f"Saved: {file_path} ({len(pdf_bytes):,} bytes)")
         except Exception as e:
-            log.error(f"Failed to save PDF: {e}")
+            self.last_error = f"Failed to save temp file '{safe_name}': {e}"
+            log.error(self.last_error)
             return False
 
         success = True
@@ -697,12 +701,34 @@ class Printer:
         return success
 
     def _send_to_printer(self, path, print_settings=""):
-        if self.sumatra_path and os.path.exists(self.sumatra_path):
-            return self._print_sumatra(path, print_settings)
+        ext = os.path.splitext(path)[1].lower()
+        sumatra_supported = ext in (
+            ".pdf", ".xps", ".cbz", ".cbr", ".djvu", ".chm",
+            ".epub", ".mobi", ".png", ".jpg", ".jpeg", ".bmp",
+            ".gif", ".webp", ".tiff"
+        )
+
+        if self.sumatra_path and os.path.exists(self.sumatra_path) and sumatra_supported:
+            if self._print_sumatra(path, print_settings):
+                return True
+
         if sys.platform == "win32":
-            return self._print_shell(path)
-        # Linux — try lp/lpr
-        return self._print_cups(path)
+            if self._print_shell(path):
+                return True
+
+        if not sumatra_supported and sys.platform != "win32":
+            if self._print_cups(path):
+                return True
+            self.last_error = f"Unsupported format '{ext}' for silent printing on Linux. Convert file to PDF or Image before sending."
+            log.error(self.last_error)
+            return False
+
+        if self.sumatra_path and os.path.exists(self.sumatra_path) and not sumatra_supported:
+            self.last_error = f"SumatraPDF cannot print '{ext}' files. Please convert to PDF or Image (.pdf, .jpg, .png) before queuing."
+            log.error(self.last_error)
+            return False
+
+        return self._print_cups(path) if sys.platform != "win32" else False
 
     def _print_sumatra(self, path, print_settings=""):
         try:
@@ -720,24 +746,29 @@ class Printer:
             if r.returncode == 0:
                 log.info(f"✓ Printed: {os.path.basename(path)}")
                 return True
-            log.error(f"SumatraPDF error: {r.stderr}")
+            err_msg = (r.stderr or "").strip() or f"Exit code {r.returncode}"
+            self.last_error = f"SumatraPDF error: {err_msg}"
+            log.error(self.last_error)
             return False
         except subprocess.TimeoutExpired:
-            log.error("Print timeout (60s)")
+            self.last_error = "Print timeout (60s exceeded)"
+            log.error(self.last_error)
             return False
         except Exception as e:
-            log.error(f"Print error: {e}")
+            self.last_error = f"Print error: {e}"
+            log.error(self.last_error)
             return False
 
     def _print_shell(self, path):
         try:
-            log.info(f"Printing via shell: {os.path.basename(path)}")
+            log.info(f"Printing via Windows shell: {os.path.basename(path)}")
             os.startfile(path, "print")
             time.sleep(5)
-            log.info(f"✓ Sent: {os.path.basename(path)}")
+            log.info(f"✓ Sent to Windows printer shell: {os.path.basename(path)}")
             return True
         except Exception as e:
-            log.error(f"Shell print error: {e}")
+            self.last_error = f"Windows shell print error: {e}"
+            log.error(self.last_error)
             return False
 
     def _print_cups(self, path):
@@ -752,10 +783,13 @@ class Printer:
             if r.returncode == 0:
                 log.info(f"✓ Printed: {os.path.basename(path)}")
                 return True
-            log.error(f"CUPS error: {r.stderr}")
+            err_msg = (r.stderr or "").strip() or f"Exit code {r.returncode}"
+            self.last_error = f"CUPS error: {err_msg}"
+            log.error(self.last_error)
             return False
         except Exception as e:
-            log.error(f"CUPS print error: {e}")
+            self.last_error = f"CUPS print error: {e}"
+            log.error(self.last_error)
             return False
 
 # ──────────────────────────────────────────────────────────────────────

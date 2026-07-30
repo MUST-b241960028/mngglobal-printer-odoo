@@ -107,6 +107,34 @@ class MngPrintQueue(models.Model):
             "state": "cancelled",
         })
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        import base64, os, tempfile, subprocess
+        for vals in vals_list:
+            filename = vals.get("pdf_filename") or vals.get("name", "")
+            ext = os.path.splitext(filename)[1].lower()
+            if ext in (".docx", ".doc", ".xlsx", ".xls", ".odt", ".rtf", ".txt") and vals.get("pdf_data"):
+                try:
+                    raw_data = base64.b64decode(vals["pdf_data"])
+                    with tempfile.TemporaryDirectory() as tmpdir:
+                        in_file = os.path.join(tmpdir, filename)
+                        with open(in_file, "wb") as f:
+                            f.write(raw_data)
+
+                        cmd = ["soffice", "--headless", "--convert-to", "pdf", in_file, "--outdir", tmpdir]
+                        res = subprocess.run(cmd, capture_output=True, timeout=30)
+
+                        pdf_out = os.path.splitext(in_file)[0] + ".pdf"
+                        if os.path.exists(pdf_out):
+                            with open(pdf_out, "rb") as f:
+                                vals["pdf_data"] = base64.b64encode(f.read()).decode("utf-8")
+                            vals["pdf_filename"] = os.path.basename(pdf_out)
+                            _logger.info(f"Auto-converted {filename} -> {vals['pdf_filename']}")
+                except Exception as e:
+                    _logger.error(f"Failed to auto-convert {filename} to PDF: {e}")
+
+        return super().create(vals_list)
+
     def action_retry(self):
         """Амжилтгүй эсвэл цуцлагдсан ажлыг дахин дарааллд оруулах."""
         self.filtered(lambda r: r.state in ("failed", "cancelled")).write({
