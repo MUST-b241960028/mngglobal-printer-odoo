@@ -497,8 +497,8 @@ class OdooConnection:
                 common = xmlrpc.client.ServerProxy(f"{self.url}/xmlrpc/2/common", allow_none=True, context=context)
                 version = common.version()
             except Exception as e:
-                err_str = str(e)
-                if ("CERTIFICATE_VERIFY_FAILED" in err_str or "SSL" in err_str) and self.verify_ssl:
+                err_str_lower = str(e).lower()
+                if ("certificate" in err_str_lower or "ssl" in err_str_lower or "verify" in err_str_lower) and self.verify_ssl:
                     # Retry once with unverified SSL context if standard SSL verification fails
                     log.warning(f"SSL verification failed ({e}), attempting connection with unverified SSL context...")
                     try:
