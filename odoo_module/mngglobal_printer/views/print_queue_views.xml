@@ -33,7 +33,7 @@
                             <div class="mb-2">
                                 <field name="pdf_data" filename="pdf_filename" widget="binary" string="Файл сонгох (.pdf, .docx, .xlsx, зураг)"/>
                             </div>
-                            <field name="pdf_data" widget="pdf_viewer" filename="pdf_filename" style="height: 520px; width: 100%; border: 1px solid #ccc; border-radius: 4px;" invisible="not pdf_data"/>
+                            <field name="pdf_preview_html" widget="html" style="width: 100%;"/>
                         </div>
 
                         <!-- Right Side: Print Settings Panel -->

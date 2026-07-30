@@ -103,6 +103,31 @@ class MngPrintQueue(models.Model):
                         "• PowerPoint & Текст (.pptx, .ppt, .txt, .rtf, .odt)"
                     ) % ext)
 
+    pdf_preview_html = fields.Html(
+        string="PDF HTML Preview",
+        compute="_compute_pdf_preview_html",
+        sanitize=False
+    )
+
+    @api.depends("pdf_data")
+    def _compute_pdf_preview_html(self):
+        for rec in self:
+            if rec.pdf_data:
+                b64_str = rec.pdf_data.decode("utf-8") if isinstance(rec.pdf_data, bytes) else rec.pdf_data
+                rec.pdf_preview_html = f'''
+                    <iframe src="data:application/pdf;base64,{b64_str}"
+                            style="width:100%; height:540px; border:1px solid #ddd; border-radius:6px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                    </iframe>
+                '''
+            else:
+                rec.pdf_preview_html = '''
+                    <div style="text-align:center; padding: 120px 20px; color: #777; background: #fdfdfd; border: 2px dashed #ccc; border-radius: 6px;">
+                        <div style="font-size: 48px; margin-bottom: 10px;">📄</div>
+                        <h4 style="color: #444; font-weight: 600;">Баримт Сонгогдоогүй Байна</h4>
+                        <p style="font-size: 13px; color: #888;">Дээд талын хэсгээс .pdf, .docx, .xlsx баримтаа байршуулна уу.</p>
+                    </div>
+                '''
+
     @api.depends("name", "pdf_filename")
     def _compute_display_name(self):
         for rec in self:
@@ -137,6 +162,33 @@ class MngPrintQueue(models.Model):
         self.filtered(lambda r: r.state == "pending").write({
             "state": "cancelled",
         })
+
+    @api.onchange("pdf_data", "pdf_filename")
+    def _onchange_convert_to_pdf(self):
+        if self.pdf_data and self.pdf_filename:
+            filename = self.pdf_filename
+            ext = os.path.splitext(filename)[1].lower()
+            if ext in CONVERTIBLE_EXTENSIONS:
+                try:
+                    raw_data = base64.b64decode(self.pdf_data)
+                    with tempfile.TemporaryDirectory() as tmpdir:
+                        in_file = os.path.join(tmpdir, filename)
+                        with open(in_file, "wb") as f:
+                            f.write(raw_data)
+
+                        cmd = ["soffice", "--headless", "--convert-to", "pdf", in_file, "--outdir", tmpdir]
+                        subprocess.run(cmd, capture_output=True, timeout=45)
+
+                        pdf_out = os.path.splitext(in_file)[0] + ".pdf"
+                        if os.path.exists(pdf_out):
+                            with open(pdf_out, "rb") as f:
+                                self.pdf_data = base64.b64encode(f.read()).decode("utf-8")
+                            self.pdf_filename = os.path.basename(pdf_out)
+                            if not self.name or self.name == "New":
+                                self.name = os.path.splitext(filename)[0]
+                            _logger.info(f"Onchange auto-converted {filename} -> {self.pdf_filename}")
+                except Exception as e:
+                    _logger.error(f"Onchange auto-conversion error for {filename}: {e}")
 
     @api.model_create_multi
     def create(self, vals_list):

@@ -53,6 +53,29 @@ class MngPrintWizard(models.TransientModel):
 
     pdf_preview = fields.Binary(string="PDF Урьдчилан харах", attachment=False)
     pdf_preview_filename = fields.Char(string="Файлын нэр", default="preview.pdf")
+    pdf_preview_html = fields.Html(
+        string="PDF HTML Preview",
+        compute="_compute_pdf_preview_html",
+        sanitize=False
+    )
+
+    @api.depends("pdf_preview")
+    def _compute_pdf_preview_html(self):
+        for rec in self:
+            if rec.pdf_preview:
+                b64_str = rec.pdf_preview.decode("utf-8") if isinstance(rec.pdf_preview, bytes) else rec.pdf_preview
+                rec.pdf_preview_html = f'''
+                    <iframe src="data:application/pdf;base64,{b64_str}"
+                            style="width:100%; height:540px; border:1px solid #ddd; border-radius:6px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                    </iframe>
+                '''
+            else:
+                rec.pdf_preview_html = '''
+                    <div style="text-align:center; padding: 120px 20px; color: #777; background: #fdfdfd; border: 2px dashed #ccc; border-radius: 6px;">
+                        <div style="font-size: 48px; margin-bottom: 10px;">📄</div>
+                        <h4 style="color: #444; font-weight: 600;">Баримт Бэлдэж Байна...</h4>
+                    </div>
+                '''
 
     @api.model
     def default_get(self, fields_list):
