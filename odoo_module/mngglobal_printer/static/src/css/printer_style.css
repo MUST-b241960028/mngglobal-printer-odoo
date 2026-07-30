@@ -1,0 +1,21 @@
+.o_mng_big_dropzone .o_select_file_button {
+    display: block !important;
+    width: 100% !important;
+    min-height: 220px !important;
+    border: 2px dashed #714B67 !important;
+    border-radius: 12px !important;
+    background-color: #FAF8FA !important;
+    color: #714B67 !important;
+    font-size: 20px !important;
+    font-weight: bold !important;
+    text-align: center !important;
+    padding: 60px 20px !important;
+    cursor: pointer !important;
+    white-space: pre-wrap !important;
+    box-shadow: none !important;
+}
+
+.o_mng_big_dropzone .o_select_file_button:hover {
+    background-color: #F3EBF1 !important;
+    border-color: #58334E !important;
+}

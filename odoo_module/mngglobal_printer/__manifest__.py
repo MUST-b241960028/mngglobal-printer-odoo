@@ -23,6 +23,11 @@
         "views/print_wizard_views.xml",
         "data/cron_data.xml",
     ],
+    "assets": {
+        "web.assets_backend": [
+            "mngglobal_printer/static/src/css/printer_style.css",
+        ],
+    },
     "installable": True,
     "application": True,
     "auto_install": False,
