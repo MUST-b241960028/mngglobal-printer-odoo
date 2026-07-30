@@ -5,6 +5,9 @@ from odoo import models, fields, api, _
 _logger = logging.getLogger(__name__)
 
 
+IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".bmp", ".gif", ".webp", ".tiff")
+
+
 class MngPrintWizard(models.TransientModel):
     _name = "mng.print.wizard"
     _description = "Хэвлэх тохиргоо ба урьдчилан харах"
@@ -59,21 +62,32 @@ class MngPrintWizard(models.TransientModel):
         sanitize=False
     )
 
-    @api.depends("pdf_preview")
+    @api.depends("pdf_preview", "pdf_preview_filename")
     def _compute_pdf_preview_html(self):
         for rec in self:
             if rec.pdf_preview:
-                if rec.id:
-                    iframe_src = f"/mng_printer/stream_pdf?model={rec._name}&id={rec.id}&field=pdf_preview"
-                else:
-                    b64_str = rec.pdf_preview.decode("utf-8") if isinstance(rec.pdf_preview, bytes) else rec.pdf_preview
-                    iframe_src = f"data:application/pdf;base64,{b64_str}#toolbar=0"
+                ext = os.path.splitext(rec.pdf_preview_filename or "")[1].lower()
+                b64_str = rec.pdf_preview.decode("utf-8") if isinstance(rec.pdf_preview, bytes) else rec.pdf_preview
 
-                rec.pdf_preview_html = f'''
-                    <iframe src="{iframe_src}"
-                            style="width:100%; height:780px; border:1px solid #ddd; border-radius:6px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-                    </iframe>
-                '''
+                if ext in IMAGE_EXTENSIONS:
+                    mime = "jpeg" if ext in (".jpg", ".jpeg") else ext.replace(".", "")
+                    rec.pdf_preview_html = f'''
+                        <div style="text-align:center; padding: 20px; background: #FAF8FA; border: 1px solid #ddd; border-radius: 6px; min-height: 780px; display: flex; align-items: center; justify-content: center;">
+                            <img src="data:image/{mime};base64,{b64_str}"
+                                 style="max-width: 100%; max-height: 740px; object-fit: contain; border-radius: 4px; box-shadow: 0 4px 16px rgba(0,0,0,0.12);"/>
+                        </div>
+                    '''
+                else:
+                    if rec.id:
+                        iframe_src = f"/mng_printer/stream_pdf?model={rec._name}&id={rec.id}&field=pdf_preview"
+                    else:
+                        iframe_src = f"data:application/pdf;base64,{b64_str}#toolbar=0"
+
+                    rec.pdf_preview_html = f'''
+                        <iframe src="{iframe_src}"
+                                style="width:100%; height:780px; border:1px solid #ddd; border-radius:6px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                        </iframe>
+                    '''
             else:
                 rec.pdf_preview_html = '''
                     <div style="text-align:center; padding: 120px 20px; color: #777; background: #fdfdfd; border: 2px dashed #ccc; border-radius: 6px;">
