@@ -1434,6 +1434,28 @@ def run_gui(start_minimized=False):
                 msg_queue.put(("test_result", (False, str(e))))
         threading.Thread(target=_t, daemon=True).start()
 
+    def on_check_update():
+        update_btn.config(state="disabled", text="Checking...")
+        def _u():
+            latest = _fetch_latest_release()
+            if not latest:
+                msg_queue.put(("log", "Update check: Unable to query GitHub releases"))
+                msg_queue.put(("update_btn_reset", None))
+                return
+            tag, url = latest
+            if _parse_version(tag) > _parse_version(APP_VERSION):
+                msg_queue.put(("success", f"New update available ({APP_VERSION} -> {tag}). Downloading..."))
+                if apply_self_update(url):
+                    msg_queue.put(("success", "Update downloaded! Restarting bridge app..."))
+                    time.sleep(1)
+                    root.after(0, root.destroy)
+                else:
+                    msg_queue.put(("warning", "Self-update is supported when running as compiled .exe"))
+            else:
+                msg_queue.put(("success", f"Bridge app is up to date (v{APP_VERSION})."))
+            msg_queue.put(("update_btn_reset", None))
+        threading.Thread(target=_u, daemon=True).start()
+
     def on_start():
         _save()
         if not url_var.get().strip() or not db_var.get().strip():
@@ -1467,6 +1489,7 @@ def run_gui(start_minimized=False):
         start_btn.pack_forget()
         stop_btn.pack(side="right", padx=(8, 0))
         test_btn.config(state="disabled")
+        update_btn.config(state="disabled")
 
     def on_stop():
         if engine_ref[0]:

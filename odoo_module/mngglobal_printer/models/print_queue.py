@@ -1,7 +1,23 @@
 import logging
+import os
+import base64
+import tempfile
+import subprocess
 from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
 
 _logger = logging.getLogger(__name__)
+
+SUPPORTED_EXTENSIONS = (
+    ".pdf", ".png", ".jpg", ".jpeg", ".bmp", ".gif", ".webp", ".tiff",
+    ".docx", ".doc", ".xlsx", ".xls", ".pptx", ".ppt",
+    ".odt", ".ods", ".odp", ".rtf", ".txt", ".csv"
+)
+
+CONVERTIBLE_EXTENSIONS = (
+    ".docx", ".doc", ".xlsx", ".xls", ".pptx", ".ppt",
+    ".odt", ".ods", ".odp", ".rtf", ".txt", ".csv"
+)
 
 
 class MngPrintQueue(models.Model):
@@ -72,6 +88,21 @@ class MngPrintQueue(models.Model):
     note = fields.Text(string="Тэмдэглэл",
                        help="Хэвлэх ажлын нэмэлт тэмдэглэл")
 
+    @api.constrains("pdf_filename")
+    def _check_supported_format(self):
+        for rec in self:
+            if rec.pdf_filename:
+                ext = os.path.splitext(rec.pdf_filename)[1].lower()
+                if ext and ext not in SUPPORTED_EXTENSIONS:
+                    raise ValidationError(_(
+                        "Хэвлэх боломжгүй форматтай файл байна (%s).\n\n"
+                        "Зөвхөн дараах форматын файлуудыг хэвлэх боломжтой:\n"
+                        "• PDF баримтууд (.pdf)\n"
+                        "• Зургууд (.png, .jpg, .jpeg, .bmp, .gif, .webp, .tiff)\n"
+                        "• MS Word & Excel (.docx, .doc, .xlsx, .xls, .csv)\n"
+                        "• PowerPoint & Текст (.pptx, .ppt, .txt, .rtf, .odt)"
+                    ) % ext)
+
     @api.depends("name", "pdf_filename")
     def _compute_display_name(self):
         for rec in self:
@@ -109,11 +140,10 @@ class MngPrintQueue(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
-        import base64, os, tempfile, subprocess
         for vals in vals_list:
             filename = vals.get("pdf_filename") or vals.get("name", "")
             ext = os.path.splitext(filename)[1].lower()
-            if ext in (".docx", ".doc", ".xlsx", ".xls", ".odt", ".rtf", ".txt") and vals.get("pdf_data"):
+            if ext in CONVERTIBLE_EXTENSIONS and vals.get("pdf_data"):
                 try:
                     raw_data = base64.b64decode(vals["pdf_data"])
                     with tempfile.TemporaryDirectory() as tmpdir:
@@ -122,7 +152,7 @@ class MngPrintQueue(models.Model):
                             f.write(raw_data)
 
                         cmd = ["soffice", "--headless", "--convert-to", "pdf", in_file, "--outdir", tmpdir]
-                        res = subprocess.run(cmd, capture_output=True, timeout=30)
+                        res = subprocess.run(cmd, capture_output=True, timeout=45)
 
                         pdf_out = os.path.splitext(in_file)[0] + ".pdf"
                         if os.path.exists(pdf_out):
