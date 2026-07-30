@@ -8,50 +8,64 @@
         <field name="name">mng.print.queue.form</field>
         <field name="model">mng.print.queue</field>
         <field name="arch" type="xml">
-            <form string="Хэвлэх ажил">
+            <form string="🖨️ Хэвлэх ажил — Урьдчилан Харах &amp; Тохиргоо">
                 <header>
+                    <button name="action_retry" string="🔄 Дахин хэвлэх"
+                            type="object" class="btn-primary"
+                            invisible="state not in ('failed', 'cancelled')"/>
                     <button name="action_cancel" string="Цуцлах"
                             type="object" class="btn-secondary"
                             invisible="state != 'pending'"/>
-                    <button name="action_retry" string="🔄 Дахин оролдох"
-                            type="object" class="btn-primary"
-                            invisible="state not in ('failed', 'cancelled')"/>
                     <field name="state" widget="statusbar"
                            statusbar_visible="pending,printed"/>
                 </header>
                 <sheet>
-                    <div class="oe_title">
+                    <div class="oe_title mb-3">
                         <h1>
-                            <field name="name" placeholder="Баримтын нэр..."
-                                   required="1"/>
+                            <field name="name" placeholder="Баримтын нэр..." required="1"/>
                         </h1>
                     </div>
-                    <group>
-                        <group string="Баримт">
-                            <field name="pdf_data" filename="pdf_filename"
-                                   widget="binary" string="PDF файл"/>
+                    <div class="row" style="margin: 0;">
+                        <!-- Left Side: Live PDF Viewer -->
+                        <div class="col-lg-7 col-md-7" style="padding-right: 15px; border-right: 1px solid #e0e0e0;">
+                            <h4 class="text-primary mb-2">📄 Баримт Урьдчилан Харах / Файл Байршуулах</h4>
                             <field name="pdf_filename" invisible="1"/>
-                            <field name="printer_id" options="{'no_create': True}"/>
-                            <field name="copies"/>
-                            <field name="note" placeholder="Нэмэлт тэмдэглэл..."/>
-                        </group>
-                        <group string="Хэвлэх тохиргоо">
-                            <field name="pages" placeholder="ж: 1-3,5,8"/>
-                            <field name="page_subset"/>
-                            <field name="duplex"/>
-                            <field name="orientation"/>
-                            <field name="color_mode"/>
-                            <field name="scaling"/>
-                        </group>
-                        <group string="Мэдээлэл">
-                            <field name="user_id"/>
-                            <field name="source_ref"/>
-                            <field name="create_date" string="Дарааллд орсон"/>
-                            <field name="printed_at"/>
-                            <field name="error_message"
-                                   invisible="state != 'failed'"/>
-                        </group>
-                    </group>
+                            <div class="mb-2">
+                                <field name="pdf_data" filename="pdf_filename" widget="binary" string="Файл сонгох (.pdf, .docx, .xlsx, зураг)"/>
+                            </div>
+                            <field name="pdf_data" widget="pdf_viewer" filename="pdf_filename" style="height: 520px; width: 100%; border: 1px solid #ccc; border-radius: 4px;" invisible="not pdf_data"/>
+                        </div>
+
+                        <!-- Right Side: Print Settings Panel -->
+                        <div class="col-lg-5 col-md-5" style="padding-left: 15px;">
+                            <h4 class="text-primary mb-3">⚙️ Хэвлэх Тохиргоо</h4>
+                            <group string="Принтер">
+                                <field name="printer_id" options="{'no_create': True}" placeholder="Суурь принтер хэрэглэх"/>
+                                <field name="copies"/>
+                                <field name="note" placeholder="Нэмэлт тэмдэглэл..."/>
+                            </group>
+
+                            <group string="Хуудасны Сонголт">
+                                <field name="pages" placeholder="ж: 1-3,5,8"/>
+                                <field name="page_subset"/>
+                            </group>
+
+                            <group string="Хэвлэх Загвар">
+                                <field name="duplex"/>
+                                <field name="orientation"/>
+                                <field name="color_mode"/>
+                                <field name="scaling"/>
+                            </group>
+
+                            <group string="Мэдээлэл">
+                                <field name="user_id"/>
+                                <field name="source_ref"/>
+                                <field name="create_date" string="Дарааллд орсон"/>
+                                <field name="printed_at"/>
+                                <field name="error_message" invisible="state != 'failed'"/>
+                            </group>
+                        </div>
+                    </div>
                 </sheet>
             </form>
         </field>
