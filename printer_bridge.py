@@ -473,36 +473,74 @@ def set_autostart_enabled(enable):
 # ──────────────────────────────────────────────────────────────────────
 
 class OdooConnection:
-    def __init__(self, url, database, username, password):
+    def __init__(self, url, database, username, password, verify_ssl=True):
         self.url = url.rstrip("/")
         self.database = database
         self.username = username
         self.password = password
+        self.verify_ssl = verify_ssl
         self.uid = None
         self.models = None
         self.server_version = "unknown"
+        self.last_error = ""
 
     def connect(self):
         log.info(f"Connecting to Odoo at {self.url} ...")
+        self.last_error = ""
+        context = None
+        if not self.verify_ssl:
+            import ssl
+            context = ssl._create_unverified_context()
+
         try:
-            common = xmlrpc.client.ServerProxy(f"{self.url}/xmlrpc/2/common", allow_none=True)
-            version = common.version()
+            try:
+                common = xmlrpc.client.ServerProxy(f"{self.url}/xmlrpc/2/common", allow_none=True, context=context)
+                version = common.version()
+            except Exception as e:
+                err_str = str(e)
+                if ("CERTIFICATE_VERIFY_FAILED" in err_str or "SSL" in err_str) and self.verify_ssl:
+                    # Retry once with unverified SSL context if standard SSL verification fails
+                    log.warning(f"SSL verification failed ({e}), attempting connection with unverified SSL context...")
+                    try:
+                        import ssl
+                        unverified_ctx = ssl._create_unverified_context()
+                        common = xmlrpc.client.ServerProxy(f"{self.url}/xmlrpc/2/common", allow_none=True, context=unverified_ctx)
+                        version = common.version()
+                        context = unverified_ctx
+                    except Exception as ssl_e:
+                        self.last_error = f"SSL Certificate Verification Failed: {ssl_e}"
+                        log.error(self.last_error)
+                        return False
+                else:
+                    self.last_error = f"Cannot reach Odoo server at {self.url}: {e}"
+                    log.error(self.last_error)
+                    return False
+
             self.server_version = version.get("server_version", "unknown")
             log.info(f"Odoo server version: {self.server_version}")
 
-            self.uid = common.authenticate(self.database, self.username, self.password, {})
+            try:
+                self.uid = common.authenticate(self.database, self.username, self.password, {})
+            except Exception as e:
+                self.last_error = f"Authentication request error: {e}"
+                log.error(self.last_error)
+                return False
+
             if not self.uid:
-                log.error("Authentication failed!")
+                self.last_error = f"Authentication failed for user '{self.username}' on database '{self.database}'. Check database name, username, and password."
+                log.error(self.last_error)
                 return False
 
             log.info(f"Authenticated as UID: {self.uid}")
-            self.models = xmlrpc.client.ServerProxy(f"{self.url}/xmlrpc/2/object", allow_none=True)
+            self.models = xmlrpc.client.ServerProxy(f"{self.url}/xmlrpc/2/object", allow_none=True, context=context)
             return True
         except ConnectionRefusedError:
-            log.error(f"Connection refused at {self.url}")
+            self.last_error = f"Connection refused at {self.url}. Ensure Odoo service is running and port is open."
+            log.error(self.last_error)
             return False
         except Exception as e:
-            log.error(f"Connection error: {e}")
+            self.last_error = f"Connection error: {e}"
+            log.error(self.last_error)
             return False
 
     def execute(self, model, method, *args, **kwargs):
@@ -726,7 +764,8 @@ class BridgeEngine:
 
     def test_connection(self):
         if not self.odoo.connect():
-            return False, "Connection failed. Check URL, database, and credentials."
+            err_msg = self.odoo.last_error or "Check URL, database, and credentials."
+            return False, f"Connection failed: {err_msg}"
         try:
             jobs = self.odoo.get_pending_jobs()
             return True, (
@@ -1324,7 +1363,8 @@ def run_gui(start_minimized=False):
             odoo = OdooConnection(url_var.get(), db_var.get(), user_var.get(), pass_var.get())
             try:
                 if not odoo.connect():
-                    msg_queue.put(("test_result", (False, "Connection failed.")))
+                    err_msg = odoo.last_error or "Check URL, database, and credentials."
+                    msg_queue.put(("test_result", (False, f"Connection failed: {err_msg}")))
                     return
                 try:
                     jobs = odoo.get_pending_jobs()
