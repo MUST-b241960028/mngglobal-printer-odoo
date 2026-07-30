@@ -1,9 +1,13 @@
-from odoo import models, fields, api, _
+import logging
 import base64
+from odoo import models, fields, api, _
+
+_logger = logging.getLogger(__name__)
+
 
 class MngPrintWizard(models.TransientModel):
     _name = "mng.print.wizard"
-    _description = "Хэвлэх тохиргоо"
+    _description = "Хэвлэх тохиргоо ба урьдчилан харах"
 
     printer_id = fields.Many2one(
         "mng.printer.device", 
@@ -47,25 +51,59 @@ class MngPrintWizard(models.TransientModel):
     res_model = fields.Char(string="Эх загвар")
     res_id = fields.Integer(string="Эх бичлэгийн ID")
 
+    pdf_preview = fields.Binary(string="PDF Урьдчилан харах", attachment=False)
+    pdf_preview_filename = fields.Char(string="Файлын нэр", default="preview.pdf")
+
+    @api.model
+    def default_get(self, fields_list):
+        res = super().default_get(fields_list)
+        res_model = res.get("res_model") or self.env.context.get("active_model")
+        res_id = res.get("res_id") or self.env.context.get("active_id")
+
+        if res_model and res_id:
+            res["res_model"] = res_model
+            res["res_id"] = res_id
+            try:
+                record = self.env[res_model].browse(res_id)
+                if hasattr(record, "_get_print_report") and hasattr(record, "_render_pdf_for_print"):
+                    report = record._get_print_report()
+                    pdf_content, _ = record._render_pdf_for_print(report)
+                    if pdf_content:
+                        doc_name = (
+                            getattr(record, "name", None)
+                            or getattr(record, "number", None)
+                            or str(record.id)
+                        )
+                        doc_name = "".join(c for c in doc_name if c.isalnum() or c in "._- ").strip()
+                        res["pdf_preview"] = base64.b64encode(pdf_content).decode("utf-8")
+                        res["pdf_preview_filename"] = f"{doc_name}.pdf"
+            except Exception as e:
+                _logger.warning(f"Could not generate PDF preview for {res_model},{res_id}: {e}")
+
+        return res
+
     def action_print(self):
         self.ensure_one()
-        record = self.env[self.res_model].browse(self.res_id)
-        
-        # Call the existing rendering logic from the mixin
-        report = record._get_print_report()
-        pdf_content, pdf_type = record._render_pdf_for_print(report)
-        
-        doc_name = (
-            getattr(record, "name", None)
-            or getattr(record, "number", None)
-            or str(record.id)
-        )
-        filename = f"{doc_name}.pdf"
-        filename = "".join(c for c in filename if c.isalnum() or c in "._- ").strip()
+        pdf_b64 = self.pdf_preview
+        filename = self.pdf_preview_filename or "document.pdf"
+
+        if not pdf_b64 and self.res_model and self.res_id:
+            record = self.env[self.res_model].browse(self.res_id)
+            report = record._get_print_report()
+            pdf_content, _ = record._render_pdf_for_print(report)
+            pdf_b64 = base64.b64encode(pdf_content).decode("utf-8")
+            doc_name = (
+                getattr(record, "name", None)
+                or getattr(record, "number", None)
+                or str(record.id)
+            )
+            filename = f"{doc_name}.pdf"
+
+        doc_name = os.path.splitext(filename)[0]
 
         self.env["mng.print.queue"].create({
             "name": doc_name,
-            "pdf_data": base64.b64encode(pdf_content).decode("utf-8"),
+            "pdf_data": pdf_b64,
             "pdf_filename": filename,
             "source_model": self.res_model,
             "source_id": self.res_id,
