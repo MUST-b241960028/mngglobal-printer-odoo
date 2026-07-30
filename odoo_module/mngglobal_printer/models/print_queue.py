@@ -113,18 +113,23 @@ class MngPrintQueue(models.Model):
     def _compute_pdf_preview_html(self):
         for rec in self:
             if rec.pdf_data:
-                b64_str = rec.pdf_data.decode("utf-8") if isinstance(rec.pdf_data, bytes) else rec.pdf_data
+                if rec.id:
+                    iframe_src = f"/mng_printer/stream_pdf?model={rec._name}&id={rec.id}&field=pdf_data"
+                else:
+                    b64_str = rec.pdf_data.decode("utf-8") if isinstance(rec.pdf_data, bytes) else rec.pdf_data
+                    iframe_src = f"data:application/pdf;base64,{b64_str}#toolbar=0"
+
                 rec.pdf_preview_html = f'''
-                    <iframe src="data:application/pdf;base64,{b64_str}"
+                    <iframe src="{iframe_src}"
                             style="width:100%; height:780px; border:1px solid #ddd; border-radius:6px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
                     </iframe>
                 '''
             else:
                 rec.pdf_preview_html = '''
-                    <div style="text-align:center; padding: 120px 20px; color: #777; background: #fdfdfd; border: 2px dashed #ccc; border-radius: 6px;">
-                        <div style="font-size: 48px; margin-bottom: 10px;">📄</div>
-                        <h4 style="color: #444; font-weight: 600;">Баримт Сонгогдоогүй Байна</h4>
-                        <p style="font-size: 13px; color: #888;">Дээд талын хэсгээс .pdf, .docx, .xlsx баримтаа байршуулна уу.</p>
+                    <div style="text-align:center; padding: 90px 20px; color: #714B67; background: #FAF8FA; border: 2px dashed #714B67; border-radius: 8px;">
+                        <div style="font-size: 54px; margin-bottom: 12px;">📁</div>
+                        <h3 style="color: #714B67; font-weight: bold; margin-bottom: 8px;">Баримтаа Энд Дарж Байршуулна уу</h3>
+                        <p style="font-size: 13px; color: #666;">Дээд талын "Байршуулах" товчийг ашиглан .pdf, .docx, .xlsx баримтаа сонгоно уу.</p>
                     </div>
                 '''
 
@@ -189,6 +194,8 @@ class MngPrintQueue(models.Model):
                             _logger.info(f"Onchange auto-converted {filename} -> {self.pdf_filename}")
                 except Exception as e:
                     _logger.error(f"Onchange auto-conversion error for {filename}: {e}")
+
+        self._compute_pdf_preview_html()
 
     @api.model_create_multi
     def create(self, vals_list):

@@ -65,7 +65,7 @@ def app_dir():
 # ──────────────────────────────────────────────────────────────────────
 
 APP_NAME = "MNG Printer Bridge"
-APP_VERSION = "1.3.7"
+APP_VERSION = "1.3.8"
 CONFIG_FILE = os.path.join(app_dir(), "config.ini")
 LOG_FILE = os.path.join(app_dir(), "printer_bridge.log")
 ICON_FILE = "icon.png"  # resolved via resource_path()

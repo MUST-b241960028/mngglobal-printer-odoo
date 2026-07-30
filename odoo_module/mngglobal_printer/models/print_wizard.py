@@ -63,9 +63,14 @@ class MngPrintWizard(models.TransientModel):
     def _compute_pdf_preview_html(self):
         for rec in self:
             if rec.pdf_preview:
-                b64_str = rec.pdf_preview.decode("utf-8") if isinstance(rec.pdf_preview, bytes) else rec.pdf_preview
+                if rec.id:
+                    iframe_src = f"/mng_printer/stream_pdf?model={rec._name}&id={rec.id}&field=pdf_preview"
+                else:
+                    b64_str = rec.pdf_preview.decode("utf-8") if isinstance(rec.pdf_preview, bytes) else rec.pdf_preview
+                    iframe_src = f"data:application/pdf;base64,{b64_str}#toolbar=0"
+
                 rec.pdf_preview_html = f'''
-                    <iframe src="data:application/pdf;base64,{b64_str}"
+                    <iframe src="{iframe_src}"
                             style="width:100%; height:780px; border:1px solid #ddd; border-radius:6px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
                     </iframe>
                 '''
