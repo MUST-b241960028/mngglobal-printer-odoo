@@ -116,7 +116,7 @@ class MngPrintQueue(models.Model):
                 b64_str = rec.pdf_data.decode("utf-8") if isinstance(rec.pdf_data, bytes) else rec.pdf_data
                 rec.pdf_preview_html = f'''
                     <iframe src="data:application/pdf;base64,{b64_str}"
-                            style="width:100%; height:540px; border:1px solid #ddd; border-radius:6px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                            style="width:100%; height:780px; border:1px solid #ddd; border-radius:6px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
                     </iframe>
                 '''
             else:
