@@ -26,14 +26,28 @@
                         </h1>
                     </div>
                     <div class="row" style="margin: 0;">
-                        <!-- Left Side: Live PDF Viewer -->
+                        <!-- Left Side: Live PDF Viewer & Clickable Dropzone -->
                         <div class="col-lg-7 col-md-7" style="padding-right: 15px; border-right: 1px solid #e0e0e0;">
                             <h4 class="text-primary mb-2">📄 Баримт Урьдчилан Харах / Файл Байршуулах</h4>
                             <field name="pdf_filename" invisible="1"/>
-                            <div class="mb-2">
-                                <field name="pdf_data" filename="pdf_filename" widget="binary" string="Файл сонгох (.pdf, .docx, .xlsx, зураг)"/>
+
+                            <!-- Big Clickable Upload Box (Shown when no file uploaded) -->
+                            <div class="position-relative text-center p-5 mb-3" style="border: 2px dashed #714B67; border-radius: 12px; background: #FAF8FA; min-height: 280px; cursor: pointer;" invisible="pdf_data">
+                                <div style="font-size: 64px; color: #714B67;" class="mb-2">📁</div>
+                                <h3 style="color: #714B67; font-weight: bold; margin-bottom: 8px;">Баримтаа Энд Дарж Байршуулна уу</h3>
+                                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">.pdf, .docx, .xlsx, .pptx, .jpg, .png файлууд дэмжигдэнэ</p>
+                                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; overflow: hidden;">
+                                    <field name="pdf_data" filename="pdf_filename" widget="binary" style="width: 100%; height: 100%; cursor: pointer;"/>
+                                </div>
                             </div>
-                            <field name="pdf_preview_html" widget="html" style="width: 100%;"/>
+
+                            <!-- Small edit bar (Shown when file is uploaded) -->
+                            <div class="mb-2" invisible="not pdf_data">
+                                <field name="pdf_data" filename="pdf_filename" widget="binary" string="Солих / Өөрчлөх"/>
+                            </div>
+
+                            <!-- Live PDF Preview Container -->
+                            <field name="pdf_preview_html" widget="html" style="width: 100%;" invisible="not pdf_data"/>
                         </div>
 
                         <!-- Right Side: Print Settings Panel -->
