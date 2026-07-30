@@ -65,7 +65,7 @@ def app_dir():
 # ──────────────────────────────────────────────────────────────────────
 
 APP_NAME = "MNG Printer Bridge"
-APP_VERSION = "1.3.0"
+APP_VERSION = "1.3.1"
 CONFIG_FILE = os.path.join(app_dir(), "config.ini")
 LOG_FILE = os.path.join(app_dir(), "printer_bridge.log")
 ICON_FILE = "icon.png"  # resolved via resource_path()
@@ -479,75 +479,92 @@ class OdooConnection:
         self.username = username
         self.password = password
         self.verify_ssl = verify_ssl
+        self.use_unverified_ssl = not verify_ssl
         self.uid = None
         self.models = None
         self.server_version = "unknown"
         self.last_error = ""
 
+    def _create_proxy(self, path, unverified=False):
+        context = None
+        if unverified or self.use_unverified_ssl or not self.verify_ssl:
+            import ssl
+            context = ssl._create_unverified_context()
+        return xmlrpc.client.ServerProxy(f"{self.url}{path}", allow_none=True, context=context)
+
+    def _is_ssl_error(self, e):
+        err_str = str(e).lower()
+        return any(k in err_str for k in ("certificate", "ssl", "verify", "1007", "cert", "handshake"))
+
     def connect(self):
         log.info(f"Connecting to Odoo at {self.url} ...")
         self.last_error = ""
-        context = None
-        if not self.verify_ssl:
-            import ssl
-            context = ssl._create_unverified_context()
 
         try:
-            try:
-                common = xmlrpc.client.ServerProxy(f"{self.url}/xmlrpc/2/common", allow_none=True, context=context)
-                version = common.version()
-            except Exception as e:
-                err_str_lower = str(e).lower()
-                if ("certificate" in err_str_lower or "ssl" in err_str_lower or "verify" in err_str_lower) and self.verify_ssl:
-                    # Retry once with unverified SSL context if standard SSL verification fails
-                    log.warning(f"SSL verification failed ({e}), attempting connection with unverified SSL context...")
-                    try:
-                        import ssl
-                        unverified_ctx = ssl._create_unverified_context()
-                        common = xmlrpc.client.ServerProxy(f"{self.url}/xmlrpc/2/common", allow_none=True, context=unverified_ctx)
-                        version = common.version()
-                        context = unverified_ctx
-                    except Exception as ssl_e:
-                        self.last_error = f"SSL Certificate Verification Failed: {ssl_e}"
-                        log.error(self.last_error)
-                        return False
-                else:
-                    self.last_error = f"Cannot reach Odoo server at {self.url}: {e}"
+            common = self._create_proxy("/xmlrpc/2/common")
+            version = common.version()
+        except Exception as e:
+            if self._is_ssl_error(e) and not self.use_unverified_ssl:
+                log.warning(f"SSL verification failed ({e}), retrying with unverified SSL context...")
+                try:
+                    self.use_unverified_ssl = True
+                    common = self._create_proxy("/xmlrpc/2/common", unverified=True)
+                    version = common.version()
+                except Exception as ssl_e:
+                    self.last_error = f"SSL Certificate Verification Failed: {ssl_e}"
                     log.error(self.last_error)
                     return False
-
-            self.server_version = version.get("server_version", "unknown")
-            log.info(f"Odoo server version: {self.server_version}")
-
-            try:
-                self.uid = common.authenticate(self.database, self.username, self.password, {})
-            except Exception as e:
-                self.last_error = f"Authentication request error: {e}"
+            else:
+                self.last_error = f"Cannot reach Odoo server at {self.url}: {e}"
                 log.error(self.last_error)
                 return False
 
-            if not self.uid:
-                self.last_error = f"Authentication failed for user '{self.username}' on database '{self.database}'. Check database name, username, and password."
-                log.error(self.last_error)
-                return False
+        self.server_version = version.get("server_version", "unknown")
+        log.info(f"Odoo server version: {self.server_version}")
 
-            log.info(f"Authenticated as UID: {self.uid}")
-            self.models = xmlrpc.client.ServerProxy(f"{self.url}/xmlrpc/2/object", allow_none=True, context=context)
-            return True
-        except ConnectionRefusedError:
-            self.last_error = f"Connection refused at {self.url}. Ensure Odoo service is running and port is open."
-            log.error(self.last_error)
-            return False
+        try:
+            self.uid = common.authenticate(self.database, self.username, self.password, {})
         except Exception as e:
-            self.last_error = f"Connection error: {e}"
+            if self._is_ssl_error(e) and not self.use_unverified_ssl:
+                log.warning(f"SSL error during authentication ({e}), retrying with unverified SSL context...")
+                try:
+                    self.use_unverified_ssl = True
+                    common = self._create_proxy("/xmlrpc/2/common", unverified=True)
+                    self.uid = common.authenticate(self.database, self.username, self.password, {})
+                except Exception as ssl_e:
+                    self.last_error = f"Authentication SSL Error: {ssl_e}"
+                    log.error(self.last_error)
+                    return False
+            else:
+                self.last_error = f"Authentication call failed: {e}"
+                log.error(self.last_error)
+                return False
+
+        if not self.uid:
+            self.last_error = f"Authentication failed for user '{self.username}' on database '{self.database}'. Check database name, username, and password."
             log.error(self.last_error)
             return False
+
+        log.info(f"Authenticated as UID: {self.uid}")
+        self.models = self._create_proxy("/xmlrpc/2/object")
+        return True
 
     def execute(self, model, method, *args, **kwargs):
-        return self.models.execute_kw(
-            self.database, self.uid, self.password,
-            model, method, list(args), kwargs if kwargs else {},
-        )
+        try:
+            return self.models.execute_kw(
+                self.database, self.uid, self.password,
+                model, method, list(args), kwargs if kwargs else {},
+            )
+        except Exception as e:
+            if self._is_ssl_error(e) and not self.use_unverified_ssl:
+                log.warning(f"SSL error during RPC execution ({e}). Switching to unverified SSL context...")
+                self.use_unverified_ssl = True
+                self.models = self._create_proxy("/xmlrpc/2/object", unverified=True)
+                return self.models.execute_kw(
+                    self.database, self.uid, self.password,
+                    model, method, list(args), kwargs if kwargs else {},
+                )
+            raise
 
     def get_pending_jobs(self):
         """Get all pending print jobs from mng.print.queue."""
