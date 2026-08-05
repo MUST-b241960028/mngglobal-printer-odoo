@@ -39,6 +39,10 @@ class MngVisaApplication(models.Model):
         required=True, tracking=True)
     program_code = fields.Char(
         related="program_type_id.code", string="Хөтөлбөрийн код", store=True)
+    recruitment_period_id = fields.Many2one(
+        "mng.visa.recruitment.period", string="Элсэлтийн үе / Хавтас",
+        domain="[('state', '!=', 'archived')]",
+        tracking=True, help="Сурагч/хэрэглэгчийн бүртгэгдсэн элсэлтийн хугацааны хавтас")
     stage_id = fields.Many2one(
         "mng.visa.stage", string="Үе шат",
         tracking=True, group_expand="_read_group_stage_ids",

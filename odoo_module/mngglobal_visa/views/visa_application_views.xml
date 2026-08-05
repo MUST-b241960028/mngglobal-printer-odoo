@@ -37,6 +37,7 @@
                             </div>
                             <div>
                                 <field name="program_type_id" widget="badge"/>
+                                <field name="recruitment_period_id" widget="badge" class="ms-1"/>
                             </div>
                             <div class="mt-1">
                                 <field name="checklist_progress"
@@ -66,6 +67,7 @@
                 <field name="client_name"/>
                 <field name="client_phone"/>
                 <field name="program_type_id"/>
+                <field name="recruitment_period_id" widget="badge"/>
                 <field name="stage_id"/>
                 <field name="departure_date"/>
                 <field name="payment_status" widget="badge"
@@ -144,8 +146,9 @@
                             <field name="passport_expiry"/>
                             <field name="date_of_birth"/>
                         </group>
-                        <group string="Хөтөлбөр">
+                        <group string="Хөтөлбөр ба Элсэлтийн хавтас">
                             <field name="program_type_id"/>
+                            <field name="recruitment_period_id"/>
                             <field name="school_name"/>
                             <field name="city"/>
                             <field name="program_duration"/>
@@ -277,6 +280,7 @@
                 <field name="client_phone"/>
                 <field name="passport_number"/>
                 <field name="program_type_id"/>
+                <field name="recruitment_period_id"/>
                 <field name="assigned_to"/>
                 <separator/>
                 <filter string="Филиппин" name="ph"
@@ -296,6 +300,8 @@
                 <filter string="Хэсэгчлэн" name="partial"
                         domain="[('payment_status', '=', 'partial')]"/>
                 <separator/>
+                <filter string="Элсэлтийн үе / Хавтас" name="group_period"
+                        context="{'group_by': 'recruitment_period_id'}"/>
                 <filter string="Хөтөлбөр" name="group_program"
                         context="{'group_by': 'program_type_id'}"/>
                 <filter string="Хариуцагч" name="group_user"

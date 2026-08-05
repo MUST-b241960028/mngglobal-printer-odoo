@@ -2,6 +2,12 @@
 <odoo>
  <data noupdate="0">
 
+        <!-- Max File Upload Size (200MB in bytes) -->
+        <record id="param_web_max_file_upload_size" model="ir.config_parameter">
+            <field name="key">web.max_file_upload_size</field>
+            <field name="value">209715200</field>
+        </record>
+
  <!-- Sequence -->
  <record id="seq_visa_application" model="ir.sequence">
  <field name="name">Visa Application Sequence</field>

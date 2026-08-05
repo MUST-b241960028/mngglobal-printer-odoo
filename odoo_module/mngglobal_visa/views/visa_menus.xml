@@ -13,6 +13,12 @@
               sequence="1"
               groups="mngglobal_visa.group_visa_manager,base.group_system"/>
 
+    <menuitem id="mng_visa_recruitment_period_menu"
+              name="📁 Элсэлтийн хавтаснууд"
+              action="mng_visa_recruitment_period_action"
+              parent="mng_visa_root_menu"
+              sequence="2"/>
+
     <menuitem id="mng_visa_apps_parent"
               name="Хөтөлбөрүүд"
               parent="mng_visa_root_menu"
@@ -115,6 +121,12 @@
               action="mng_visa_checklist_tmpl_action"
               parent="mng_visa_config_menu"
               sequence="10"/>
+
+    <menuitem id="mng_visa_recruitment_period_config_menu"
+              name="Элсэлтийн үе / Хавтасны тохиргоо"
+              action="mng_visa_recruitment_period_action"
+              parent="mng_visa_config_menu"
+              sequence="15"/>
 
     <menuitem id="mng_visa_fee_tmpl_menu"
               name="Төлбөрийн загвар"

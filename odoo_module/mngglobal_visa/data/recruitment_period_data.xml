@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Initial Recruiting Period Folders -->
+        <record id="recruitment_period_sep_2026" model="mng.visa.recruitment.period">
+            <field name="name">2026 Оны 9-р сарын элсэлт (September Recruit)</field>
+            <field name="code">INT-SEP-2026</field>
+            <field name="date_start">2026-06-01</field>
+            <field name="date_end">2026-09-30</field>
+            <field name="state">active</field>
+            <field name="color">1</field>
+            <field name="note">2026 оны Намрын 9-р сарын оюутан элсүүлэлт болон визийн бүрдүүлэлтийн хавтас.</field>
+        </record>
+
+        <record id="recruitment_period_oct_2026" model="mng.visa.recruitment.period">
+            <field name="name">2026 Оны 10-р сарын элсэлт (October Recruit)</field>
+            <field name="code">INT-OCT-2026</field>
+            <field name="date_start">2026-07-01</field>
+            <field name="date_end">2026-10-31</field>
+            <field name="state">active</field>
+            <field name="color">2</field>
+            <field name="note">2026 оны Намрын 10-р сарын элсэлтийн хавтас.</field>
+        </record>
+
+        <record id="recruitment_period_nov_2026" model="mng.visa.recruitment.period">
+            <field name="name">2026 Оны 11-р сарын элсэлт (November Recruit)</field>
+            <field name="code">INT-NOV-2026</field>
+            <field name="date_start">2026-08-01</field>
+            <field name="date_end">2026-11-30</field>
+            <field name="state">active</field>
+            <field name="color">3</field>
+            <field name="note">2026 оны Өвлийн 11-р сарын элсэлтийн хавтас.</field>
+        </record>
+
+        <record id="recruitment_period_spring_2027" model="mng.visa.recruitment.period">
+            <field name="name">2027 Оны Хаврын элсэлт (Spring Recruit 2027)</field>
+            <field name="code">INT-SPR-2027</field>
+            <field name="date_start">2026-10-01</field>
+            <field name="date_end">2027-03-31</field>
+            <field name="state">draft</field>
+            <field name="color">4</field>
+            <field name="note">2027 оны Хаврын 3-р сарын оюутан элсүүлэлтийн бэлтгэл хавтас.</field>
+        </record>
+    </data>
+</odoo>
