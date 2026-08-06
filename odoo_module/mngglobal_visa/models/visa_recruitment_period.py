@@ -21,9 +21,9 @@ class MngVisaRecruitmentPeriod(models.Model):
         help="Тодорхой нэг хөтөлбөрт зориулсан бол сонгоно. Хоосон орхивол бүх хөтөлбөрт хамаарна.")
     
     state = fields.Selection([
-        ("draft", "Бэлтгэж буй"),
-        ("active", "Нээлттэй / Явагдаж буй"),
-        ("closed", "Хаагдсан / Нисчихсэн"),
+        ("draft", "Бэлтгэл"),
+        ("active", "Нээлттэй"),
+        ("closed", "Хаагдсан"),
         ("archived", "Архив"),
     ], default="active", string="Төлөв", tracking=True)
 

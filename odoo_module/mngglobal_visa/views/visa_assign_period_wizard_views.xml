@@ -12,6 +12,7 @@
                         Сонгосон лидүүд / аппликейшнуудад тохируулах <b>Элсэлтийн хавтас</b>-аа сонгоно уу.
                     </div>
                     <group>
+                        <field name="program_type_id" invisible="1"/>
                         <field name="recruitment_period_id" options="{'no_create_edit': False}"/>
                     </group>
                     <notebook>

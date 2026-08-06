@@ -9,16 +9,29 @@ class MngVisaAssignPeriodWizard(models.TransientModel):
     _name = "mng.visa.assign.period.wizard"
     _description = "Элсэлтийн хавтас бөөнөөр тохируулах"
 
+    program_type_id = fields.Many2one(
+        "mng.visa.program.type", string="Хөтөлбөр",
+        compute="_compute_program_type_id"
+    )
     recruitment_period_id = fields.Many2one(
         "mng.visa.recruitment.period",
         string="Сонгох элсэлтийн хавтас",
         required=True,
-        domain="[('state', '!=', 'archived')]"
+        domain="['&', ('state', '!=', 'archived'), '|', ('program_type_id', '=', False), ('program_type_id', '=', program_type_id)]"
     )
     application_ids = fields.Many2many(
         "mng.visa.application",
         string="Сонгосон лидүүд / аппликейшнууд"
     )
+
+    @api.depends("application_ids", "application_ids.program_type_id")
+    def _compute_program_type_id(self):
+        for rec in self:
+            progs = rec.application_ids.mapped("program_type_id")
+            if len(progs) == 1:
+                rec.program_type_id = progs.id
+            else:
+                rec.program_type_id = False
 
     @api.model
     def default_get(self, fields_list):
