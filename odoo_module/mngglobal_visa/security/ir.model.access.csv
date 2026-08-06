@@ -25,7 +25,6 @@ access_visa_period_move_user,mng.visa.period.move user,model_mng_visa_period_mov
 access_visa_period_move_manager,mng.visa.period.move manager,model_mng_visa_period_move,mngglobal_visa.group_visa_manager,1,0,1,0
 access_visa_assign_period_wizard_all,mng.visa.assign.period.wizard all,model_mng_visa_assign_period_wizard,,1,1,1,1
 access_visa_passport_ocr_wizard_all,mng.visa.passport.ocr.wizard all,model_mng_visa_passport_ocr_wizard,,1,1,1,1
-access_visa_ai_copilot_wizard_all,mng.visa.ai.copilot.wizard all,model_mng_visa_ai_copilot_wizard,,1,1,1,1
 access_visa_period_add_lead_wizard_all,mng.visa.period.add.lead.wizard all,model_mng_visa_period_add_lead_wizard,,1,1,1,1
 access_visa_period_move_wizard_user,mng.visa.period.move.wizard user,model_mng_visa_period_move_wizard,mngglobal_visa.group_visa_user,1,1,1,1
 access_visa_dashboard_user,mng.visa.dashboard user,model_mng_visa_dashboard,mngglobal_visa.group_visa_manager,1,1,1,1

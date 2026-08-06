@@ -14,8 +14,8 @@ class ResConfigSettings(models.TransientModel):
             ("gemini-2.5-flash", "Gemini 2.5 Flash (Хурдан / Задалбар)"),
             ("gemini-2.5-pro", "Gemini 2.5 Pro (Өндөр чадамжтай)"),
         ],
-        string="AI Загвар",
+        string="Gemini загвар",
         default="gemini-2.5-flash",
         config_parameter="mngglobal_visa.gemini_model",
-        help="AI хүсэлтүүдэд ашиглагдах загвар"
+        help="Паспорт OCR-д ашиглах Gemini загвар"
     )

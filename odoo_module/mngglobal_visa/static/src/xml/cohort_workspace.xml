@@ -19,7 +19,7 @@
                         <i class="fa fa-refresh" aria-hidden="true"/>
                     </button>
                     <button class="mng_primary_button" type="button" t-on-click="newLead">
-                        <i class="fa fa-plus" aria-hidden="true"/> Шинэ хүсэлт
+                        <i class="fa fa-plus" aria-hidden="true"/> Шинэ гэрээ
                     </button>
                 </div>
             </header>

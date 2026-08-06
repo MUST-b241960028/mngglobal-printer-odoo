@@ -8,9 +8,9 @@
         <field name="inherit_id" ref="base.res_config_settings_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//form" position="inside">
-                <app data-string="MNG Виза AI" string="MNG Виза AI" name="mngglobal_visa">
-                    <block title="AI Туслах ба OCR Тохиргоо" name="mng_visa_ai_setting_container">
-                        <setting id="gemini_api_setting" help="Google AI Studio Gemini API Key оруулснаар AI Паспорт унших болон AI Туслах ажиллана.">
+                <app data-string="Паспорт OCR" string="Паспорт OCR" name="mngglobal_visa">
+                    <block title="Паспорт OCR тохиргоо" name="mng_visa_ai_setting_container">
+                        <setting id="gemini_api_setting" help="Google AI Studio Gemini API Key оруулснаар паспортыг автоматаар уншина.">
                             <div class="field_title">Gemini API Key</div>
                             <div class="content-group">
                                 <div class="mt16">
@@ -18,8 +18,8 @@
                                 </div>
                             </div>
                         </setting>
-                        <setting id="gemini_model_setting" help="Ашиглагдах Gemini AI загварыг сонгоно.">
-                            <div class="field_title">AI Загвар</div>
+                        <setting id="gemini_model_setting" help="Паспорт уншихад ашиглах Gemini загварыг сонгоно.">
+                            <div class="field_title">Gemini загвар</div>
                             <div class="content-group">
                                 <div class="mt16">
                                     <field name="gemini_model"/>
@@ -33,7 +33,7 @@
     </record>
 
     <record id="mng_visa_config_settings_action" model="ir.actions.act_window">
-        <field name="name">AI Тохиргоо</field>
+        <field name="name">Паспорт OCR тохиргоо</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">res.config.settings</field>
         <field name="view_mode">form</field>

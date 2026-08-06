@@ -508,7 +508,7 @@
     </record>
 
     <record id="mng_visa_app_action_intake" model="ir.actions.act_window">
-        <field name="name">Шинэ хүсэлтүүд</field>
+        <field name="name">Шинэ гэрээ</field>
         <field name="res_model">mng.visa.application</field>
         <field name="view_mode">kanban,list,form</field>
         <field name="domain">[('recruitment_period_id', '=', False)]</field>

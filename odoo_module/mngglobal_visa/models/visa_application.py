@@ -353,7 +353,7 @@ class MngVisaApplication(models.Model):
         if not program or any(app.stage_id.id not in columns_by_id for app in applications):
             unassigned_column = {
                 "id": False,
-                "name": _("Шинэ хүсэлтүүд") if not program else _("Үе шат тохируулаагүй"),
+                "name": _("Шинэ гэрээ") if not program else _("Үе шат тохируулаагүй"),
                 "is_done": False,
                 "is_failed": False,
                 "cards": [],
@@ -408,7 +408,7 @@ class MngVisaApplication(models.Model):
         return {
             "program": {
                 "id": program.id if program else False,
-                "name": program.name if program else _("Шинэ хүсэлтүүд"),
+                "name": program.name if program else _("Шинэ гэрээ"),
             },
             "cohorts": [
                 {
@@ -517,7 +517,7 @@ class MngVisaApplication(models.Model):
             body += "<br/><span>%s</span>" % html_escape(reason)
         if new_application:
             body += "<br/><span>%s: %s</span>" % (
-                _("Шинэ хүсэлт"), html_escape(new_application.display_name),
+                _("Шинэ гэрээ"), html_escape(new_application.display_name),
             )
         self.message_post(body=body + "</p>")
         return move
@@ -797,7 +797,7 @@ class MngVisaApplication(models.Model):
                 "tag": "display_notification",
                 "params": {
                     "title": "Анхааруулга",
-                    "message": "Gemini API Key тохируулагдаагүй байна. Тохиргоо -> AI Тохиргоо хэсэгт API Key оруулна уу.",
+                    "message": "Gemini API Key тохируулагдаагүй байна. Тохиргоо -> Паспорт OCR тохиргоо хэсэгт API Key оруулна уу.",
                     "type": "warning",
                 }
             }

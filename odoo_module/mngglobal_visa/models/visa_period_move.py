@@ -31,6 +31,6 @@ class MngVisaPeriodMove(models.Model):
         "res.users", string="Шилжүүлсэн", required=True,
         default=lambda self: self.env.user, readonly=True)
     new_application_id = fields.Many2one(
-        "mng.visa.application", string="Шинэ хүсэлт",
+        "mng.visa.application", string="Шинэ гэрээ",
         ondelete="set null",
-        help="Хойшлуулж шинээр үүсгэсэн хүсэлт.")
+        help="Хойшлуулж шинээр үүсгэсэн гэрээ.")

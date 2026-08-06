@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record id="mng_visa_cohort_workspace_intake" model="ir.actions.client">
-        <field name="name">Шинэ хүсэлтүүд</field>
+        <field name="name">Шинэ гэрээ</field>
         <field name="tag">mngglobal_visa.cohort_workspace</field>
         <field name="params" eval="{'scope': 'unassigned'}"/>
     </record>

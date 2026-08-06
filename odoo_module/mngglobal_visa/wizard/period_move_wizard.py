@@ -19,7 +19,7 @@ class MngVisaPeriodMoveWizard(models.TransientModel):
         domain="['&', ('state', '!=', 'archived'), '|', ('program_type_id', '=', False), ('program_type_id', '=', program_type_id)]")
     mode = fields.Selection([
         ("move", "Одоогийн хүсэлтийг шилжүүлэх"),
-        ("defer", "Шинэ хүсэлт үүсгэж хойшлуулах"),
+        ("defer", "Шинэ гэрээ үүсгэж хойшлуулах"),
     ], string="Үйлдэл", required=True, default="move", readonly=True)
     reason = fields.Text(string="Шалтгаан", required=True)
 
@@ -37,7 +37,7 @@ class MngVisaPeriodMoveWizard(models.TransientModel):
             )
             return {
                 "type": "ir.actions.act_window",
-                "name": _("Шинэ хүсэлт"),
+                "name": _("Шинэ гэрээ"),
                 "res_model": "mng.visa.application",
                 "res_id": new_application.id,
                 "view_mode": "form",

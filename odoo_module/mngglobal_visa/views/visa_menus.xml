@@ -14,44 +14,49 @@
               groups="mngglobal_visa.group_visa_manager,base.group_system"/>
 
     <menuitem id="mng_visa_intake_menu"
-              name="Шинэ хүсэлтүүд"
+              name="Шинэ гэрээ"
               action="mng_visa_cohort_workspace_intake"
               parent="mng_visa_root_menu"
               sequence="5"/>
 
-    <!-- Program categories — flat top-level for fast 1-click access -->
+    <menuitem id="mng_visa_agreements_menu"
+              name="Гэрээнүүд"
+              parent="mng_visa_root_menu"
+              sequence="10"/>
+
+    <!-- Program category workspaces live under one agreement menu. -->
     <menuitem id="mng_visa_ph_adult_menu"
               name="Филиппин Насанд хүрэгч"
               action="mng_visa_cohort_workspace_ph_adult"
-              parent="mng_visa_root_menu"
+              parent="mng_visa_agreements_menu"
               sequence="10"
               groups="mngglobal_visa.group_visa_ph_adult,mngglobal_visa.group_visa_manager"/>
 
     <menuitem id="mng_visa_ph_kids_menu"
               name="Филиппин Хүүхэд"
               action="mng_visa_cohort_workspace_ph_kids"
-              parent="mng_visa_root_menu"
+              parent="mng_visa_agreements_menu"
               sequence="20"
               groups="mngglobal_visa.group_visa_ph_kids,mngglobal_visa.group_visa_manager"/>
 
     <menuitem id="mng_visa_jp_student_menu"
               name="Япон Оюутан"
               action="mng_visa_cohort_workspace_jp_student"
-              parent="mng_visa_root_menu"
+              parent="mng_visa_agreements_menu"
               sequence="30"
               groups="mngglobal_visa.group_visa_jp_student,mngglobal_visa.group_visa_manager"/>
 
     <menuitem id="mng_visa_jp_worker_menu"
               name="Япон Ажилтан"
               action="mng_visa_cohort_workspace_jp_worker"
-              parent="mng_visa_root_menu"
+              parent="mng_visa_agreements_menu"
               sequence="40"
               groups="mngglobal_visa.group_visa_jp_worker,mngglobal_visa.group_visa_manager"/>
 
     <menuitem id="mng_visa_kr_menu"
               name="Солонгос"
               action="mng_visa_cohort_workspace_kr"
-              parent="mng_visa_root_menu"
+              parent="mng_visa_agreements_menu"
               sequence="50"
               groups="mngglobal_visa.group_visa_kr,mngglobal_visa.group_visa_manager"/>
 
@@ -115,13 +120,6 @@
               parent="mng_visa_root_menu"
               sequence="100"/>
 
-    <!-- AI Assistant Menu -->
-    <menuitem id="mng_visa_ai_copilot_menu"
-              name="AI Туслах"
-              action="mng_visa_ai_copilot_wizard_action"
-              parent="mng_visa_root_menu"
-              sequence="2"/>
-
     <menuitem id="mng_visa_checklist_tmpl_menu"
               name="Шалгах хуудасны загвар"
               action="mng_visa_checklist_tmpl_action"
@@ -142,7 +140,7 @@
               groups="mngglobal_visa.group_visa_finance,mngglobal_visa.group_visa_manager"/>
 
     <menuitem id="mng_visa_ai_config_menu"
-              name="AI Тохиргоо"
+              name="Паспорт OCR тохиргоо"
               action="mng_visa_config_settings_action"
               parent="mng_visa_config_menu"
               sequence="30"

@@ -41,7 +41,7 @@ class MngVisaPassportOcrWizard(models.TransientModel):
         model = self.env["ir.config_parameter"].sudo().get_param("mngglobal_visa.gemini_model", "gemini-2.5-flash")
 
         if not api_key:
-            raise UserError(_("Gemini API Key тохируулагдаагүй байна. Тохиргоо -> AI Тохиргоо хэсэгт API Key оруулна уу."))
+            raise UserError(_("Gemini API Key тохируулагдаагүй байна. Тохиргоо -> Паспорт OCR тохиргоо хэсэгт API Key оруулна уу."))
 
         mime_type = "image/jpeg"
         if self.file_name:

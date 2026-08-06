@@ -1,12 +1,11 @@
 {
     "name": "MNG Виза — Зуучлалын Удирдлага",
-    "version": "2.3.2",
+    "version": "2.3.3",
     "category": "Services",
-    "summary": "MNG Global зуучлалын үйл ажиллагааны удирдлагын систем ба AI Туслах",
+    "summary": "MNG Global зуучлалын үйл ажиллагааны удирдлагын систем",
     "description": """
-        Филиппин, Япон, Солонгос зуучлалын бүрэн удирдлага + AI Туслах.
+        Филиппин, Япон, Солонгос зуучлалын бүрэн удирдлага.
         - AI Passport OCR Scanning & Auto-Fill (Паспорт автоматаар унших)
-        - AI ERP Copilot Assistant (Эрп мэдээллийн AI Туслах)
         - AI Smart Client Message Drafter (Оюутны сануулга мессеж бэлтгэгч)
         - SearchPanel sidebar: Хөтөлбөр тус бүрийн pipeline дотор элсэлтийн үеэр шүүх
         - Kanban pipeline (drag & drop)
@@ -28,7 +27,6 @@
         "views/visa_assign_period_wizard_views.xml",
         "views/period_move_wizard_views.xml",
         "views/passport_ocr_wizard_views.xml",
-        "views/ai_copilot_wizard_views.xml",
         "views/period_add_lead_wizard_views.xml",
         "views/res_config_settings_views.xml",
         "views/visa_document_views.xml",
