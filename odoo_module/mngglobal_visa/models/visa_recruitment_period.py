@@ -3,15 +3,15 @@ from odoo import models, fields, api, _
 
 class MngVisaRecruitmentPeriod(models.Model):
     """
-    Элсэлтийн үе / Хавтас — Оюутан элсүүлэлтийн хугацаа, хавтас бүрийг ангилна.
+    Элсэлтийн үе — Оюутан элсүүлэлтийн хугацаа, кохорт бүрийг ангилна.
     Жишээ нь: 9-р сарын элсэлт, 10-р сарын элсэлт, 11-р сарын элсэлт гэх мэт.
     """
     _name = "mng.visa.recruitment.period"
-    _description = "Элсэлтийн үе / Хавтас"
+    _description = "Элсэлтийн үе"
     _inherit = ["mail.thread"]
     _order = "date_start desc, id desc"
 
-    name = fields.Char(string="Элсэлтийн нэр / Хавтас", required=True, tracking=True)
+    name = fields.Char(string="Элсэлтийн үеийн нэр", required=True, tracking=True)
     code = fields.Char(string="Код", help="Жишээ: SEP-2026, OCT-2026")
     date_start = fields.Date(string="Эхлэх огноо", tracking=True)
     date_end = fields.Date(string="Дуусах / Нисэх огноо", tracking=True)
@@ -33,7 +33,7 @@ class MngVisaRecruitmentPeriod(models.Model):
 
     application_ids = fields.One2many(
         "mng.visa.application", "recruitment_period_id",
-        string="Хүсэлтүүд / Аппликейшн")
+        string="Аппликейшнүүд")
 
     application_count = fields.Integer(
         string="Нийт аппликейшн", compute="_compute_counts")
@@ -51,11 +51,11 @@ class MngVisaRecruitmentPeriod(models.Model):
 
     def action_view_applications(self):
         """
-        Хавтасны карт дээр дарахад тухайн элсэлтийн үед хамаарах аппликейшнуудыг нээнэ.
+        Элсэлтийн үеийн тохиргооноос тухайн кохортын ажлын самбарыг нээнэ.
         """
         self.ensure_one()
         return {
-            "name": f"📁 {self.name} — Аппликейшнууд",
+            "name": f"{self.name} — Аппликейшнууд",
             "type": "ir.actions.act_window",
             "res_model": "mng.visa.application",
             "view_mode": "kanban,list,form,pivot,graph",
@@ -68,11 +68,11 @@ class MngVisaRecruitmentPeriod(models.Model):
 
     def action_open_add_leads_wizard(self):
         """
-        Эзэнгүй лидүүдээс сонгож энэ хавтасанд нэмэх визардыг нээнэ.
+        Хуваарилаагүй аппликейшнүүдээс сонгож энэ элсэлтийн үед нэмэх визардыг нээнэ.
         """
         self.ensure_one()
         return {
-            "name": _("➕ Эзэнгүй лид нэмэх"),
+            "name": _("Хуваарилаагүй аппликейшн нэмэх"),
             "type": "ir.actions.act_window",
             "res_model": "mng.visa.period.add.lead.wizard",
             "view_mode": "form",

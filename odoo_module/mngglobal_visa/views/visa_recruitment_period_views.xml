@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- Folder Kanban View -->
+    <!-- Cohort configuration view. Daily work happens in the program pipeline. -->
     <record id="mng_visa_recruitment_period_kanban" model="ir.ui.view">
         <field name="name">mng.visa.recruitment.period.kanban</field>
         <field name="model">mng.visa.recruitment.period</field>
         <field name="arch" type="xml">
-            <kanban class="o_kanban_mobile" default_order="date_start desc">
+            <kanban class="o_kanban_mobile mng_visa_cohort_settings" default_order="date_start desc">
                 <field name="name"/>
                 <field name="code"/>
                 <field name="date_start"/>
@@ -19,9 +19,9 @@
                 <field name="program_type_id"/>
                 <templates>
                     <t t-name="card">
-                        <div class="oe_kanban_global_click p-3 shadow-sm rounded border" style="background: #ffffff; position: relative;">
+                        <div class="oe_kanban_global_click p-3 border bg-white" style="position: relative; border-radius: 6px;">
                             <div class="d-flex align-items-center mb-2">
-                                <div style="font-size: 38px; color: #714B67; margin-right: 12px; line-height: 1;">📂</div>
+                                <i class="fa fa-calendar-o me-3 text-primary" style="font-size: 24px;" title="Элсэлтийн үе"/>
                                 <div class="flex-grow-1">
                                     <h5 class="fw-bold mb-1 text-primary">
                                         <field name="name"/>
@@ -43,13 +43,13 @@
                             </div>
 
                             <div t-if="record.date_start.raw_value or record.date_end.raw_value" class="text-muted small mb-3">
-                                📅 <field name="date_start"/> ~ <field name="date_end"/>
+                                <field name="date_start"/> ~ <field name="date_end"/>
                             </div>
 
                             <div class="row text-center bg-light rounded py-2 mx-0 mb-3 border">
                                 <div class="col-6 border-end">
                                     <div class="fs-5 fw-bold text-dark"><field name="application_count"/></div>
-                                    <div class="text-uppercase text-muted" style="font-size: 11px;">Нийт Хүсэлт</div>
+                                    <div class="text-uppercase text-muted" style="font-size: 11px;">Аппликейшн</div>
                                 </div>
                                 <div class="col-6">
                                     <div class="fs-5 fw-bold text-success"><field name="paid_count"/></div>
@@ -59,7 +59,7 @@
 
                             <div class="d-grid">
                                 <button type="object" name="action_view_applications" class="btn btn-outline-primary btn-sm fw-bold">
-                                    📁 Хавтас Рүү Орох (<t t-esc="record.application_count.raw_value"/>)
+                                    Ажлын самбар нээх (<t t-esc="record.application_count.raw_value"/>)
                                 </button>
                             </div>
                         </div>
@@ -69,12 +69,12 @@
         </field>
     </record>
 
-    <!-- Folder List View -->
+    <!-- Cohort list view -->
     <record id="mng_visa_recruitment_period_list" model="ir.ui.view">
         <field name="name">mng.visa.recruitment.period.list</field>
         <field name="model">mng.visa.recruitment.period</field>
         <field name="arch" type="xml">
-            <list string="Элсэлтийн хавтаснууд">
+            <list string="Элсэлтийн үеүүд">
                 <field name="name"/>
                 <field name="code"/>
                 <field name="date_start"/>
@@ -89,17 +89,18 @@
         </field>
     </record>
 
-    <!-- Folder Form View -->
+    <!-- Cohort configuration form -->
     <record id="mng_visa_recruitment_period_form" model="ir.ui.view">
         <field name="name">mng.visa.recruitment.period.form</field>
         <field name="model">mng.visa.recruitment.period</field>
         <field name="arch" type="xml">
-            <form string="Элсэлтийн үе / Хавтас">
+            <form string="Элсэлтийн үе">
                 <header>
                     <button name="action_open_add_leads_wizard"
-                            string="➕ Эзэнгүй лид нэмэх"
+                            string="Хуваарилаагүй аппликейшн нэмэх"
                             type="object"
-                            class="oe_highlight"/>
+                            class="oe_highlight"
+                            icon="fa-plus"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,active,closed"/>
                 </header>
                 <sheet>
@@ -107,13 +108,13 @@
                         <button name="action_view_applications"
                                 type="object"
                                 class="oe_stat_button"
-                                icon="fa-folder-open">
+                                icon="fa-columns">
                             <field name="application_count" widget="statinfo" string="Аппликейшнууд"/>
                         </button>
                     </div>
 
                     <div class="oe_title">
-                        <label for="name" string="Элсэлтийн нэр / Хавтасны нэр"/>
+                        <label for="name" string="Элсэлтийн үеийн нэр"/>
                         <h1>
                             <field name="name" placeholder="ж: 2026 Оны 9-р сарын элсэлт"/>
                         </h1>
@@ -133,7 +134,7 @@
                     </group>
 
                     <notebook>
-                        <page string="📂 Хавтасны хүсэлтүүд" name="applications">
+                        <page string="Аппликейшнүүд" name="applications">
                             <field name="application_ids" readonly="1">
                                 <list>
                                     <field name="name"/>
@@ -157,9 +158,9 @@
 
     <!-- Recruitment Period Management (Settings) -->
     <record id="mng_visa_recruitment_period_action" model="ir.actions.act_window">
-        <field name="name">📁 Элсэлтийн үе / Хавтас тохиргоо</field>
+        <field name="name">Элсэлтийн үеийн тохиргоо</field>
         <field name="res_model">mng.visa.recruitment.period</field>
-        <field name="view_mode">list,kanban,form</field>
+        <field name="view_mode">list,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Шинэ элсэлтийн үе үүсгэх
@@ -167,10 +168,9 @@
             <p>
                 Хөтөлбөр тус бүрийн элсэлтийн хугацааг энд тохируулна.
                 Жишээ нь: "2026 Оны 1-р сарын элсэлт (January Intake)" гэх мэт.
-                Үүсгэсэн үеүүд хөтөлбөрийн pipeline-д зүүн талын sidebar-аар шүүгддэг.
+                Ажилтнууд хөтөлбөрийн ажлын самбараас элсэлтийн үеэр шүүж ажиллана.
             </p>
         </field>
     </record>
 
 </odoo>
-

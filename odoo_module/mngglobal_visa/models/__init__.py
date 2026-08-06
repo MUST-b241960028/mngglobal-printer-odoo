@@ -1,5 +1,6 @@
 from . import visa_program_type
 from . import visa_recruitment_period
+from . import visa_period_move
 from . import visa_stage
 from . import visa_application
 from . import visa_payment

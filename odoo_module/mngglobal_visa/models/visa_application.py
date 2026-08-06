@@ -1,4 +1,6 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, _
+from odoo.exceptions import UserError, ValidationError
+from odoo.tools import html_escape
 
 
 class MngVisaApplication(models.Model):
@@ -43,6 +45,16 @@ class MngVisaApplication(models.Model):
         "mng.visa.recruitment.period", string="Элсэлтийн үе / Хавтас",
         domain="['&', ('state', '!=', 'archived'), '|', ('program_type_id', '=', False), ('program_type_id', '=', program_type_id)]",
         tracking=True, help="Сурагч/хэрэглэгчийн бүртгэгдсэн элсэлтийн хугацааны хавтас")
+    period_move_ids = fields.One2many(
+        "mng.visa.period.move", "application_id", string="Элсэлтийн үеийн түүх")
+    period_move_count = fields.Integer(
+        compute="_compute_period_move_count", string="Шилжилт")
+    previous_application_id = fields.Many2one(
+        "mng.visa.application", string="Өмнөх аппликейшн",
+        ondelete="set null", copy=False, readonly=True)
+    deferred_application_ids = fields.One2many(
+        "mng.visa.application", "previous_application_id",
+        string="Дараагийн аппликейшнүүд")
     stage_id = fields.Many2one(
         "mng.visa.stage", string="Үе шат",
         tracking=True, group_expand="_read_group_stage_ids",
@@ -197,6 +209,11 @@ class MngVisaApplication(models.Model):
         for rec in self:
             rec.meeting_count = len(rec.meeting_ids)
 
+    @api.depends("period_move_ids")
+    def _compute_period_move_count(self):
+        for rec in self:
+            rec.period_move_count = len(rec.period_move_ids)
+
     def action_schedule_meeting(self):
         """Open calendar event form pre-filled with client info."""
         self.ensure_one()
@@ -269,7 +286,23 @@ class MngVisaApplication(models.Model):
 
     # Stage change tracking
 
+    @api.constrains("program_type_id", "recruitment_period_id")
+    def _check_recruitment_period_program(self):
+        for rec in self:
+            period_program = rec.recruitment_period_id.program_type_id
+            if period_program and period_program != rec.program_type_id:
+                raise ValidationError(_(
+                    "Сонгосон элсэлтийн үе нь тухайн хөтөлбөрт хамаарахгүй байна."
+                ))
+
     def write(self, vals):
+        old_periods = {}
+        period_changed = "recruitment_period_id" in vals
+        if period_changed:
+            old_periods = {
+                rec.id: rec.recruitment_period_id for rec in self
+            }
+
         if "stage_id" in vals:
             stage = self.env["mng.visa.stage"].browse(vals["stage_id"])
             today = fields.Date.today()
@@ -280,7 +313,165 @@ class MngVisaApplication(models.Model):
             if stage.is_yellow_card:
                 vals.setdefault("date_yellow_card", today)
         result = super().write(vals)
+
+        if period_changed and not self.env.context.get("mng_skip_period_history"):
+            move_type = "move" if vals.get("recruitment_period_id") else "unassign"
+            reason = self.env.context.get("mng_period_move_reason")
+            for rec in self:
+                from_period = old_periods[rec.id]
+                if from_period != rec.recruitment_period_id:
+                    rec._record_period_change(
+                        from_period, rec.recruitment_period_id, move_type, reason
+                    )
         return result
+
+    def _validate_target_period(self, target_period):
+        self.ensure_one()
+        if not target_period or not target_period.exists():
+            raise UserError(_("Шинэ элсэлтийн үе сонгоно уу."))
+        if target_period.state == "archived":
+            raise UserError(_("Архивлагдсан элсэлтийн үе рүү шилжүүлэх боломжгүй."))
+        if (
+            target_period.program_type_id
+            and target_period.program_type_id != self.program_type_id
+        ):
+            raise UserError(_(
+                "'%s' элсэлтийн үе нь '%s' хөтөлбөрт хамаарахгүй байна."
+            ) % (target_period.name, self.program_type_id.name))
+
+    def _record_period_change(
+        self, from_period, to_period, move_type, reason=False,
+        new_application=False,
+    ):
+        self.ensure_one()
+        move = self.env["mng.visa.period.move"].create({
+            "application_id": self.id,
+            "from_period_id": from_period.id if from_period else False,
+            "to_period_id": to_period.id if to_period else False,
+            "move_type": move_type,
+            "reason": reason or False,
+            "new_application_id": new_application.id if new_application else False,
+        })
+
+        labels = dict(move._fields["move_type"].selection)
+        from_name = html_escape(from_period.name) if from_period else _("Хуваарилаагүй")
+        to_name = html_escape(to_period.name) if to_period else _("Хуваарилаагүй")
+        body = "<p><b>%s</b>: %s &rarr; %s" % (
+            html_escape(labels[move_type]), from_name, to_name,
+        )
+        if reason:
+            body += "<br/><span>%s</span>" % html_escape(reason)
+        if new_application:
+            body += "<br/><span>%s: %s</span>" % (
+                _("Шинэ аппликейшн"), html_escape(new_application.display_name),
+            )
+        self.message_post(body=body + "</p>")
+        return move
+
+    def action_move_to_period(self, target_period, reason=False, move_type="move"):
+        """Move the current case while preserving a visible audit history."""
+        self.ensure_one()
+        target_period = self.env["mng.visa.recruitment.period"].browse(
+            target_period.id if hasattr(target_period, "id") else target_period
+        )
+        self._validate_target_period(target_period)
+        from_period = self.recruitment_period_id
+        if from_period == target_period:
+            return False
+
+        self.with_context(mng_skip_period_history=True).write({
+            "recruitment_period_id": target_period.id,
+        })
+        return self._record_period_change(
+            from_period, target_period, move_type, reason
+        )
+
+    def action_defer_to_period(self, target_period, reason):
+        """Create a fresh case for a later cohort without copying case artifacts."""
+        self.ensure_one()
+        target_period = self.env["mng.visa.recruitment.period"].browse(
+            target_period.id if hasattr(target_period, "id") else target_period
+        )
+        self._validate_target_period(target_period)
+
+        Stage = self.env["mng.visa.stage"]
+        first_stage = Stage.search(
+            [("program_type_id", "=", self.program_type_id.id)],
+            order="sequence, id", limit=1,
+        )
+        values = {
+            "program_type_id": self.program_type_id.id,
+            "recruitment_period_id": target_period.id,
+            "stage_id": first_stage.id,
+            "previous_application_id": self.id,
+            "priority": self.priority,
+            "partner_id": self.partner_id.id,
+            "client_name": self.client_name,
+            "client_phone": self.client_phone,
+            "client_email": self.client_email,
+            "passport_number": self.passport_number,
+            "passport_expiry": self.passport_expiry,
+            "date_of_birth": self.date_of_birth,
+            "parent_name": self.parent_name,
+            "parent_phone": self.parent_phone,
+            "teacher_id": self.teacher_id.id,
+            "school_name": self.school_name,
+            "city": self.city,
+            "program_duration": self.program_duration,
+            "assigned_to": self.assigned_to.id,
+            "currency_id": self.currency_id.id,
+        }
+        new_application = self.env["mng.visa.application"].create(values)
+        self._record_period_change(
+            self.recruitment_period_id, target_period, "defer", reason,
+            new_application=new_application,
+        )
+        new_application.message_post(
+            body="<p><b>%s</b>: %s</p>" % (
+                _("Өмнөх аппликейшнээс үүсгэсэн"),
+                html_escape(self.display_name),
+            )
+        )
+        return new_application
+
+    def action_open_move_period_wizard(self):
+        self.ensure_one()
+        return {
+            "name": _("Элсэлтийн үе солих"),
+            "type": "ir.actions.act_window",
+            "res_model": "mng.visa.period.move.wizard",
+            "view_mode": "form",
+            "target": "new",
+            "context": {
+                "default_application_id": self.id,
+                "default_mode": "move",
+            },
+        }
+
+    def action_open_defer_period_wizard(self):
+        self.ensure_one()
+        return {
+            "name": _("Дараагийн элсэлтэд шилжүүлэх"),
+            "type": "ir.actions.act_window",
+            "res_model": "mng.visa.period.move.wizard",
+            "view_mode": "form",
+            "target": "new",
+            "context": {
+                "default_application_id": self.id,
+                "default_mode": "defer",
+            },
+        }
+
+    def action_open_period_history(self):
+        self.ensure_one()
+        return {
+            "type": "ir.actions.act_window",
+            "name": _("Элсэлтийн үеийн түүх"),
+            "res_model": "mng.visa.period.move",
+            "view_mode": "list,form",
+            "domain": [("application_id", "=", self.id)],
+            "context": {"default_application_id": self.id},
+        }
 
     def _populate_all_checklists(self):
         """Load ALL checklist items for this program at once (skips duplicates)."""
@@ -522,4 +713,3 @@ Output ONLY the message text in Mongolian. No greeting tags like 'Subject:'.
                     "type": "danger",
                 }
             }
-

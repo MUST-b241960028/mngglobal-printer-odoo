@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mng_visa_period_move_wizard_form" model="ir.ui.view">
+        <field name="name">mng.visa.period.move.wizard.form</field>
+        <field name="model">mng.visa.period.move.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Элсэлтийн үе шилжүүлэх">
+                <sheet>
+                    <field name="mode" invisible="1"/>
+                    <div class="alert alert-info" role="alert" invisible="mode != 'move'">
+                        Аппликейшний одоогийн үе шат, төлбөр, баримт болон ажлын түүх хадгалагдана.
+                    </div>
+                    <div class="alert alert-warning" role="alert" invisible="mode != 'defer'">
+                        Шинэ элсэлтийн үед шинэ аппликейшн үүснэ. Хувийн мэдээлэл хуулагдах боловч
+                        төлбөр, баримт, checklist болон нэхэмжлэл хуулагдахгүй.
+                    </div>
+                    <group>
+                        <group>
+                            <field name="application_id"/>
+                            <field name="program_type_id"/>
+                        </group>
+                        <group>
+                            <field name="current_period_id"/>
+                            <field name="target_period_id" options="{'no_create_edit': True}"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="reason" placeholder="Жишээ: Визний материал хойшилсон тул дараагийн элсэлт рүү шилжүүлэв..."/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_confirm" string="Баталгаажуулах" type="object"
+                            class="oe_highlight" icon="fa-check"/>
+                    <button string="Цуцлах" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

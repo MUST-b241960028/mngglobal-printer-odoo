@@ -107,6 +107,58 @@
         </record>
 
         <!-- ======================= -->
+        <!--  COHORT MOVE HISTORY    -->
+        <!-- ======================= -->
+        <record id="rule_visa_period_move_manager" model="ir.rule">
+            <field name="name">Manager: All Cohort Moves</field>
+            <field name="model_id" ref="model_mng_visa_period_move"/>
+            <field name="groups" eval="[(4, ref('group_visa_manager')), (4, ref('base.group_system'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <record id="rule_visa_period_move_ph_adult" model="ir.rule">
+            <field name="name">Program: PH Adult (Cohort Moves)</field>
+            <field name="model_id" ref="model_mng_visa_period_move"/>
+            <field name="groups" eval="[(4, ref('group_visa_ph_adult'))]"/>
+            <field name="domain_force">[('application_id.program_type_id.code', '=', 'PH_ADULT')]</field>
+        </record>
+
+        <record id="rule_visa_period_move_ph_kids" model="ir.rule">
+            <field name="name">Program: PH Kids (Cohort Moves)</field>
+            <field name="model_id" ref="model_mng_visa_period_move"/>
+            <field name="groups" eval="[(4, ref('group_visa_ph_kids'))]"/>
+            <field name="domain_force">[('application_id.program_type_id.code', '=', 'PH_KIDS')]</field>
+        </record>
+
+        <record id="rule_visa_period_move_jp_student" model="ir.rule">
+            <field name="name">Program: Japan Student (Cohort Moves)</field>
+            <field name="model_id" ref="model_mng_visa_period_move"/>
+            <field name="groups" eval="[(4, ref('group_visa_jp_student'))]"/>
+            <field name="domain_force">[('application_id.program_type_id.code', '=', 'JP_STUDENT')]</field>
+        </record>
+
+        <record id="rule_visa_period_move_jp_worker" model="ir.rule">
+            <field name="name">Program: Japan Worker (Cohort Moves)</field>
+            <field name="model_id" ref="model_mng_visa_period_move"/>
+            <field name="groups" eval="[(4, ref('group_visa_jp_worker'))]"/>
+            <field name="domain_force">[('application_id.program_type_id.code', '=', 'JP_WORKER')]</field>
+        </record>
+
+        <record id="rule_visa_period_move_kr" model="ir.rule">
+            <field name="name">Program: Korea (Cohort Moves)</field>
+            <field name="model_id" ref="model_mng_visa_period_move"/>
+            <field name="groups" eval="[(4, ref('group_visa_kr'))]"/>
+            <field name="domain_force">[('application_id.program_type_id.code', '=', 'KR')]</field>
+        </record>
+
+        <record id="rule_visa_period_move_prevent_leak" model="ir.rule">
+            <field name="name">Prevent Cohort Move Leak</field>
+            <field name="model_id" ref="model_mng_visa_period_move"/>
+            <field name="groups" eval="[(4, ref('group_visa_user'))]"/>
+            <field name="domain_force">[(0, '=', 1)]</field>
+        </record>
+
+        <!-- ======================= -->
         <!--  CHECKLIST ITEMS        -->
         <!-- ======================= -->
         <record id="rule_visa_checklist_manager" model="ir.rule">
@@ -316,4 +368,3 @@
 
     </data>
 </odoo>
-

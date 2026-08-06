@@ -18,6 +18,22 @@
     padding: 20px 0 !important;
 }
 
+/* Cohort workspaces keep the pipeline compact and easy to scan. */
+.o_mng_visa_cohort_board .o_kanban_record {
+    border: 1px solid #d8dee8 !important;
+    border-radius: 6px !important;
+    box-shadow: none !important;
+}
+.o_mng_visa_cohort_board .o_kanban_record:hover {
+    border-color: #2f6f75 !important;
+    box-shadow: 0 2px 8px rgba(25, 45, 55, 0.12) !important;
+}
+.o_mng_visa_cohort_board .o_kanban_record .o_kanban_record_top {
+    border-bottom: 1px solid #edf0f3;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+}
+
 /* Base resets for buttons simulating cards */
 button.mng_stat_btn, button.mng_mini_stat, button.mng_analytics_link {
     outline: none !important;

@@ -4,10 +4,10 @@ from odoo.exceptions import UserError
 
 class MngVisaAssignPeriodWizard(models.TransientModel):
     """
-    Олон лидэд нэгэн зэрэг элсэлтийн хавтас тохируулах визард.
+    Олон аппликейшнийг нэгэн зэрэг элсэлтийн үед шилжүүлэх визард.
     """
     _name = "mng.visa.assign.period.wizard"
-    _description = "Элсэлтийн хавтас бөөнөөр тохируулах"
+    _description = "Элсэлтийн үе бөөнөөр шилжүүлэх"
 
     program_type_id = fields.Many2one(
         "mng.visa.program.type", string="Хөтөлбөр",
@@ -15,7 +15,7 @@ class MngVisaAssignPeriodWizard(models.TransientModel):
     )
     recruitment_period_id = fields.Many2one(
         "mng.visa.recruitment.period",
-        string="Сонгох элсэлтийн хавтас",
+        string="Шинэ элсэлтийн үе",
         required=True,
         domain="['&', ('state', '!=', 'archived'), '|', ('program_type_id', '=', False), ('program_type_id', '=', program_type_id)]"
     )
@@ -23,6 +23,7 @@ class MngVisaAssignPeriodWizard(models.TransientModel):
         "mng.visa.application",
         string="Сонгосон лидүүд / аппликейшнууд"
     )
+    reason = fields.Text(string="Шилжүүлэх шалтгаан", required=True)
 
     @api.depends("application_ids", "application_ids.program_type_id")
     def _compute_program_type_id(self):
@@ -46,22 +47,20 @@ class MngVisaAssignPeriodWizard(models.TransientModel):
         if not self.application_ids:
             raise UserError(_("Ямар нэгэн аппликейшн сонгогдоогүй байна!"))
         
-        self.application_ids.write({
-            "recruitment_period_id": self.recruitment_period_id.id
-        })
-
+        moved_count = 0
         for app in self.application_ids:
-            app.message_post(
-                body=_("📁 Элсэлтийн хавтас шинэчлэгдлээ: <b>%s</b>") % self.recruitment_period_id.name
-            )
+            if app.action_move_to_period(
+                self.recruitment_period_id, self.reason, move_type="assign"
+            ):
+                moved_count += 1
 
         return {
             "type": "ir.actions.client",
             "tag": "display_notification",
             "params": {
-                "title": _("Амжилттай!"),
-                "message": _("Нийт %s лидийн элсэлтийн хавтас '%s' болж шинэчлэгдлээ.") % (
-                    len(self.application_ids), self.recruitment_period_id.name
+                "title": _("Кохорт шинэчлэгдлээ"),
+                "message": _("Нийт %s аппликейшнийг '%s' элсэлтийн үед шилжүүллээ.") % (
+                    moved_count, self.recruitment_period_id.name
                 ),
                 "type": "success",
                 "sticky": False,

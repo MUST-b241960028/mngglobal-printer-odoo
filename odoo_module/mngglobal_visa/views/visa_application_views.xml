@@ -6,7 +6,7 @@
         <field name="name">mng.visa.application.kanban</field>
         <field name="model">mng.visa.application</field>
         <field name="arch" type="xml">
-            <kanban default_group_by="stage_id" class="o_kanban_small_column">
+            <kanban default_group_by="stage_id" class="o_kanban_small_column mng_visa_cohort_board">
                 <field name="name"/>
                 <field name="client_name"/>
                 <field name="program_type_id"/>
@@ -106,6 +106,14 @@
                     <button name="action_schedule_meeting"
                             string="Уулзалт товлох"
                             type="object"/>
+                    <button name="action_open_move_period_wizard"
+                            string="Элсэлтийн үе солих"
+                            type="object" icon="fa-exchange"
+                            invisible="not id"/>
+                    <button name="action_open_defer_period_wizard"
+                            string="Дараагийн элсэлтэд шилжүүлэх"
+                            type="object" icon="fa-forward"
+                            invisible="not id"/>
                     <field name="stage_id" widget="statusbar"
                            options="{'clickable': '1'}"/>
                 </header>
@@ -128,6 +136,11 @@
                                 type="object" name="action_open_meetings">
                             <field name="meeting_count" widget="statinfo"
                                    string="Уулзалт"/>
+                        </button>
+                        <button class="oe_stat_button" icon="fa-exchange"
+                                type="object" name="action_open_period_history">
+                            <field name="period_move_count" widget="statinfo"
+                                   string="Элсэлтийн түүх"/>
                         </button>
                     </div>
                     <div class="oe_title">
@@ -152,9 +165,9 @@
                             <field name="passport_expiry"/>
                             <field name="date_of_birth"/>
                         </group>
-                        <group string="Хөтөлбөр ба Элсэлтийн хавтас">
+                        <group string="Хөтөлбөр ба элсэлтийн үе">
                             <field name="program_type_id"/>
-                            <field name="recruitment_period_id"/>
+                            <field name="recruitment_period_id" string="Элсэлтийн үе"/>
                             <field name="school_name"/>
                             <field name="city"/>
                             <field name="program_duration"/>
@@ -233,6 +246,22 @@
                                 </group>
                             </group>
                         </page>
+                        <page string="Элсэлтийн түүх" name="period_history">
+                            <group invisible="not previous_application_id">
+                                <field name="previous_application_id"/>
+                            </group>
+                            <field name="period_move_ids" readonly="1">
+                                <list create="0" edit="0" delete="0">
+                                    <field name="moved_at"/>
+                                    <field name="move_type" widget="badge"/>
+                                    <field name="from_period_id"/>
+                                    <field name="to_period_id"/>
+                                    <field name="reason"/>
+                                    <field name="moved_by" widget="many2one_avatar_user"/>
+                                    <field name="new_application_id" optional="hide"/>
+                                </list>
+                            </field>
+                        </page>
                         <page string="Тэмдэглэл">
                             <field name="notes"/>
                             <group invisible="rejection_reason == False">
@@ -298,6 +327,10 @@
                 <separator/>
                 <filter string="Миний өргөдлүүд" name="mine"
                         domain="[('assigned_to', '=', uid)]"/>
+                <filter string="Хуваарилаагүй" name="unassigned"
+                        domain="[('recruitment_period_id', '=', False)]"/>
+                <filter string="Нээлттэй элсэлтүүд" name="open_cohorts"
+                        domain="[('recruitment_period_id.state', '=', 'active')]"/>
                 <filter string="Хугацаат" name="deadline"
                         domain="[('departure_date', '!=', False)]"/>
                 <separator/>
@@ -306,7 +339,7 @@
                 <filter string="Хэсэгчлэн" name="partial"
                         domain="[('payment_status', '=', 'partial')]"/>
                 <separator/>
-                <filter string="Элсэлтийн үе / Хавтас" name="group_period"
+                <filter string="Элсэлтийн үе" name="group_period"
                         context="{'group_by': 'recruitment_period_id'}"/>
                 <filter string="Хөтөлбөр" name="group_program"
                         context="{'group_by': 'program_type_id'}"/>
@@ -323,7 +356,7 @@
                            enable_counters="1"
                            limit="0"
                            string="Элсэлтийн үе"
-                           domain="[('program_type_id', '=', context.get('default_program_type_id', False))]"/>
+                           domain="['|', ('program_type_id', '=', False), ('program_type_id', '=', context.get('default_program_type_id', False))]"/>
                 </searchpanel>
             </search>
         </field>
@@ -435,7 +468,7 @@
     </record>
 
     <record id="mng_visa_app_action_ph_adult" model="ir.actions.act_window">
-        <field name="name">Филиппин Насанд хүрэгч</field>
+        <field name="name">Филиппин Насанд хүрэгч - Кохортын ажлын самбар</field>
         <field name="res_model">mng.visa.application</field>
         <field name="view_mode">kanban,list,calendar,form</field>
         <field name="domain">[('program_type_id.code', '=', 'PH_ADULT')]</field>
@@ -443,7 +476,7 @@
     </record>
 
     <record id="mng_visa_app_action_ph_kids" model="ir.actions.act_window">
-        <field name="name">Филиппин Хүүхэд</field>
+        <field name="name">Филиппин Хүүхэд - Кохортын ажлын самбар</field>
         <field name="res_model">mng.visa.application</field>
         <field name="view_mode">kanban,list,calendar,form</field>
         <field name="domain">[('program_type_id.code', '=', 'PH_KIDS')]</field>
@@ -451,7 +484,7 @@
     </record>
 
     <record id="mng_visa_app_action_jp_student" model="ir.actions.act_window">
-        <field name="name">Япон Оюутан</field>
+        <field name="name">Япон Оюутан - Кохортын ажлын самбар</field>
         <field name="res_model">mng.visa.application</field>
         <field name="view_mode">kanban,list,calendar,form</field>
         <field name="domain">[('program_type_id.code', '=', 'JP_STUDENT')]</field>
@@ -459,7 +492,7 @@
     </record>
 
     <record id="mng_visa_app_action_jp_worker" model="ir.actions.act_window">
-        <field name="name">Япон Ажилтан</field>
+        <field name="name">Япон Ажилтан - Кохортын ажлын самбар</field>
         <field name="res_model">mng.visa.application</field>
         <field name="view_mode">kanban,list,calendar,form</field>
         <field name="domain">[('program_type_id.code', '=', 'JP_WORKER')]</field>
@@ -467,11 +500,19 @@
     </record>
 
     <record id="mng_visa_app_action_kr" model="ir.actions.act_window">
-        <field name="name">Солонгос</field>
+        <field name="name">Солонгос - Кохортын ажлын самбар</field>
         <field name="res_model">mng.visa.application</field>
         <field name="view_mode">kanban,list,calendar,form</field>
         <field name="domain">[('program_type_id.code', '=', 'KR')]</field>
         <field name="context" eval="{'default_program_type_id': ref('mngglobal_visa.prog_kr')}"/>
+    </record>
+
+    <record id="mng_visa_app_action_intake" model="ir.actions.act_window">
+        <field name="name">Шинэ хүсэлтүүд</field>
+        <field name="res_model">mng.visa.application</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('recruitment_period_id', '=', False)]</field>
+        <field name="context" eval="{'search_default_unassigned': 1}"/>
     </record>
 
 </odoo>

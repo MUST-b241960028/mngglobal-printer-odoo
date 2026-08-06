@@ -5,12 +5,12 @@
         <field name="name">mng.visa.period.add.lead.wizard.form</field>
         <field name="model">mng.visa.period.add.lead.wizard</field>
         <field name="arch" type="xml">
-            <form string="➕ Эзэнгүй лид хавтасанд нэмэх">
+            <form string="Хуваарилаагүй аппликейшн нэмэх">
                 <sheet>
                     <field name="period_id" invisible="1"/>
                     <field name="program_type_id" invisible="1"/>
                     <div class="alert alert-info" role="alert">
-                        Энэхүү хавтасанд оруулах <b>Хавтасгүй / Эзэнгүй</b> лидүүдийг сонгоно уу.
+                        Энэ элсэлтийн үед оруулах <b>хуваарилаагүй</b> аппликейшнүүдийг сонгоно уу.
                     </div>
                     <group>
                         <field name="application_ids" widget="many2many" options="{'no_create': True}">
@@ -25,7 +25,7 @@
                     </group>
                 </sheet>
                 <footer>
-                    <button name="action_add_leads" string="➕ Сонгосон лидүүдийг нэмэх" type="object" class="btn-primary"/>
+                    <button name="action_add_leads" string="Сонгосон аппликейшнүүдийг нэмэх" type="object" class="btn-primary" icon="fa-plus"/>
                     <button string="Цуцлах" class="btn-secondary" special="cancel"/>
                 </footer>
             </form>
