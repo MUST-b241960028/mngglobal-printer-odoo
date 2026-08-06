@@ -284,6 +284,151 @@ class MngVisaApplication(models.Model):
                 order="sequence")
         return stages.search([], order="sequence")
 
+    @api.model
+    def get_cohort_workspace_data(
+        self, program_id=False, cohort_id=False, scope="all", search_term=False
+    ):
+        """Return the compact, permission-aware data set for the cohort workspace."""
+        Program = self.env["mng.visa.program.type"]
+        Period = self.env["mng.visa.recruitment.period"]
+        Stage = self.env["mng.visa.stage"]
+
+        program = Program.browse(program_id).exists() if program_id else Program
+        if program_id and not program:
+            raise UserError(_("Хөтөлбөр олдсонгүй."))
+
+        selected_cohort = Period.browse(cohort_id).exists() if cohort_id else Period
+        if selected_cohort and program and selected_cohort.program_type_id.id not in (
+            False, program.id
+        ):
+            selected_cohort = Period
+
+        scope = scope if scope in {"all", "unassigned", "cohort"} else "all"
+        base_domain = [("active", "=", True)]
+        if program:
+            base_domain.append(("program_type_id", "=", program.id))
+        if scope == "unassigned":
+            base_domain.append(("recruitment_period_id", "=", False))
+        elif scope == "cohort" and selected_cohort:
+            base_domain.append(("recruitment_period_id", "=", selected_cohort.id))
+
+        if search_term:
+            search_domain = [
+                "|", "|", "|",
+                ("client_name", "ilike", search_term),
+                ("client_phone", "ilike", search_term),
+                ("client_email", "ilike", search_term),
+                ("passport_number", "ilike", search_term),
+            ]
+            base_domain.extend(search_domain)
+
+        applications = self.search(base_domain, order="priority desc, write_date desc", limit=500)
+        cohort_domain = [("state", "!=", "archived"), ("active", "=", True)]
+        if program:
+            cohort_domain.extend([
+                "|",
+                ("program_type_id", "=", False),
+                ("program_type_id", "=", program.id),
+            ])
+        cohorts = Period.search(cohort_domain, order="date_start desc, id desc")
+        stages = Stage.search(
+            [("program_type_id", "=", program.id)] if program else [],
+            order="sequence, id",
+        )
+
+        columns = []
+        columns_by_id = {}
+        for stage in stages:
+            column = {
+                "id": stage.id,
+                "name": stage.name,
+                "is_done": stage.is_done,
+                "is_failed": stage.is_failed,
+                "cards": [],
+            }
+            columns.append(column)
+            columns_by_id[stage.id] = column
+
+        # Intake and old records can legitimately be missing a configured stage.
+        if not program or any(app.stage_id.id not in columns_by_id for app in applications):
+            unassigned_column = {
+                "id": False,
+                "name": _("Шинэ хүсэлтүүд") if not program else _("Үе шат тохируулаагүй"),
+                "is_done": False,
+                "is_failed": False,
+                "cards": [],
+            }
+            columns.insert(0, unassigned_column)
+            columns_by_id[False] = unassigned_column
+
+        for application in applications:
+            stage_column = columns_by_id.get(
+                application.stage_id.id, columns_by_id.get(False)
+            )
+            if not stage_column:
+                # A stage may have been deleted between the two searches.
+                continue
+            stage_column["cards"].append({
+                "id": application.id,
+                "name": application.client_name or application.display_name,
+                "reference": application.name,
+                "program": application.program_type_id.name,
+                "cohort_id": application.recruitment_period_id.id or False,
+                "cohort_name": application.recruitment_period_id.name or _("Хуваарилаагүй"),
+                "phone": application.client_phone or "",
+                "email": application.client_email or "",
+                "assignee": application.assigned_to.name or "",
+                "assignee_initial": (application.assigned_to.name or "?")[:1].upper(),
+                "payment_status": application.payment_status,
+                "checklist_progress": round(application.checklist_progress or 0),
+                "priority": application.priority,
+                "departure_date": str(application.departure_date) if application.departure_date else False,
+                "kanban_state": application.kanban_state,
+            })
+
+        today = fields.Date.today()
+        from datetime import timedelta
+        leaving_soon_domain = base_domain[:1]
+        if program:
+            leaving_soon_domain.append(("program_type_id", "=", program.id))
+        leaving_soon_domain.extend([
+            ("departure_date", ">=", today),
+            ("departure_date", "<=", today + timedelta(days=30)),
+        ])
+        program_domain = [("active", "=", True)]
+        if program:
+            program_domain.append(("program_type_id", "=", program.id))
+
+        return {
+            "program": {
+                "id": program.id if program else False,
+                "name": program.name if program else _("Шинэ хүсэлтүүд"),
+            },
+            "cohorts": [
+                {
+                    "id": cohort.id,
+                    "name": cohort.name,
+                    "state": cohort.state,
+                    "count": self.search_count(program_domain + [
+                        ("recruitment_period_id", "=", cohort.id),
+                    ]),
+                }
+                for cohort in cohorts
+            ],
+            "columns": columns,
+            "stats": {
+                "total": self.search_count(program_domain),
+                "in_view": len(applications),
+                "unassigned": self.search_count(program_domain + [
+                    ("recruitment_period_id", "=", False),
+                ]),
+                "blocked": self.search_count(program_domain + [
+                    ("kanban_state", "=", "blocked"),
+                ]),
+                "departing": self.search_count(leaving_soon_domain),
+            },
+        }
+
     # Stage change tracking
 
     @api.constrains("program_type_id", "recruitment_period_id")

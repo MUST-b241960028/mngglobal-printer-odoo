@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mng_visa_cohort_workspace_intake" model="ir.actions.client">
+        <field name="name">Шинэ хүсэлтүүд</field>
+        <field name="tag">mngglobal_visa.cohort_workspace</field>
+        <field name="params" eval="{'scope': 'unassigned'}"/>
+    </record>
+
+    <record id="mng_visa_cohort_workspace_ph_adult" model="ir.actions.client">
+        <field name="name">Филиппин Насанд хүрэгч</field>
+        <field name="tag">mngglobal_visa.cohort_workspace</field>
+        <field name="params" eval="{'program_id': ref('mngglobal_visa.prog_ph_adult')}"/>
+    </record>
+
+    <record id="mng_visa_cohort_workspace_ph_kids" model="ir.actions.client">
+        <field name="name">Филиппин Хүүхэд</field>
+        <field name="tag">mngglobal_visa.cohort_workspace</field>
+        <field name="params" eval="{'program_id': ref('mngglobal_visa.prog_ph_kids')}"/>
+    </record>
+
+    <record id="mng_visa_cohort_workspace_jp_student" model="ir.actions.client">
+        <field name="name">Япон Оюутан</field>
+        <field name="tag">mngglobal_visa.cohort_workspace</field>
+        <field name="params" eval="{'program_id': ref('mngglobal_visa.prog_jp_student')}"/>
+    </record>
+
+    <record id="mng_visa_cohort_workspace_jp_worker" model="ir.actions.client">
+        <field name="name">Япон Ажилтан</field>
+        <field name="tag">mngglobal_visa.cohort_workspace</field>
+        <field name="params" eval="{'program_id': ref('mngglobal_visa.prog_jp_worker')}"/>
+    </record>
+
+    <record id="mng_visa_cohort_workspace_kr" model="ir.actions.client">
+        <field name="name">Солонгос</field>
+        <field name="tag">mngglobal_visa.cohort_workspace</field>
+        <field name="params" eval="{'program_id': ref('mngglobal_visa.prog_kr')}"/>
+    </record>
+</odoo>

@@ -12,7 +12,7 @@ class TestCohortLifecycle(TransactionCase):
             "code": "COHORT_TEST",
             "visa_type": "student",
         })
-        cls.env["mng.visa.stage"].create({
+        cls.stage = cls.env["mng.visa.stage"].create({
             "name": "Inquiry",
             "program_type_id": cls.program.id,
             "sequence": 1,
@@ -70,3 +70,37 @@ class TestCohortLifecycle(TransactionCase):
             lambda move: move.move_type == "defer"
             and move.new_application_id == deferred
         ))
+
+    def test_workspace_data_keeps_program_and_cohort_boundaries(self):
+        assigned = self._new_application()
+        assigned.stage_id = self.stage
+        unassigned = self.env["mng.visa.application"].create({
+            "program_type_id": self.program.id,
+            "client_name": "Unassigned Student",
+            "kanban_state": "blocked",
+        })
+
+        workspace = self.env["mng.visa.application"].get_cohort_workspace_data(
+            self.program.id
+        )
+
+        self.assertEqual(workspace["program"]["id"], self.program.id)
+        self.assertEqual(workspace["stats"]["total"], 2)
+        self.assertEqual(workspace["stats"]["unassigned"], 1)
+        self.assertEqual(workspace["stats"]["blocked"], 1)
+        self.assertTrue(any(
+            card["id"] == assigned.id
+            for column in workspace["columns"]
+            for card in column["cards"]
+        ))
+
+        cohort_workspace = self.env["mng.visa.application"].get_cohort_workspace_data(
+            self.program.id, self.current_period.id, "cohort"
+        )
+        visible_ids = {
+            card["id"]
+            for column in cohort_workspace["columns"]
+            for card in column["cards"]
+        }
+        self.assertEqual(visible_ids, {assigned.id})
+        self.assertNotIn(unassigned.id, visible_ids)

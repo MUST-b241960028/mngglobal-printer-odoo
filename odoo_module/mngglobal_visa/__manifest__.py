@@ -1,6 +1,6 @@
 {
     "name": "MNG Виза — Зуучлалын Удирдлага",
-    "version": "2.2.0",
+    "version": "2.3.0",
     "category": "Services",
     "summary": "MNG Global зуучлалын үйл ажиллагааны удирдлагын систем ба AI Туслах",
     "description": """
@@ -24,6 +24,7 @@
         "data/recruitment_period_data.xml",
         "views/visa_recruitment_period_views.xml",
         "views/visa_application_views.xml",
+        "views/visa_cohort_workspace_views.xml",
         "views/visa_assign_period_wizard_views.xml",
         "views/period_move_wizard_views.xml",
         "views/passport_ocr_wizard_views.xml",
@@ -38,7 +39,10 @@
     ],
     "assets": {
         "web.assets_backend": [
-            "mngglobal_visa/static/src/css/dashboard.css"
+            "mngglobal_visa/static/src/css/dashboard.css",
+            "mngglobal_visa/static/src/css/cohort_workspace.css",
+            "mngglobal_visa/static/src/js/cohort_workspace.js",
+            "mngglobal_visa/static/src/xml/cohort_workspace.xml",
         ]
     },
     "application": True,

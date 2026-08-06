@@ -111,19 +111,19 @@ class MngVisaDashboard(models.TransientModel):
                                view_mode="list,form")
 
     def action_open_ph_adult(self):
-        return self.env.ref("mngglobal_visa.mng_visa_app_action_ph_adult").read()[0]
+        return self.env.ref("mngglobal_visa.mng_visa_cohort_workspace_ph_adult").read()[0]
 
     def action_open_ph_kids(self):
-        return self.env.ref("mngglobal_visa.mng_visa_app_action_ph_kids").read()[0]
+        return self.env.ref("mngglobal_visa.mng_visa_cohort_workspace_ph_kids").read()[0]
 
     def action_open_jp_student(self):
-        return self.env.ref("mngglobal_visa.mng_visa_app_action_jp_student").read()[0]
+        return self.env.ref("mngglobal_visa.mng_visa_cohort_workspace_jp_student").read()[0]
 
     def action_open_jp_worker(self):
-        return self.env.ref("mngglobal_visa.mng_visa_app_action_jp_worker").read()[0]
+        return self.env.ref("mngglobal_visa.mng_visa_cohort_workspace_jp_worker").read()[0]
 
     def action_open_kr(self):
-        return self.env.ref("mngglobal_visa.mng_visa_app_action_kr").read()[0]
+        return self.env.ref("mngglobal_visa.mng_visa_cohort_workspace_kr").read()[0]
 
     def action_open_overdue(self):
         return {
@@ -154,4 +154,3 @@ class MngVisaDashboard(models.TransientModel):
              ("active", "=", True)],
             view_mode="list,form",
         )
-

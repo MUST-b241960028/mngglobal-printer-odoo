@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="mngglobal_visa.CohortWorkspace">
+        <main class="mng_cohort_workspace">
+            <header class="mng_workspace_header">
+                <div class="mng_workspace_identity">
+                    <span class="mng_workspace_kicker">КОХОРТЫН УДИРДЛАГА</span>
+                    <h1 t-esc="state.data ? state.data.program.name : 'Ачаалж байна'"/>
+                    <span class="mng_workspace_result" t-if="state.data">
+                        <t t-esc="state.data.stats.in_view"/> аппликейшн
+                    </span>
+                </div>
+                <div class="mng_workspace_actions">
+                    <form class="mng_workspace_search" t-on-submit="onSearchSubmit">
+                        <i class="fa fa-search" aria-hidden="true"/>
+                        <input type="search" placeholder="Нэр, утас, паспорт" t-att-value="state.search" t-on-input="onSearchInput"/>
+                    </form>
+                    <button class="mng_icon_button" type="button" title="Шинэчлэх" aria-label="Шинэчлэх" t-on-click="load">
+                        <i class="fa fa-refresh" aria-hidden="true"/>
+                    </button>
+                    <button class="mng_primary_button" type="button" t-on-click="newLead">
+                        <i class="fa fa-plus" aria-hidden="true"/> Шинэ хүсэлт
+                    </button>
+                </div>
+            </header>
+
+            <section class="mng_workspace_stats" t-if="state.data">
+                <div class="mng_stat_cell">
+                    <span>Нийт идэвхтэй</span><strong t-esc="state.data.stats.total"/>
+                </div>
+                <button class="mng_stat_cell mng_stat_button" type="button" t-on-click="() => this.setScope('unassigned')">
+                    <span>Хуваарилаагүй</span><strong t-esc="state.data.stats.unassigned"/>
+                </button>
+                <div class="mng_stat_cell mng_stat_alert">
+                    <span>Саатсан</span><strong t-esc="state.data.stats.blocked"/>
+                </div>
+                <div class="mng_stat_cell mng_stat_departure">
+                    <span>30 хоногт нисэх</span><strong t-esc="state.data.stats.departing"/>
+                </div>
+            </section>
+
+            <section class="mng_workspace_content" t-if="state.data">
+                <aside class="mng_cohort_rail" aria-label="Кохортын шүүлтүүр">
+                    <div class="mng_rail_heading">АЖЛЫН ХҮРЭЭ</div>
+                    <button type="button" t-att-class="state.scope === 'all' ? 'mng_scope_button is-active' : 'mng_scope_button'" t-on-click="() => this.setScope('all')">
+                        <span>Бүх кохорт</span><b t-esc="state.data.stats.total"/>
+                    </button>
+                    <button type="button" t-att-class="state.scope === 'unassigned' ? 'mng_scope_button is-active' : 'mng_scope_button'" t-on-click="() => this.setScope('unassigned')">
+                        <span>Хуваарилаагүй</span><b t-esc="state.data.stats.unassigned"/>
+                    </button>
+                    <div class="mng_rail_heading mng_rail_heading_cohorts">ЭЛСЭЛТИЙН ҮЕ</div>
+                    <div class="mng_cohort_list">
+                        <button t-foreach="state.data.cohorts" t-as="cohort" t-key="cohort.id" type="button" t-att-class="state.scope === 'cohort' &amp;&amp; state.cohortId === cohort.id ? 'mng_scope_button is-active' : 'mng_scope_button'" t-on-click="() => this.setCohort(cohort.id)">
+                            <span class="mng_scope_name" t-esc="cohort.name"/>
+                            <b t-esc="cohort.count"/>
+                        </button>
+                    </div>
+                </aside>
+
+                <section class="mng_pipeline_area" aria-label="Аппликейшний үе шат">
+                    <div class="mng_pipeline_columns">
+                        <article t-foreach="state.data.columns" t-as="column" t-key="column.id || 'unassigned'" t-att-class="column.is_done ? 'mng_pipeline_column is-done' : (column.is_failed ? 'mng_pipeline_column is-failed' : 'mng_pipeline_column')" t-on-dragover="allowDrop" t-on-drop="(event) => this.onDrop(event, column)">
+                            <header class="mng_column_header">
+                                <span class="mng_column_marker"/>
+                                <h2 t-esc="column.name"/>
+                                <b t-esc="column.cards.length"/>
+                            </header>
+                            <div class="mng_column_cards">
+                                <button t-foreach="column.cards" t-as="lead" t-key="lead.id" type="button" draggable="true" t-att-class="state.selectedId === lead.id ? 'mng_lead_card is-selected' : 'mng_lead_card'" t-on-click="() => this.selectLead(lead.id)" t-on-dragstart="(event) => this.onDragStart(event, lead)">
+                                    <div class="mng_card_reference">
+                                        <span t-esc="lead.reference"/>
+                                        <i t-if="lead.kanban_state === 'blocked'" class="fa fa-exclamation-circle" title="Саатсан" aria-label="Саатсан"/>
+                                    </div>
+                                    <strong class="mng_card_name" t-esc="lead.name"/>
+                                    <span class="mng_card_cohort" t-esc="lead.cohort_name"/>
+                                    <div class="mng_card_progress">
+                                        <span t-att-style="'width: ' + lead.checklist_progress + '%'"/>
+                                    </div>
+                                    <div class="mng_card_footer">
+                                        <span t-if="lead.departure_date" class="mng_departure"><i class="fa fa-plane" aria-hidden="true"/> <t t-esc="lead.departure_date"/></span>
+                                        <span t-else=""/>
+                                        <span class="mng_assignee" t-att-title="lead.assignee" t-esc="lead.assignee_initial"/>
+                                    </div>
+                                </button>
+                                <div class="mng_empty_column" t-if="!column.cards.length">Хоосон</div>
+                            </div>
+                        </article>
+                    </div>
+                </section>
+
+                <aside class="mng_lead_inspector">
+                    <t t-if="selectedLead">
+                        <div class="mng_inspector_topline">
+                            <span t-esc="selectedLead.reference"/>
+                            <span t-att-class="'mng_payment mng_payment_' + selectedLead.payment_status" t-esc="this.paymentLabel(selectedLead.payment_status)"/>
+                        </div>
+                        <h2 t-esc="selectedLead.name"/>
+                        <p class="mng_inspector_cohort" t-esc="selectedLead.cohort_name"/>
+                        <dl class="mng_lead_facts">
+                            <div><dt>Утас</dt><dd t-esc="selectedLead.phone || '---'"/></div>
+                            <div><dt>Имэйл</dt><dd t-esc="selectedLead.email || '---'"/></div>
+                            <div><dt>Хариуцагч</dt><dd t-esc="selectedLead.assignee || '---'"/></div>
+                            <div><dt>Явц</dt><dd><t t-esc="selectedLead.checklist_progress"/>%</dd></div>
+                        </dl>
+                        <div class="mng_inspector_actions">
+                            <button class="mng_primary_button mng_inspector_open" type="button" t-on-click="openLead"><i class="fa fa-external-link" aria-hidden="true"/> Дэлгэрэнгүй</button>
+                            <button class="mng_secondary_button" type="button" t-on-click="() => this.openPeriodAction('action_open_move_period_wizard')">Үе солих</button>
+                            <button class="mng_secondary_button" type="button" t-on-click="() => this.openPeriodAction('action_open_defer_period_wizard')">Дараагийн үед</button>
+                        </div>
+                    </t>
+                    <div class="mng_no_selection" t-else="">
+                        <i class="fa fa-id-card-o" aria-hidden="true"/>
+                        <span>Аппликейшн сонгоогүй байна</span>
+                    </div>
+                </aside>
+            </section>
+
+            <div class="mng_workspace_loading" t-if="state.loading">
+                <i class="fa fa-spinner fa-spin" aria-hidden="true"/>
+            </div>
+        </main>
+    </t>
+</templates>

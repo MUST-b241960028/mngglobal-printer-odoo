@@ -15,42 +15,42 @@
 
     <menuitem id="mng_visa_intake_menu"
               name="Шинэ хүсэлтүүд"
-              action="mng_visa_app_action_intake"
+              action="mng_visa_cohort_workspace_intake"
               parent="mng_visa_root_menu"
               sequence="5"/>
 
     <!-- Program categories — flat top-level for fast 1-click access -->
     <menuitem id="mng_visa_ph_adult_menu"
               name="Филиппин Насанд хүрэгч"
-              action="mng_visa_app_action_ph_adult"
+              action="mng_visa_cohort_workspace_ph_adult"
               parent="mng_visa_root_menu"
               sequence="10"
               groups="mngglobal_visa.group_visa_ph_adult,mngglobal_visa.group_visa_manager"/>
 
     <menuitem id="mng_visa_ph_kids_menu"
               name="Филиппин Хүүхэд"
-              action="mng_visa_app_action_ph_kids"
+              action="mng_visa_cohort_workspace_ph_kids"
               parent="mng_visa_root_menu"
               sequence="20"
               groups="mngglobal_visa.group_visa_ph_kids,mngglobal_visa.group_visa_manager"/>
 
     <menuitem id="mng_visa_jp_student_menu"
               name="Япон Оюутан"
-              action="mng_visa_app_action_jp_student"
+              action="mng_visa_cohort_workspace_jp_student"
               parent="mng_visa_root_menu"
               sequence="30"
               groups="mngglobal_visa.group_visa_jp_student,mngglobal_visa.group_visa_manager"/>
 
     <menuitem id="mng_visa_jp_worker_menu"
               name="Япон Ажилтан"
-              action="mng_visa_app_action_jp_worker"
+              action="mng_visa_cohort_workspace_jp_worker"
               parent="mng_visa_root_menu"
               sequence="40"
               groups="mngglobal_visa.group_visa_jp_worker,mngglobal_visa.group_visa_manager"/>
 
     <menuitem id="mng_visa_kr_menu"
               name="Солонгос"
-              action="mng_visa_app_action_kr"
+              action="mng_visa_cohort_workspace_kr"
               parent="mng_visa_root_menu"
               sequence="50"
               groups="mngglobal_visa.group_visa_kr,mngglobal_visa.group_visa_manager"/>

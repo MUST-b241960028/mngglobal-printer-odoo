@@ -55,14 +55,13 @@ class MngVisaRecruitmentPeriod(models.Model):
         """
         self.ensure_one()
         return {
-            "name": f"{self.name} — Аппликейшнууд",
-            "type": "ir.actions.act_window",
-            "res_model": "mng.visa.application",
-            "view_mode": "kanban,list,form,pivot,graph",
-            "domain": [("recruitment_period_id", "=", self.id)],
-            "context": {
-                "default_recruitment_period_id": self.id,
-                "search_default_recruitment_period_id": self.id,
+            "name": self.name,
+            "type": "ir.actions.client",
+            "tag": "mngglobal_visa.cohort_workspace",
+            "params": {
+                "program_id": self.program_type_id.id or False,
+                "scope": "cohort",
+                "cohort_id": self.id,
             },
         }
 
