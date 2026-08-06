@@ -313,10 +313,11 @@
                 <searchpanel>
                     <field name="recruitment_period_id"
                            icon="fa-folder-o"
-                           select="one"
+                           select="multi"
                            enable_counters="1"
                            limit="0"
-                           string="Элсэлтийн үе"/>
+                           string="Элсэлтийн үе"
+                           domain="[('program_type_id', '=', context.get('default_program_type_id', False))]"/>
                 </searchpanel>
             </search>
         </field>
