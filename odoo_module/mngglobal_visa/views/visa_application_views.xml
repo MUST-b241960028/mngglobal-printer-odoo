@@ -310,6 +310,13 @@
                         context="{'group_by': 'stage_id'}"/>
                 <filter string="Төлбөр" name="group_payment"
                         context="{'group_by': 'payment_status'}"/>
+                <searchpanel>
+                    <field name="recruitment_period_id"
+                           icon="fa-folder-o"
+                           enable_counters="1"
+                           limit="0"
+                           string="📁 Элсэлтийн үе"/>
+                </searchpanel>
             </search>
         </field>
     </record>

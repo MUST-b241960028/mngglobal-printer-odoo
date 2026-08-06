@@ -1,49 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="1">
-        <!-- Initial Category-Specific Recruiting Folders -->
-        <record id="recruitment_period_kr_sep_2026" model="mng.visa.recruitment.period">
-            <field name="name">Солонгос — 2026.09-р сарын элсэлт (September Recruit)</field>
-            <field name="code">KR-SEP-2026</field>
-            <field name="program_type_id" ref="mngglobal_visa.prog_kr"/>
-            <field name="date_start">2026-06-01</field>
-            <field name="date_end">2026-09-30</field>
-            <field name="state">active</field>
-            <field name="color">1</field>
-            <field name="note">Солонгосын Их дээд сургуулиудын 2026 оны Намрын 9-р сарын элсэлтийн хавтас.</field>
-        </record>
 
-        <record id="recruitment_period_jp_stu_oct_2026" model="mng.visa.recruitment.period">
-            <field name="name">Япон Оюутан — 2026.10-р сарын элсэлт (October Recruit)</field>
-            <field name="code">JP-STU-OCT-2026</field>
+        <!-- ═══════════════════════════════════════════════════════════
+             🇯🇵 JAPAN STUDENT — Predetermined Quarterly (Jan / Apr / Jul / Oct)
+             Admin creates new year's periods manually via Settings.
+             ═══════════════════════════════════════════════════════════ -->
+        <record id="rp_jp_stu_2026_jan" model="mng.visa.recruitment.period">
+            <field name="name">2026 — 1-р сарын элсэлт (January)</field>
+            <field name="code">JP-STU-JAN-2026</field>
             <field name="program_type_id" ref="mngglobal_visa.prog_jp_student"/>
-            <field name="date_start">2026-06-01</field>
-            <field name="date_end">2026-10-31</field>
-            <field name="state">active</field>
-            <field name="color">2</field>
-            <field name="note">Япон хэлний сургуулийн 2026 оны 10-р сарын элсэлтийн хавтас.</field>
+            <field name="date_start">2025-07-01</field>
+            <field name="date_end">2026-01-31</field>
+            <field name="state">closed</field>
+            <field name="color">1</field>
         </record>
-
-        <record id="recruitment_period_jp_wrk_nov_2026" model="mng.visa.recruitment.period">
-            <field name="name">Япон Ажилтан — 2026.11-р сарын сонгон шалгаруулалт</field>
-            <field name="code">JP-WRK-NOV-2026</field>
-            <field name="program_type_id" ref="mngglobal_visa.prog_jp_worker"/>
-            <field name="date_start">2026-07-01</field>
-            <field name="date_end">2026-11-30</field>
+        <record id="rp_jp_stu_2026_apr" model="mng.visa.recruitment.period">
+            <field name="name">2026 — 4-р сарын элсэлт (April)</field>
+            <field name="code">JP-STU-APR-2026</field>
+            <field name="program_type_id" ref="mngglobal_visa.prog_jp_student"/>
+            <field name="date_start">2025-10-01</field>
+            <field name="date_end">2026-04-30</field>
+            <field name="state">closed</field>
+            <field name="color">2</field>
+        </record>
+        <record id="rp_jp_stu_2026_jul" model="mng.visa.recruitment.period">
+            <field name="name">2026 — 7-р сарын элсэлт (July)</field>
+            <field name="code">JP-STU-JUL-2026</field>
+            <field name="program_type_id" ref="mngglobal_visa.prog_jp_student"/>
+            <field name="date_start">2026-01-01</field>
+            <field name="date_end">2026-07-31</field>
             <field name="state">active</field>
             <field name="color">3</field>
-            <field name="note">Японы Дадлагажигч болон Тусгай ур чадварын ажилтнуудын 11-р сарын хавтас.</field>
+        </record>
+        <record id="rp_jp_stu_2026_oct" model="mng.visa.recruitment.period">
+            <field name="name">2026 — 10-р сарын элсэлт (October)</field>
+            <field name="code">JP-STU-OCT-2026</field>
+            <field name="program_type_id" ref="mngglobal_visa.prog_jp_student"/>
+            <field name="date_start">2026-04-01</field>
+            <field name="date_end">2026-10-31</field>
+            <field name="state">active</field>
+            <field name="color">4</field>
         </record>
 
-        <record id="recruitment_period_ph_kids_spring_2027" model="mng.visa.recruitment.period">
-            <field name="name">Филиппин Хүүхэд — 2027 Оны Хаврын Англи хэлний Кэмп</field>
-            <field name="code">PH-KIDS-SPR-2027</field>
-            <field name="program_type_id" ref="mngglobal_visa.prog_ph_kids"/>
-            <field name="date_start">2026-10-01</field>
-            <field name="date_end">2027-03-31</field>
-            <field name="state">draft</field>
-            <field name="color">4</field>
-            <field name="note">Филиппиний хүүхдийн Англи хэлний хаврын амралтын кэмпийн хавтас.</field>
+        <!-- ═══════════════════════════════════════════════════════════
+             🇯🇵 JAPAN WORKER — Spontaneous / Ad-hoc Recruiting
+             No predetermined schedule. Admin creates periods manually
+             via Settings → Элсэлтийн үе тохиргоо as opportunities arise.
+             ═══════════════════════════════════════════════════════════ -->
+
+        <!-- ═══════════════════════════════════════════════════════════
+             🇰🇷 KOREA — Predetermined Quarterly (Mar / Jun / Sep / Dec)
+             Admin creates new year's periods manually via Settings.
+             ═══════════════════════════════════════════════════════════ -->
+        <record id="rp_kr_2026_mar" model="mng.visa.recruitment.period">
+            <field name="name">2026 — 3-р сарын элсэлт (March)</field>
+            <field name="code">KR-MAR-2026</field>
+            <field name="program_type_id" ref="mngglobal_visa.prog_kr"/>
+            <field name="date_start">2025-09-01</field>
+            <field name="date_end">2026-03-31</field>
+            <field name="state">closed</field>
+            <field name="color">5</field>
         </record>
+        <record id="rp_kr_2026_jun" model="mng.visa.recruitment.period">
+            <field name="name">2026 — 6-р сарын элсэлт (June)</field>
+            <field name="code">KR-JUN-2026</field>
+            <field name="program_type_id" ref="mngglobal_visa.prog_kr"/>
+            <field name="date_start">2025-12-01</field>
+            <field name="date_end">2026-06-30</field>
+            <field name="state">closed</field>
+            <field name="color">6</field>
+        </record>
+        <record id="rp_kr_2026_sep" model="mng.visa.recruitment.period">
+            <field name="name">2026 — 9-р сарын элсэлт (September)</field>
+            <field name="code">KR-SEP-2026</field>
+            <field name="program_type_id" ref="mngglobal_visa.prog_kr"/>
+            <field name="date_start">2026-03-01</field>
+            <field name="date_end">2026-09-30</field>
+            <field name="state">active</field>
+            <field name="color">7</field>
+        </record>
+        <record id="rp_kr_2026_dec" model="mng.visa.recruitment.period">
+            <field name="name">2026 — 12-р сарын элсэлт (December)</field>
+            <field name="code">KR-DEC-2026</field>
+            <field name="program_type_id" ref="mngglobal_visa.prog_kr"/>
+            <field name="date_start">2026-06-01</field>
+            <field name="date_end">2026-12-31</field>
+            <field name="state">active</field>
+            <field name="color">8</field>
+        </record>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             🇵🇭 PHILIPPINES ADULT & KIDS — Ad-hoc / Custom Periods
+             Admin creates periods manually as needed.
+             ═══════════════════════════════════════════════════════════ -->
+
     </data>
 </odoo>

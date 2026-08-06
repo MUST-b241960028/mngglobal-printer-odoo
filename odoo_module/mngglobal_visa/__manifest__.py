@@ -1,11 +1,11 @@
 {
     "name": "MNG Виза — Зуучлалын Удирдлага",
-    "version": "1.5.1",
+    "version": "2.0.0",
     "category": "Services",
     "summary": "MNG Global зуучлалын үйл ажиллагааны удирдлагын систем",
     "description": """
         Филиппин, Япон, Солонгос зуучлалын бүрэн удирдлага.
-        - Элсэлтийн үе / Хавтасны ангилал (Per-category folder & mass assign functionality)
+        - SearchPanel sidebar: Хөтөлбөр тус бүрийн pipeline дотор элсэлтийн үеэр шүүх
         - Kanban pipeline (drag & drop)
         - Хөтөлбөр тус бүрийн үе шатны тохиргоо
         - Шалгах хуудас (per-stage checklist)
