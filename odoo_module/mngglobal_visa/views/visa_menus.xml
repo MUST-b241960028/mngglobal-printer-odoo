@@ -7,7 +7,7 @@
               sequence="5"/>
 
     <menuitem id="mng_visa_dashboard_menu"
-              name="📊 Dashboard"
+              name="Dashboard"
               action="mng_visa_dashboard_action"
               parent="mng_visa_root_menu"
               sequence="1"
@@ -15,35 +15,35 @@
 
     <!-- Program categories — flat top-level for fast 1-click access -->
     <menuitem id="mng_visa_ph_adult_menu"
-              name="🇵🇭 Филиппин Насанд хүрэгч"
+              name="Филиппин Насанд хүрэгч"
               action="mng_visa_app_action_ph_adult"
               parent="mng_visa_root_menu"
               sequence="10"
               groups="mngglobal_visa.group_visa_ph_adult,mngglobal_visa.group_visa_manager"/>
 
     <menuitem id="mng_visa_ph_kids_menu"
-              name="🇵🇭 Филиппин Хүүхэд"
+              name="Филиппин Хүүхэд"
               action="mng_visa_app_action_ph_kids"
               parent="mng_visa_root_menu"
               sequence="20"
               groups="mngglobal_visa.group_visa_ph_kids,mngglobal_visa.group_visa_manager"/>
 
     <menuitem id="mng_visa_jp_student_menu"
-              name="🇯🇵 Япон Оюутан"
+              name="Япон Оюутан"
               action="mng_visa_app_action_jp_student"
               parent="mng_visa_root_menu"
               sequence="30"
               groups="mngglobal_visa.group_visa_jp_student,mngglobal_visa.group_visa_manager"/>
 
     <menuitem id="mng_visa_jp_worker_menu"
-              name="🇯🇵 Япон Ажилтан"
+              name="Япон Ажилтан"
               action="mng_visa_app_action_jp_worker"
               parent="mng_visa_root_menu"
               sequence="40"
               groups="mngglobal_visa.group_visa_jp_worker,mngglobal_visa.group_visa_manager"/>
 
     <menuitem id="mng_visa_kr_menu"
-              name="🇰🇷 Солонгос"
+              name="Солонгос"
               action="mng_visa_app_action_kr"
               parent="mng_visa_root_menu"
               sequence="50"
@@ -51,7 +51,7 @@
 
     <!-- Finance -->
     <menuitem id="mng_visa_finance_menu"
-              name="💰 Санхүү"
+              name="Санхүү"
               parent="mng_visa_root_menu"
               sequence="60"
               groups="mngglobal_visa.group_visa_finance,mngglobal_visa.group_visa_manager"/>
@@ -65,7 +65,7 @@
 
     <!-- Reports -->
     <menuitem id="mng_visa_reports_menu"
-              name="📈 Тайлан"
+              name="Тайлан"
               parent="mng_visa_root_menu"
               sequence="70"
               groups="mngglobal_visa.group_visa_manager,base.group_system"/>
@@ -105,7 +105,7 @@
 
     <!-- Settings -->
     <menuitem id="mng_visa_config_menu"
-              name="⚙️ Тохиргоо"
+              name="Тохиргоо"
               parent="mng_visa_root_menu"
               sequence="100"/>
 
@@ -116,7 +116,7 @@
               sequence="10"/>
 
     <menuitem id="mng_visa_recruitment_period_config_menu"
-              name="📁 Элсэлтийн үе / Хавтас тохиргоо"
+              name="Элсэлтийн үе тохиргоо"
               action="mng_visa_recruitment_period_action"
               parent="mng_visa_config_menu"
               sequence="15"/>

@@ -313,9 +313,10 @@
                 <searchpanel>
                     <field name="recruitment_period_id"
                            icon="fa-folder-o"
+                           select="one"
                            enable_counters="1"
                            limit="0"
-                           string="📁 Элсэлтийн үе"/>
+                           string="Элсэлтийн үе"/>
                 </searchpanel>
             </search>
         </field>
