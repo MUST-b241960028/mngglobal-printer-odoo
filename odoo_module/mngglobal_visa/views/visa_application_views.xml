@@ -94,12 +94,6 @@
                     <field name="active" invisible="1"/>
                     <button name="action_restore" string="Сэргээх" type="object"
                             class="btn-primary" invisible="active"/>
-                    <button name="action_open_passport_ocr"
-                            string="✨ AI Паспорт Унших"
-                            type="object" class="btn-primary"/>
-                    <button name="action_generate_ai_message"
-                            string="✨ AI Мессеж Бэлдэх"
-                            type="object"/>
                     <button name="action_generate_fee_schedule"
                             string="Төлбөрийн хуваарь үүсгэх"
                             type="object"
@@ -112,10 +106,6 @@
                     <button name="action_schedule_meeting"
                             string="Уулзалт товлох"
                             type="object"/>
-                    <button name="action_open_move_period_wizard"
-                            string="Элсэлтийн үе солих"
-                            type="object" icon="fa-exchange"
-                            invisible="not id"/>
                     <button name="action_open_defer_period_wizard"
                             string="Дараагийн элсэлтэд шилжүүлэх"
                             type="object" icon="fa-forward"
