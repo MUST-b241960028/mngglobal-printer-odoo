@@ -153,7 +153,12 @@ class TestCohortLifecycle(TransactionCase):
         }
 
         self.assertEqual(workspace["current_cohort_id"], current_period.id)
-        self.assertEqual([cohort["id"] for cohort in workspace["cohorts"]], [current_period.id])
+        sidebar_period_ids = {cohort["id"] for cohort in workspace["cohorts"]}
+        self.assertTrue({
+            older_period.id,
+            current_period.id,
+            future_period.id,
+        }.issubset(sidebar_period_ids))
         self.assertEqual(visible_ids, {current_application.id})
         self.assertNotIn(older_application.id, visible_ids)
         self.assertNotIn(future_application.id, visible_ids)

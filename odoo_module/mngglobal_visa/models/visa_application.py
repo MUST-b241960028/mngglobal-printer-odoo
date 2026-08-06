@@ -352,7 +352,14 @@ class MngVisaApplication(models.Model):
             base_domain.extend(search_domain)
 
         applications = self.search(base_domain, order="priority desc, write_date desc", limit=500)
-        cohorts = current_cohort
+        cohort_domain = [("state", "!=", "archived"), ("active", "=", True)]
+        if program:
+            cohort_domain.extend([
+                "|",
+                ("program_type_id", "=", False),
+                ("program_type_id", "=", program.id),
+            ])
+        cohorts = Period.search(cohort_domain, order="date_start desc, id desc")
         stages = Stage.search(
             [("program_type_id", "=", program.id)] if program else [],
             order="sequence, id",

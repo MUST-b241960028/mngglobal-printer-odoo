@@ -41,9 +41,16 @@
 
             <section class="mng_workspace_content" t-if="state.data">
                 <aside class="mng_cohort_rail" aria-label="Элсэлтийн үеийн шүүлтүүр">
-                    <div class="mng_rail_heading">ОДООГИЙН ЭЛСЭЛТИЙН ҮЕ</div>
+                    <div class="mng_rail_heading">ШҮҮЛТҮҮР</div>
+                    <button type="button" t-att-class="state.scope === 'all' ? 'mng_scope_button is-active' : 'mng_scope_button'" t-on-click="() => this.setScope('all')">
+                        <span>Бүх элсэлтийн үе</span><b t-esc="state.data.stats.total"/>
+                    </button>
+                    <button type="button" t-att-class="state.scope === 'unassigned' ? 'mng_scope_button is-active' : 'mng_scope_button'" t-on-click="() => this.setScope('unassigned')">
+                        <span>Хуваарилаагүй</span><b t-esc="state.data.stats.unassigned"/>
+                    </button>
+                    <div class="mng_rail_heading mng_rail_heading_cohorts">ЭЛСЭЛТИЙН ҮЕ</div>
                     <div class="mng_cohort_list">
-                        <button t-foreach="state.data.cohorts" t-as="cohort" t-key="cohort.id" type="button" t-att-class="state.scope === 'current' || (state.scope === 'cohort' &amp;&amp; state.cohortId === cohort.id) ? 'mng_scope_button is-active' : 'mng_scope_button'" t-on-click="() => this.setCohort(cohort.id)">
+                        <button t-foreach="state.data.cohorts" t-as="cohort" t-key="cohort.id" type="button" t-att-class="(state.scope === 'current' &amp;&amp; state.data.current_cohort_id === cohort.id) || (state.scope === 'cohort' &amp;&amp; state.cohortId === cohort.id) ? 'mng_scope_button is-active' : 'mng_scope_button'" t-on-click="() => this.setCohort(cohort.id)">
                             <span class="mng_scope_name" t-esc="cohort.name"/>
                             <b t-esc="cohort.count"/>
                         </button>
