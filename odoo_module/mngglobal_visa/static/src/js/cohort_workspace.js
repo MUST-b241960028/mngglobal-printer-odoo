@@ -138,7 +138,7 @@ export class CohortWorkspace extends Component {
         });
     }
 
-    async openPeriodAction(method) {
+    async executeLeadAction(method) {
         if (!this.selectedLead) {
             return;
         }

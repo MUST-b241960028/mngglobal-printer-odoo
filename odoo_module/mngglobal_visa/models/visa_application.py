@@ -399,6 +399,12 @@ class MngVisaApplication(models.Model):
         if program:
             program_domain.append(("program_type_id", "=", program.id))
 
+        can_create_invoice = (
+            self.env.user.has_group("mngglobal_visa.group_visa_finance")
+            or self.env.user.has_group("mngglobal_visa.group_visa_manager")
+            or self.env.user.has_group("base.group_system")
+        )
+
         return {
             "program": {
                 "id": program.id if program else False,
@@ -416,6 +422,9 @@ class MngVisaApplication(models.Model):
                 for cohort in cohorts
             ],
             "columns": columns,
+            "capabilities": {
+                "can_create_invoice": can_create_invoice,
+            },
             "stats": {
                 "total": self.search_count(program_domain),
                 "in_view": len(applications),

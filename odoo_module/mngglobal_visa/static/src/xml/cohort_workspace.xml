@@ -104,8 +104,8 @@
                         </dl>
                         <div class="mng_inspector_actions">
                             <button class="mng_primary_button mng_inspector_open" type="button" t-on-click="openLead"><i class="fa fa-external-link" aria-hidden="true"/> Дэлгэрэнгүй</button>
-                            <button class="mng_secondary_button" type="button" t-on-click="() => this.openPeriodAction('action_open_move_period_wizard')">Үе солих</button>
-                            <button class="mng_secondary_button" type="button" t-on-click="() => this.openPeriodAction('action_open_defer_period_wizard')">Дараагийн үед</button>
+                            <button t-if="state.data.capabilities.can_create_invoice" class="mng_secondary_button mng_inspector_action_wide" type="button" t-on-click="() => this.executeLeadAction('action_create_invoice')"><i class="fa fa-file-text-o" aria-hidden="true"/> Нэхэмжлэл үүсгэх</button>
+                            <button class="mng_secondary_button mng_inspector_action_wide" type="button" t-on-click="() => this.executeLeadAction('action_schedule_meeting')"><i class="fa fa-calendar" aria-hidden="true"/> Уулзалт товлох</button>
                         </div>
                     </t>
                     <div class="mng_no_selection" t-else="">

@@ -88,6 +88,7 @@ class TestCohortLifecycle(TransactionCase):
         self.assertEqual(workspace["stats"]["total"], 2)
         self.assertEqual(workspace["stats"]["unassigned"], 1)
         self.assertEqual(workspace["stats"]["blocked"], 1)
+        self.assertIn("can_create_invoice", workspace["capabilities"])
         self.assertTrue(any(
             card["id"] == assigned.id
             for column in workspace["columns"]
