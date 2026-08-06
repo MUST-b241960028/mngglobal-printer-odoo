@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from odoo import fields
 from odoo.tests.common import TransactionCase, tagged
 
@@ -162,3 +164,46 @@ class TestCohortLifecycle(TransactionCase):
         self.assertEqual(visible_ids, {current_application.id})
         self.assertNotIn(older_application.id, visible_ids)
         self.assertNotIn(future_application.id, visible_ids)
+
+    def test_deleted_contract_can_be_restored_within_grace_period(self):
+        application = self._new_application()
+        application_id = application.id
+
+        application.unlink()
+
+        archived = self.env["mng.visa.application"].with_context(
+            active_test=False
+        ).browse(application_id).exists()
+        self.assertTrue(archived)
+        self.assertFalse(archived.active)
+        self.assertTrue(archived.deleted_at)
+        self.assertEqual(archived.deleted_by, self.env.user)
+        self.assertEqual(
+            archived.delete_deadline,
+            archived.deleted_at + timedelta(days=30),
+        )
+        self.assertFalse(self.env["mng.visa.application"].search([
+            ("id", "=", application_id),
+        ]))
+
+        archived.action_restore()
+
+        restored = self.env["mng.visa.application"].browse(application_id)
+        self.assertTrue(restored.active)
+        self.assertFalse(restored.deleted_at)
+        self.assertFalse(restored.deleted_by)
+        self.assertFalse(restored.delete_deadline)
+
+    def test_expired_deleted_contract_is_permanently_removed(self):
+        application = self._new_application()
+        application_id = application.id
+        application.unlink()
+        application.with_context(active_test=False).write({
+            "delete_deadline": fields.Datetime.now() - timedelta(days=1),
+        })
+
+        self.env["mng.visa.application"]._cron_purge_expired_deleted_contracts()
+
+        self.assertFalse(self.env["mng.visa.application"].with_context(
+            active_test=False
+        ).browse(application_id).exists())

@@ -1,6 +1,11 @@
+import logging
+from datetime import timedelta
+
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import html_escape
+
+_logger = logging.getLogger(__name__)
 
 
 class MngVisaApplication(models.Model):
@@ -72,6 +77,12 @@ class MngVisaApplication(models.Model):
         ("blocked", "Саатсан"),
     ], string="Kanban төлөв", default="normal")
     active = fields.Boolean(default=True)
+    deleted_at = fields.Datetime(
+        string="Устгасан огноо", readonly=True, copy=False)
+    deleted_by = fields.Many2one(
+        "res.users", string="Устгасан хэрэглэгч", readonly=True, copy=False)
+    delete_deadline = fields.Datetime(
+        string="Сэргээх эцсийн хугацаа", readonly=True, copy=False, index=True)
 
     # Client info (plain text — no contact database)
     client_name = fields.Char(
@@ -480,6 +491,13 @@ class MngVisaApplication(models.Model):
                 ))
 
     def write(self, vals):
+        deleted_records = self.filtered(lambda rec: not rec.active)
+        allowed_deleted_fields = {
+            "active", "deleted_at", "deleted_by", "delete_deadline",
+        }
+        if deleted_records and set(vals) - allowed_deleted_fields:
+            raise UserError(_("Устгасан гэрээг эхлээд сэргээнэ үү."))
+
         old_periods = {}
         period_changed = "recruitment_period_id" in vals
         if period_changed:
@@ -508,6 +526,65 @@ class MngVisaApplication(models.Model):
                         from_period, rec.recruitment_period_id, move_type, reason
                     )
         return result
+
+    def unlink(self):
+        """Archive contracts for a 30-day recovery window instead of deleting them."""
+        if self.env.context.get("mng_permanent_delete"):
+            return super().unlink()
+
+        active_records = self.filtered("active")
+        if not active_records:
+            return True
+
+        deleted_at = fields.Datetime.now()
+        active_records.write({
+            "active": False,
+            "deleted_at": deleted_at,
+            "deleted_by": self.env.user.id,
+            "delete_deadline": deleted_at + timedelta(days=30),
+        })
+        for record in active_records:
+            record.message_post(body="<p><b>%s</b></p>" % _(
+                "Гэрээг устгасан. 30 хоногийн дотор сэргээх боломжтой."
+            ))
+        return True
+
+    def action_restore(self):
+        """Restore a contract before its deletion grace period expires."""
+        deleted_records = self.filtered(lambda rec: not rec.active)
+        if not deleted_records:
+            return False
+
+        deleted_records.write({
+            "active": True,
+            "deleted_at": False,
+            "deleted_by": False,
+            "delete_deadline": False,
+        })
+        for record in deleted_records:
+            record.message_post(body="<p><b>%s</b></p>" % _(
+                "Гэрээг сэргээсэн."
+            ))
+        return {
+            "type": "ir.actions.client",
+            "tag": "display_notification",
+            "params": {
+                "message": _("Гэрээг сэргээсэн."),
+                "type": "success",
+                "sticky": False,
+            },
+        }
+
+    @api.model
+    def _cron_purge_expired_deleted_contracts(self):
+        """Permanently remove contracts only after their 30-day recovery window."""
+        expired = self.with_context(active_test=False).sudo().search([
+            ("active", "=", False),
+            ("delete_deadline", "<", fields.Datetime.now()),
+        ])
+        if expired:
+            _logger.info("Permanently deleting %d expired archived contracts.", len(expired))
+            expired.with_context(mng_permanent_delete=True).unlink()
 
     def _validate_target_period(self, target_period):
         self.ensure_one()

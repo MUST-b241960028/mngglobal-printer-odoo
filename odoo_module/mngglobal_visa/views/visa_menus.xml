@@ -54,6 +54,13 @@
               sequence="50"
               groups="mngglobal_visa.group_visa_kr,mngglobal_visa.group_visa_manager"/>
 
+    <menuitem id="mng_visa_deleted_apps_menu"
+              name="Устгасан гэрээнүүд"
+              action="mng_visa_app_action_deleted"
+              parent="mng_visa_agreements_menu"
+              sequence="90"
+              groups="mngglobal_visa.group_visa_manager,base.group_system"/>
+
     <!-- Finance -->
     <menuitem id="mng_visa_finance_menu"
               name="Санхүү"
