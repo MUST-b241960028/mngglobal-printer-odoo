@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Wizard Form View -->
+    <record id="mng_visa_assign_period_wizard_form" model="ir.ui.view">
+        <field name="name">mng.visa.assign.period.wizard.form</field>
+        <field name="model">mng.visa.assign.period.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Элсэлтийн хавтас тохируулах">
+                <sheet>
+                    <div class="alert alert-info" role="alert">
+                        Сонгосон лидүүд / аппликейшнуудад тохируулах <b>Элсэлтийн хавтас</b>-аа сонгоно уу.
+                    </div>
+                    <group>
+                        <field name="recruitment_period_id" options="{'no_create_edit': False}"/>
+                    </group>
+                    <notebook>
+                        <page string="Сонгосон аппликейшнууд" name="applications">
+                            <field name="application_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="client_name"/>
+                                    <field name="client_phone"/>
+                                    <field name="program_type_id"/>
+                                    <field name="stage_id"/>
+                                    <field name="recruitment_period_id" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <footer>
+                    <button name="action_apply" string="📁 Хавтас Тохируулах" type="object" class="oe_highlight"/>
+                    <button string="Цуцлах" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Mass Action Binding for Application List/Kanban -->
+    <record id="mng_visa_assign_period_wizard_action" model="ir.actions.act_window">
+        <field name="name">📁 Элсэлтийн хавтас тохируулах</field>
+        <field name="res_model">mng.visa.assign.period.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="model_mng_visa_application"/>
+        <field name="binding_view_types">list,kanban</field>
+    </record>
+
+</odoo>

@@ -65,3 +65,44 @@ class MngVisaRecruitmentPeriod(models.Model):
                 "search_default_recruitment_period_id": self.id,
             },
         }
+
+    def action_assign_unassigned_leads(self):
+        """
+        Хавтасгүй / эзэнгүй байгаа бүх хуучин лидийг энэхүү элсэлтийн хавтасанд нэгэн зэрэг оруулна.
+        Хэрэв хавтас дээр тодорхой Хөтөлбөр сонгогдсон бол зөвхөн тухайн хөтөлбөрийн эзэнгүй лидүүдийг оруулна.
+        """
+        self.ensure_one()
+        domain = [("recruitment_period_id", "=", False)]
+        if self.program_type_id:
+            domain.append(("program_type_id", "=", self.program_type_id.id))
+
+        unassigned = self.env["mng.visa.application"].search(domain)
+        if not unassigned:
+            msg = _("Зөвхөн %s хөтөлбөрийн хавтасгүй лид олдсонгүй.") % self.program_type_id.name if self.program_type_id else _("Хавтасгүй олдсон эзэнгүй лид байхгүй байна.")
+            return {
+                "type": "ir.actions.client",
+                "tag": "display_notification",
+                "params": {
+                    "title": _("Мэдээлэл"),
+                    "message": msg,
+                    "type": "info",
+                    "sticky": False,
+                }
+            }
+
+        count = len(unassigned)
+        unassigned.write({"recruitment_period_id": self.id})
+
+        return {
+            "type": "ir.actions.client",
+            "tag": "display_notification",
+            "params": {
+                "title": _("Амжилттай!"),
+                "message": _("Хавтасгүй байсан нийт %s лидийг '%s' хавтасанд амжилттай тохирууллаа.") % (
+                    count, self.name
+                ),
+                "type": "success",
+                "sticky": False,
+            }
+        }
+

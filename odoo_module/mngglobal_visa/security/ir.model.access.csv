@@ -21,4 +21,6 @@ access_visa_document_mgr,mng.visa.document manager,model_mng_visa_document,mnggl
 access_visa_recruitment_period_user,mng.visa.recruitment.period user,model_mng_visa_recruitment_period,mngglobal_visa.group_visa_user,1,1,1,0
 access_visa_recruitment_period_mgr,mng.visa.recruitment.period mgr,model_mng_visa_recruitment_period,mngglobal_visa.group_visa_manager,1,1,1,1
 access_visa_recruitment_period_admin,mng.visa.recruitment.period admin,model_mng_visa_recruitment_period,base.group_system,1,1,1,1
+access_visa_assign_period_wizard_user,mng.visa.assign.period.wizard user,model_mng_visa_assign_period_wizard,mngglobal_visa.group_visa_user,1,1,1,1
+access_visa_assign_period_wizard_admin,mng.visa.assign.period.wizard admin,model_mng_visa_assign_period_wizard,base.group_system,1,1,1,1
 access_visa_dashboard_user,mng.visa.dashboard user,model_mng_visa_dashboard,mngglobal_visa.group_visa_manager,1,1,1,1

@@ -24,40 +24,100 @@
               parent="mng_visa_root_menu"
               sequence="10"/>
 
-    <menuitem id="mng_visa_ph_adult_menu"
-              name="Филиппин Насанд хүрэгч"
-              action="mng_visa_app_action_ph_adult"
+    <!-- Филиппин Насанд хүрэгч -->
+    <menuitem id="mng_visa_ph_adult_parent"
+              name="🇵🇭 Филиппин Насанд хүрэгч"
               parent="mng_visa_apps_parent"
               sequence="10"
               groups="mngglobal_visa.group_visa_ph_adult,mngglobal_visa.group_visa_manager"/>
 
-    <menuitem id="mng_visa_ph_kids_menu"
-              name="Филиппин Хүүхэд"
-              action="mng_visa_app_action_ph_kids"
+    <menuitem id="mng_visa_ph_adult_folder_menu"
+              name="📁 Элсэлтийн хавтаснууд"
+              action="mng_visa_recruitment_period_action_ph_adult"
+              parent="mng_visa_ph_adult_parent"
+              sequence="1"/>
+
+    <menuitem id="mng_visa_ph_adult_menu"
+              name="📋 Бүх өргөдлүүд"
+              action="mng_visa_app_action_ph_adult"
+              parent="mng_visa_ph_adult_parent"
+              sequence="2"/>
+
+    <!-- Филиппин Хүүхэд -->
+    <menuitem id="mng_visa_ph_kids_parent"
+              name="🇵🇭 Филиппин Хүүхэд"
               parent="mng_visa_apps_parent"
               sequence="20"
               groups="mngglobal_visa.group_visa_ph_kids,mngglobal_visa.group_visa_manager"/>
 
-    <menuitem id="mng_visa_jp_student_menu"
-              name="Япон Оюутан"
-              action="mng_visa_app_action_jp_student"
+    <menuitem id="mng_visa_ph_kids_folder_menu"
+              name="📁 Элсэлтийн хавтаснууд"
+              action="mng_visa_recruitment_period_action_ph_kids"
+              parent="mng_visa_ph_kids_parent"
+              sequence="1"/>
+
+    <menuitem id="mng_visa_ph_kids_menu"
+              name="📋 Бүх өргөдлүүд"
+              action="mng_visa_app_action_ph_kids"
+              parent="mng_visa_ph_kids_parent"
+              sequence="2"/>
+
+    <!-- Япон Оюутан -->
+    <menuitem id="mng_visa_jp_student_parent"
+              name="🇯🇵 Япон Оюутан"
               parent="mng_visa_apps_parent"
               sequence="30"
               groups="mngglobal_visa.group_visa_jp_student,mngglobal_visa.group_visa_manager"/>
 
-    <menuitem id="mng_visa_jp_worker_menu"
-              name="Япон Ажилтан"
-              action="mng_visa_app_action_jp_worker"
+    <menuitem id="mng_visa_jp_student_folder_menu"
+              name="📁 Элсэлтийн хавтаснууд"
+              action="mng_visa_recruitment_period_action_jp_student"
+              parent="mng_visa_jp_student_parent"
+              sequence="1"/>
+
+    <menuitem id="mng_visa_jp_student_menu"
+              name="📋 Бүх өргөдлүүд"
+              action="mng_visa_app_action_jp_student"
+              parent="mng_visa_jp_student_parent"
+              sequence="2"/>
+
+    <!-- Япон Ажилтан -->
+    <menuitem id="mng_visa_jp_worker_parent"
+              name="🇯🇵 Япон Ажилтан"
               parent="mng_visa_apps_parent"
               sequence="40"
               groups="mngglobal_visa.group_visa_jp_worker,mngglobal_visa.group_visa_manager"/>
 
-    <menuitem id="mng_visa_kr_menu"
-              name="Солонгос"
-              action="mng_visa_app_action_kr"
+    <menuitem id="mng_visa_jp_worker_folder_menu"
+              name="📁 Элсэлтийн хавтаснууд"
+              action="mng_visa_recruitment_period_action_jp_worker"
+              parent="mng_visa_jp_worker_parent"
+              sequence="1"/>
+
+    <menuitem id="mng_visa_jp_worker_menu"
+              name="📋 Бүх өргөдлүүд"
+              action="mng_visa_app_action_jp_worker"
+              parent="mng_visa_jp_worker_parent"
+              sequence="2"/>
+
+    <!-- Солонгос -->
+    <menuitem id="mng_visa_kr_parent"
+              name="🇰🇷 Солонгос"
               parent="mng_visa_apps_parent"
               sequence="50"
               groups="mngglobal_visa.group_visa_kr,mngglobal_visa.group_visa_manager"/>
+
+    <menuitem id="mng_visa_kr_folder_menu"
+              name="📁 Элсэлтийн хавтаснууд"
+              action="mng_visa_recruitment_period_action_kr"
+              parent="mng_visa_kr_parent"
+              sequence="1"/>
+
+    <menuitem id="mng_visa_kr_menu"
+              name="📋 Бүх өргөдлүүд"
+              action="mng_visa_app_action_kr"
+              parent="mng_visa_kr_parent"
+              sequence="2"/>
 
     <menuitem id="mng_visa_finance_menu"
               name="Санхүү"

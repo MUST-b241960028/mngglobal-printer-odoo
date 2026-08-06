@@ -1,11 +1,11 @@
 {
     "name": "MNG Виза — Зуучлалын Удирдлага",
-    "version": "1.5.0",
+    "version": "1.5.1",
     "category": "Services",
     "summary": "MNG Global зуучлалын үйл ажиллагааны удирдлагын систем",
     "description": """
         Филиппин, Япон, Солонгос зуучлалын бүрэн удирдлага.
-        - Элсэлтийн үе / Хавтасны ангилал (September, October, November, Spring Intakes)
+        - Элсэлтийн үе / Хавтасны ангилал (Per-category folder & mass assign functionality)
         - Kanban pipeline (drag & drop)
         - Хөтөлбөр тус бүрийн үе шатны тохиргоо
         - Шалгах хуудас (per-stage checklist)
@@ -25,6 +25,7 @@
         "data/recruitment_period_data.xml",
         "views/visa_recruitment_period_views.xml",
         "views/visa_application_views.xml",
+        "views/visa_assign_period_wizard_views.xml",
         "views/visa_document_views.xml",
         "views/visa_config_views.xml",
         "views/visa_dashboard_views.xml",
