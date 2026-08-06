@@ -13,16 +13,10 @@
               sequence="1"
               groups="mngglobal_visa.group_visa_manager,base.group_system"/>
 
-    <menuitem id="mng_visa_intake_menu"
-              name="Шинэ гэрээ"
-              action="mng_visa_cohort_workspace_intake"
-              parent="mng_visa_root_menu"
-              sequence="5"/>
-
     <menuitem id="mng_visa_agreements_menu"
               name="Гэрээнүүд"
               parent="mng_visa_root_menu"
-              sequence="10"/>
+              sequence="5"/>
 
     <!-- Program category workspaces live under one agreement menu. -->
     <menuitem id="mng_visa_ph_adult_menu"

@@ -507,12 +507,4 @@
         <field name="context" eval="{'default_program_type_id': ref('mngglobal_visa.prog_kr')}"/>
     </record>
 
-    <record id="mng_visa_app_action_intake" model="ir.actions.act_window">
-        <field name="name">Шинэ гэрээ</field>
-        <field name="res_model">mng.visa.application</field>
-        <field name="view_mode">kanban,list,form</field>
-        <field name="domain">[('recruitment_period_id', '=', False)]</field>
-        <field name="context" eval="{'search_default_unassigned': 1}"/>
-    </record>
-
 </odoo>
