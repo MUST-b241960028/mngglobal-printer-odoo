@@ -99,8 +99,8 @@ jobs:
       - name: Restart Odoo & Upgrade Module
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
+          host: 46.250.244.91
+          username: root
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             set -o pipefail
@@ -117,10 +117,9 @@ jobs:
               --stop-after-init > "$UPGRADE_LOG" 2>&1
             UPGRADE_EXIT=$?
 
-            echo "Starting Odoo..."
-            sudo systemctl start odoo19
-
             if [ $UPGRADE_EXIT -ne 0 ]; then
+              echo "Starting Odoo after failed upgrade..."
+              sudo systemctl start odoo19
               echo "=========== UPGRADE FAILED (exit=$UPGRADE_EXIT) ==========="
               tail -80 "$UPGRADE_LOG"
               rm -f "$UPGRADE_LOG"
@@ -129,6 +128,15 @@ jobs:
             echo "--- Upgrade tail ---"
             tail -20 "$UPGRADE_LOG"
             rm -f "$UPGRADE_LOG"
+
+            # Odoo stores compiled JS/CSS in ir_attachment. Remove stale bundles
+            # so the newly upgraded workspace assets are rebuilt on first request.
+            echo "Clearing generated Odoo web assets..."
+            sudo -u postgres psql -v ON_ERROR_STOP=1 -d ${{ secrets.ODOO_DB }} \
+              -c "DELETE FROM ir_attachment WHERE url LIKE '/web/assets/%';"
+
+            echo "Starting Odoo..."
+            sudo systemctl start odoo19
 
             # Increase nginx upload limit for document attachments
             NGINX_CONF="/etc/nginx/conf.d/odoo_upload.conf"
