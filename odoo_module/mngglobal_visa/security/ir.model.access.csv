@@ -23,4 +23,11 @@ access_visa_recruitment_period_mgr,mng.visa.recruitment.period mgr,model_mng_vis
 access_visa_recruitment_period_admin,mng.visa.recruitment.period admin,model_mng_visa_recruitment_period,base.group_system,1,1,1,1
 access_visa_assign_period_wizard_user,mng.visa.assign.period.wizard user,model_mng_visa_assign_period_wizard,mngglobal_visa.group_visa_user,1,1,1,1
 access_visa_assign_period_wizard_admin,mng.visa.assign.period.wizard admin,model_mng_visa_assign_period_wizard,base.group_system,1,1,1,1
+access_visa_passport_ocr_wizard_user,mng.visa.passport.ocr.wizard user,model_mng_visa_passport_ocr_wizard,mngglobal_visa.group_visa_user,1,1,1,1
+access_visa_passport_ocr_wizard_admin,mng.visa.passport.ocr.wizard admin,model_mng_visa_passport_ocr_wizard,base.group_system,1,1,1,1
+access_visa_ai_copilot_wizard_user,mng.visa.ai.copilot.wizard user,model_mng_visa_ai_copilot_wizard,mngglobal_visa.group_visa_user,1,1,1,1
+access_visa_ai_copilot_wizard_admin,mng.visa.ai.copilot.wizard admin,model_mng_visa_ai_copilot_wizard,base.group_system,1,1,1,1
+access_visa_period_add_lead_wizard_user,mng.visa.period.add.lead.wizard user,model_mng_visa_period_add_lead_wizard,mngglobal_visa.group_visa_user,1,1,1,1
+access_visa_period_add_lead_wizard_admin,mng.visa.period.add.lead.wizard admin,model_mng_visa_period_add_lead_wizard,base.group_system,1,1,1,1
 access_visa_dashboard_user,mng.visa.dashboard user,model_mng_visa_dashboard,mngglobal_visa.group_visa_manager,1,1,1,1
+

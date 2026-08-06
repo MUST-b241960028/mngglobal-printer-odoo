@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="mng_visa_ai_copilot_wizard_form" model="ir.ui.view">
+        <field name="name">mng.visa.ai.copilot.wizard.form</field>
+        <field name="model">mng.visa.ai.copilot.wizard</field>
+        <field name="arch" type="xml">
+            <form string="🤖 ERP AI Туслах">
+                <sheet>
+                    <div class="alert alert-primary mb-3" role="alert">
+                        <b>🤖 MNG Global AI Туслах:</b> ERP системийн бүх мэдээлэл, статистик, тайлангийн тухай Монгол хэлээр хариулт өгнө.
+                    </div>
+                    <group>
+                        <field name="user_query" placeholder="Жишээ: Солонгосын 9-р сарын элсэлтэд хэдэн оюутан байна вэ?" rows="3"/>
+                    </group>
+                    <group string="AI Хариулт" invisible="not ai_response">
+                        <field name="ai_response" nolabel="1" readonly="1" class="border p-3 rounded bg-light" style="font-family: inherit; font-size: 14px;"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_ask_ai" string="🚀 AI-аас асуух" type="object" class="btn-primary"/>
+                    <button string="Хаах" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="mng_visa_ai_copilot_wizard_action" model="ir.actions.act_window">
+        <field name="name">🤖 AI Туслах</field>
+        <field name="res_model">mng.visa.ai.copilot.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

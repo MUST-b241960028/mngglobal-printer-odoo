@@ -8,3 +8,4 @@ from . import visa_document
 from . import visa_fee_template
 from . import visa_dashboard
 from . import visa_assign_period_wizard
+from . import res_config_settings

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="mng_visa_period_add_lead_wizard_form" model="ir.ui.view">
+        <field name="name">mng.visa.period.add.lead.wizard.form</field>
+        <field name="model">mng.visa.period.add.lead.wizard</field>
+        <field name="arch" type="xml">
+            <form string="➕ Эзэнгүй лид хавтасанд нэмэх">
+                <sheet>
+                    <field name="period_id" invisible="1"/>
+                    <field name="program_type_id" invisible="1"/>
+                    <div class="alert alert-info" role="alert">
+                        Энэхүү хавтасанд оруулах <b>Хавтасгүй / Эзэнгүй</b> лидүүдийг сонгоно уу.
+                    </div>
+                    <group>
+                        <field name="application_ids" widget="many2many" options="{'no_create': True}">
+                            <list>
+                                <field name="name"/>
+                                <field name="client_name"/>
+                                <field name="client_phone"/>
+                                <field name="program_type_id"/>
+                                <field name="stage_id"/>
+                            </list>
+                        </field>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_add_leads" string="➕ Сонгосон лидүүдийг нэмэх" type="object" class="btn-primary"/>
+                    <button string="Цуцлах" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

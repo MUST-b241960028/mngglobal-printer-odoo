@@ -96,8 +96,8 @@
         <field name="arch" type="xml">
             <form string="Элсэлтийн үе / Хавтас">
                 <header>
-                    <button name="action_assign_unassigned_leads"
-                            string="⚡ Хавтасгүй бүх лидийг энэ хавтасанд оруулах"
+                    <button name="action_open_add_leads_wizard"
+                            string="➕ Эзэнгүй лид нэмэх"
                             type="object"
                             class="oe_highlight"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,active,closed"/>

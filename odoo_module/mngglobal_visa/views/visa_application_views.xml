@@ -88,6 +88,12 @@
         <field name="arch" type="xml">
             <form>
                 <header>
+                    <button name="action_open_passport_ocr"
+                            string="✨ AI Паспорт Унших"
+                            type="object" class="btn-primary"/>
+                    <button name="action_generate_ai_message"
+                            string="✨ AI Мессеж Бэлдэх"
+                            type="object"/>
                     <button name="action_generate_fee_schedule"
                             string="Төлбөрийн хуваарь үүсгэх"
                             type="object"

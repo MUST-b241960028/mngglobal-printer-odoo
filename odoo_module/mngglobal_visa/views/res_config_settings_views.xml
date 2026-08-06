@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="res_config_settings_view_form_mng_visa" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.mng.visa</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="90"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="MNG Виза AI" string="MNG Виза AI" name="mngglobal_visa">
+                    <block title="AI Туслах ба OCR Тохиргоо" name="mng_visa_ai_setting_container">
+                        <setting id="gemini_api_setting" help="Google AI Studio Gemini API Key оруулснаар AI Паспорт унших болон AI Туслах ажиллана.">
+                            <div class="field_title">Gemini API Key</div>
+                            <div class="content-group">
+                                <div class="mt16">
+                                    <field name="gemini_api_key" password="1" placeholder="AIzaSy..."/>
+                                </div>
+                            </div>
+                        </setting>
+                        <setting id="gemini_model_setting" help="Ашиглагдах Gemini AI загварыг сонгоно.">
+                            <div class="field_title">AI Загвар</div>
+                            <div class="content-group">
+                                <div class="mt16">
+                                    <field name="gemini_model"/>
+                                </div>
+                            </div>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="mng_visa_config_settings_action" model="ir.actions.act_window">
+        <field name="name">AI Тохиргоо</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module' : 'mngglobal_visa'}</field>
+    </record>
+
+</odoo>

@@ -417,3 +417,109 @@ class MngVisaApplication(models.Model):
                 "type": "success",
             },
         }
+
+    def action_open_passport_ocr(self):
+        """
+        Паспорт OCR унших визардыг нээнэ.
+        """
+        self.ensure_one()
+        return {
+            "name": _("✨ AI Паспорт Унших"),
+            "type": "ir.actions.act_window",
+            "res_model": "mng.visa.passport.ocr.wizard",
+            "view_mode": "form",
+            "target": "new",
+            "context": {
+                "default_application_id": self.id,
+            }
+        }
+
+    def action_generate_ai_message(self):
+        """
+        Оюутанд сануулга / дараагийн алхмын тухай Монгол мессеж бэлдэнэ.
+        """
+        self.ensure_one()
+        import json
+        import urllib.request
+        import urllib.error
+
+        api_key = self.env["ir.config_parameter"].sudo().get_param("mngglobal_visa.gemini_api_key")
+        model = self.env["ir.config_parameter"].sudo().get_param("mngglobal_visa.gemini_model", "gemini-2.5-flash")
+
+        if not api_key:
+            return {
+                "type": "ir.actions.client",
+                "tag": "display_notification",
+                "params": {
+                    "title": "Анхааруулга",
+                    "message": "Gemini API Key тохируулагдаагүй байна. Тохиргоо -> AI Тохиргоо хэсэгт API Key оруулна уу.",
+                    "type": "warning",
+                }
+            }
+
+        missing_checklists = self.checklist_ids.filtered(lambda c: not c.is_done).mapped("name")
+        lead_data = {
+            "client_name": self.client_name or "Үйлчлүүлэгч",
+            "program": self.program_type_id.name or "Хөтөлбөр",
+            "stage": self.stage_id.name or "Эхлэл",
+            "payment_status": self.payment_status,
+            "remaining_fee": self.remaining_fee,
+            "missing_checklist_items": missing_checklists,
+            "departure_date": str(self.departure_date) if self.departure_date else None,
+        }
+
+        prompt = f"""
+Draft a polite, professional Mongolian SMS/Chat follow-up message from MNG Global agency to the student:
+Student Details:
+{json.dumps(lead_data, ensure_ascii=False, indent=2)}
+
+Keep it concise, friendly, and clear. Outline the next steps or missing items.
+Output ONLY the message text in Mongolian. No greeting tags like 'Subject:'.
+"""
+
+        payload = {
+            "contents": [{"parts": [{"text": prompt}]}],
+            "generationConfig": {"temperature": 0.3}
+        }
+
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
+
+        try:
+            req = urllib.request.Request(
+                url,
+                data=json.dumps(payload).encode("utf-8"),
+                headers={"Content-Type": "application/json"},
+                method="POST"
+            )
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                result = json.loads(resp.read().decode("utf-8"))
+
+            msg_text = result["candidates"][0]["content"]["parts"][0]["text"].strip()
+
+            # Post to chatter
+            self.message_post(
+                body=f"<b>✨ AI Мессеж бэлдэгч:</b><br/><pre style='white-space: pre-wrap;'>{msg_text}</pre>",
+                message_type="comment"
+            )
+
+            return {
+                "type": "ir.actions.client",
+                "tag": "display_notification",
+                "params": {
+                    "title": "AI Мессеж бэлэн боллоо!",
+                    "message": "AI-аас бэлдсэн мессежийг Chatter (Доод хэсэг)-т нэмлээ.",
+                    "type": "success",
+                    "sticky": False,
+                }
+            }
+        except Exception as e:
+            return {
+                "type": "ir.actions.client",
+                "tag": "display_notification",
+                "params": {
+                    "title": "Алдаа",
+                    "message": f"AI Мессеж үүсгэхэд алдаа гарлаа: {str(e)}",
+                    "type": "danger",
+                }
+            }
+

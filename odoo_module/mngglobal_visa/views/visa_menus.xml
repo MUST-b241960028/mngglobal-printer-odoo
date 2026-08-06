@@ -109,6 +109,13 @@
               parent="mng_visa_root_menu"
               sequence="100"/>
 
+    <!-- AI Assistant Menu -->
+    <menuitem id="mng_visa_ai_copilot_menu"
+              name="AI Туслах"
+              action="mng_visa_ai_copilot_wizard_action"
+              parent="mng_visa_root_menu"
+              sequence="2"/>
+
     <menuitem id="mng_visa_checklist_tmpl_menu"
               name="Шалгах хуудасны загвар"
               action="mng_visa_checklist_tmpl_action"
@@ -127,5 +134,12 @@
               parent="mng_visa_config_menu"
               sequence="20"
               groups="mngglobal_visa.group_visa_finance,mngglobal_visa.group_visa_manager"/>
+
+    <menuitem id="mng_visa_ai_config_menu"
+              name="AI Тохиргоо"
+              action="mng_visa_config_settings_action"
+              parent="mng_visa_config_menu"
+              sequence="30"
+              groups="mngglobal_visa.group_visa_manager,base.group_system"/>
 
 </odoo>

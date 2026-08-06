@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="mng_visa_passport_ocr_wizard_form" model="ir.ui.view">
+        <field name="name">mng.visa.passport.ocr.wizard.form</field>
+        <field name="model">mng.visa.passport.ocr.wizard</field>
+        <field name="arch" type="xml">
+            <form string="✨ AI Паспорт Унших">
+                <sheet>
+                    <field name="state" invisible="1"/>
+                    <field name="application_id" invisible="1"/>
+
+                    <!-- State 1: Upload -->
+                    <div invisible="state != 'upload'">
+                        <div class="alert alert-info" role="alert">
+                            Үйлчлүүлэгчийн паспортын зураг эсвэл PDF файлуудыг сонгон хуулна уу. 
+                            AI нь нэр, паспортын дугаар, төрсөн болон дуусах огноог 2 секундэд автоматаар уншиж бөглөнө.
+                        </div>
+                        <group>
+                            <field name="file" filename="file_name"/>
+                            <field name="file_name" invisible="1"/>
+                        </group>
+                    </div>
+
+                    <!-- State 2: Preview & Confirm -->
+                    <div invisible="state != 'preview'">
+                        <div class="alert alert-success" role="alert">
+                            ✨ AI Паспортыг амжилттай уншлаа! Доорх мэдээллийг шалгаад баталгаажуулна уу.
+                        </div>
+                        <group>
+                            <group string="Илрүүлсэн мэдээлэл">
+                                <field name="extracted_name"/>
+                                <field name="extracted_passport_number"/>
+                                <field name="extracted_dob"/>
+                                <field name="extracted_expiry"/>
+                            </group>
+                        </group>
+                    </div>
+                </sheet>
+                <footer>
+                    <button name="action_scan_passport" string="✨ AI-аар уншуулах" type="object" class="btn-primary" invisible="state != 'upload'"/>
+                    <button name="action_confirm_apply" string="💾 Баталгаажуулж Оруулна" type="object" class="btn-success" invisible="state != 'preview'"/>
+                    <button string="Цуцлах" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>
