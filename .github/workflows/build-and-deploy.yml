@@ -63,7 +63,8 @@ jobs:
           script: |
             set -e
             echo "Updating MNG modules..."
-            ADDON_PATH="${{ secrets.ODOO_ADDON_PATH }}"
+            # This is the active addons path from /etc/odoo19.conf on the VPS.
+            ADDON_PATH="/opt/odoo19/odoo19/custom-addons"
 
             # Remove old modules (git history is our backup)
             for MODULE in mngglobal_printer mngglobal_visa mngglobal_logs; do
@@ -80,8 +81,21 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           source: "odoo_module/mngglobal_printer,odoo_module/mngglobal_visa,odoo_module/mngglobal_logs"
-          target: ${{ secrets.ODOO_ADDON_PATH }}
+          target: /opt/odoo19/odoo19/custom-addons
           strip_components: 1
+
+      - name: Verify deployed workspace files
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            set -e
+            ADDON_PATH="/opt/odoo19/odoo19/custom-addons"
+            test -f "$ADDON_PATH/mngglobal_visa/static/src/js/cohort_workspace.js"
+            test -f "$ADDON_PATH/mngglobal_visa/views/visa_cohort_workspace_views.xml"
+            grep -q '"version": "2.3.0"' "$ADDON_PATH/mngglobal_visa/__manifest__.py"
 
       - name: Restart Odoo & Upgrade Module
         uses: appleboy/ssh-action@v1
