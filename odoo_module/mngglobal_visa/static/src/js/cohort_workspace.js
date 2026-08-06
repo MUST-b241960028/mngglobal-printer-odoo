@@ -53,6 +53,9 @@ export class CohortWorkspace extends Component {
                 [this.programId, this.state.cohortId || false, this.state.scope, this.state.search]
             );
             this.state.data = data;
+            if (this.state.scope === "current") {
+                this.state.cohortId = data.current_cohort_id || false;
+            }
             if (!data.columns.some((column) => column.cards.some((lead) => lead.id === this.state.selectedId))) {
                 this.state.selectedId = data.columns.flatMap((column) => column.cards)[0]?.id || false;
             }
@@ -126,7 +129,7 @@ export class CohortWorkspace extends Component {
         if (this.programId) {
             context.default_program_type_id = this.programId;
         }
-        if (this.state.scope === "cohort" && this.state.cohortId) {
+        if (["cohort", "current"].includes(this.state.scope) && this.state.cohortId) {
             context.default_recruitment_period_id = this.state.cohortId;
         }
         this.actionService.doAction({

@@ -1,3 +1,4 @@
+from odoo import fields
 from odoo.tests.common import TransactionCase, tagged
 
 
@@ -105,3 +106,54 @@ class TestCohortLifecycle(TransactionCase):
         }
         self.assertEqual(visible_ids, {assigned.id})
         self.assertNotIn(unassigned.id, visible_ids)
+
+    def test_current_workspace_uses_latest_open_recruitment_period(self):
+        today = fields.Date.today()
+        older_period = self.env["mng.visa.recruitment.period"].create({
+            "name": "Older Open Period",
+            "program_type_id": self.program.id,
+            "date_start": fields.Date.add(today, days=-60),
+            "date_end": fields.Date.add(today, days=10),
+        })
+        current_period = self.env["mng.visa.recruitment.period"].create({
+            "name": "Current Open Period",
+            "program_type_id": self.program.id,
+            "date_start": fields.Date.add(today, days=-30),
+            "date_end": fields.Date.add(today, days=60),
+        })
+        future_period = self.env["mng.visa.recruitment.period"].create({
+            "name": "Future Period",
+            "program_type_id": self.program.id,
+            "date_start": fields.Date.add(today, days=30),
+            "date_end": fields.Date.add(today, days=120),
+        })
+        older_application = self.env["mng.visa.application"].create({
+            "program_type_id": self.program.id,
+            "recruitment_period_id": older_period.id,
+            "client_name": "Older Student",
+        })
+        current_application = self.env["mng.visa.application"].create({
+            "program_type_id": self.program.id,
+            "recruitment_period_id": current_period.id,
+            "client_name": "Current Student",
+        })
+        future_application = self.env["mng.visa.application"].create({
+            "program_type_id": self.program.id,
+            "recruitment_period_id": future_period.id,
+            "client_name": "Future Student",
+        })
+
+        workspace = self.env["mng.visa.application"].get_cohort_workspace_data(
+            self.program.id, scope="current"
+        )
+        visible_ids = {
+            card["id"]
+            for column in workspace["columns"]
+            for card in column["cards"]
+        }
+
+        self.assertEqual(workspace["current_cohort_id"], current_period.id)
+        self.assertEqual([cohort["id"] for cohort in workspace["cohorts"]], [current_period.id])
+        self.assertEqual(visible_ids, {current_application.id})
+        self.assertNotIn(older_application.id, visible_ids)
+        self.assertNotIn(future_application.id, visible_ids)
