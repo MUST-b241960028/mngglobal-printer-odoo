@@ -57,8 +57,8 @@ jobs:
       - name: Deploy to VPS via SSH
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
+          host: 46.250.244.91
+          username: root
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             set -e
@@ -77,8 +77,8 @@ jobs:
       - name: Copy module files to VPS
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
+          host: 46.250.244.91
+          username: root
           key: ${{ secrets.VPS_SSH_KEY }}
           source: "odoo_module/mngglobal_printer,odoo_module/mngglobal_visa,odoo_module/mngglobal_logs"
           target: /opt/odoo19/odoo19/custom-addons
@@ -87,8 +87,8 @@ jobs:
       - name: Verify deployed workspace files
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
+          host: 46.250.244.91
+          username: root
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             set -e
