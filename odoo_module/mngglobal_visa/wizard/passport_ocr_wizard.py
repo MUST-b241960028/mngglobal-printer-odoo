@@ -14,7 +14,7 @@ class MngVisaPassportOcrWizard(models.TransientModel):
     _description = "AI Паспорт Унших Визард"
 
     application_id = fields.Many2one(
-        "mng.visa.application", string="Аппликейшн", required=True)
+        "mng.visa.application", string="Хүсэлт", required=True)
     
     file = fields.Binary(string="Паспортын зураг / Файл", required=True)
     file_name = fields.Char(string="Файлын нэр")
@@ -138,7 +138,7 @@ If any field is missing or unreadable, set its value to null.
 
     def action_confirm_apply(self):
         """
-        Илрүүлсэн мэдээллийг аппликейшн дээр бичиж хаана.
+        Илрүүлсэн мэдээллийг хүсэлт дээр бичиж хадгална.
         """
         self.ensure_one()
         vals = {}

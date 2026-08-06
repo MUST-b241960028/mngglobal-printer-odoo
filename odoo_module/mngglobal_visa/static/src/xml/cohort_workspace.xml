@@ -4,10 +4,10 @@
         <main class="mng_cohort_workspace">
             <header class="mng_workspace_header">
                 <div class="mng_workspace_identity">
-                    <span class="mng_workspace_kicker">КОХОРТЫН УДИРДЛАГА</span>
+                    <span class="mng_workspace_kicker">ЭЛСЭЛТИЙН ҮЕИЙН САМБАР</span>
                     <h1 t-esc="state.data ? state.data.program.name : 'Ачаалж байна'"/>
                     <span class="mng_workspace_result" t-if="state.data">
-                        <t t-esc="state.data.stats.in_view"/> аппликейшн
+                        <t t-esc="state.data.stats.in_view"/> хүсэлт
                     </span>
                 </div>
                 <div class="mng_workspace_actions">
@@ -35,15 +35,15 @@
                     <span>Саатсан</span><strong t-esc="state.data.stats.blocked"/>
                 </div>
                 <div class="mng_stat_cell mng_stat_departure">
-                    <span>30 хоногт нисэх</span><strong t-esc="state.data.stats.departing"/>
+                    <span>30 хоногийн дотор нисэх</span><strong t-esc="state.data.stats.departing"/>
                 </div>
             </section>
 
             <section class="mng_workspace_content" t-if="state.data">
-                <aside class="mng_cohort_rail" aria-label="Кохортын шүүлтүүр">
-                    <div class="mng_rail_heading">АЖЛЫН ХҮРЭЭ</div>
+                <aside class="mng_cohort_rail" aria-label="Элсэлтийн үеийн шүүлтүүр">
+                    <div class="mng_rail_heading">ШҮҮЛТҮҮР</div>
                     <button type="button" t-att-class="state.scope === 'all' ? 'mng_scope_button is-active' : 'mng_scope_button'" t-on-click="() => this.setScope('all')">
-                        <span>Бүх кохорт</span><b t-esc="state.data.stats.total"/>
+                        <span>Бүх элсэлтийн үе</span><b t-esc="state.data.stats.total"/>
                     </button>
                     <button type="button" t-att-class="state.scope === 'unassigned' ? 'mng_scope_button is-active' : 'mng_scope_button'" t-on-click="() => this.setScope('unassigned')">
                         <span>Хуваарилаагүй</span><b t-esc="state.data.stats.unassigned"/>
@@ -57,7 +57,7 @@
                     </div>
                 </aside>
 
-                <section class="mng_pipeline_area" aria-label="Аппликейшний үе шат">
+                <section class="mng_pipeline_area" aria-label="Хүсэлтийн үе шат">
                     <div class="mng_pipeline_columns">
                         <article t-foreach="state.data.columns" t-as="column" t-key="column.id || 'unassigned'" t-att-class="column.is_done ? 'mng_pipeline_column is-done' : (column.is_failed ? 'mng_pipeline_column is-failed' : 'mng_pipeline_column')" t-on-dragover="allowDrop" t-on-drop="(event) => this.onDrop(event, column)">
                             <header class="mng_column_header">
@@ -110,7 +110,7 @@
                     </t>
                     <div class="mng_no_selection" t-else="">
                         <i class="fa fa-id-card-o" aria-hidden="true"/>
-                        <span>Аппликейшн сонгоогүй байна</span>
+                        <span>Хүсэлт сонгоогүй байна</span>
                     </div>
                 </aside>
             </section>

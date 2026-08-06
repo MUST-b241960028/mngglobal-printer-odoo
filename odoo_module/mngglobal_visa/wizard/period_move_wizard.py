@@ -7,7 +7,7 @@ class MngVisaPeriodMoveWizard(models.TransientModel):
     _description = "Элсэлтийн үе шилжүүлэх визард"
 
     application_id = fields.Many2one(
-        "mng.visa.application", string="Аппликейшн", required=True,
+        "mng.visa.application", string="Хүсэлт", required=True,
         readonly=True)
     program_type_id = fields.Many2one(
         related="application_id.program_type_id", string="Хөтөлбөр", readonly=True)
@@ -18,8 +18,8 @@ class MngVisaPeriodMoveWizard(models.TransientModel):
         "mng.visa.recruitment.period", string="Шинэ элсэлтийн үе", required=True,
         domain="['&', ('state', '!=', 'archived'), '|', ('program_type_id', '=', False), ('program_type_id', '=', program_type_id)]")
     mode = fields.Selection([
-        ("move", "Одоогийн аппликейшнийг шилжүүлэх"),
-        ("defer", "Шинэ аппликейшн үүсгэж хойшлуулах"),
+        ("move", "Одоогийн хүсэлтийг шилжүүлэх"),
+        ("defer", "Шинэ хүсэлт үүсгэж хойшлуулах"),
     ], string="Үйлдэл", required=True, default="move", readonly=True)
     reason = fields.Text(string="Шалтгаан", required=True)
 
@@ -37,7 +37,7 @@ class MngVisaPeriodMoveWizard(models.TransientModel):
             )
             return {
                 "type": "ir.actions.act_window",
-                "name": _("Шинэ аппликейшн"),
+                "name": _("Шинэ хүсэлт"),
                 "res_model": "mng.visa.application",
                 "res_id": new_application.id,
                 "view_mode": "form",

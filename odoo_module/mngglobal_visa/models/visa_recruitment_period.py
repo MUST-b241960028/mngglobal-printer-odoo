@@ -33,10 +33,10 @@ class MngVisaRecruitmentPeriod(models.Model):
 
     application_ids = fields.One2many(
         "mng.visa.application", "recruitment_period_id",
-        string="Аппликейшнүүд")
+        string="Хүсэлтүүд")
 
     application_count = fields.Integer(
-        string="Нийт аппликейшн", compute="_compute_counts")
+        string="Нийт хүсэлт", compute="_compute_counts")
     pending_count = fields.Integer(
         string="Хүлээгдэж буй", compute="_compute_counts")
     paid_count = fields.Integer(
@@ -71,7 +71,7 @@ class MngVisaRecruitmentPeriod(models.Model):
         """
         self.ensure_one()
         return {
-            "name": _("Хуваарилаагүй аппликейшн нэмэх"),
+            "name": _("Хуваарилаагүй хүсэлт нэмэх"),
             "type": "ir.actions.act_window",
             "res_model": "mng.visa.period.add.lead.wizard",
             "view_mode": "form",

@@ -49,7 +49,7 @@
                             <div class="row text-center bg-light rounded py-2 mx-0 mb-3 border">
                                 <div class="col-6 border-end">
                                     <div class="fs-5 fw-bold text-dark"><field name="application_count"/></div>
-                                    <div class="text-uppercase text-muted" style="font-size: 11px;">Аппликейшн</div>
+                            <div class="text-uppercase text-muted" style="font-size: 11px;">Хүсэлт</div>
                                 </div>
                                 <div class="col-6">
                                     <div class="fs-5 fw-bold text-success"><field name="paid_count"/></div>
@@ -80,7 +80,7 @@
                 <field name="date_start"/>
                 <field name="date_end"/>
                 <field name="program_type_id"/>
-                <field name="application_count" string="Аппликейшн тоо"/>
+                <field name="application_count" string="Хүсэлтийн тоо"/>
                 <field name="state" widget="badge"
                        decoration-success="state == 'active'"
                        decoration-warning="state == 'draft'"
@@ -97,7 +97,7 @@
             <form string="Элсэлтийн үе">
                 <header>
                     <button name="action_open_add_leads_wizard"
-                            string="Хуваарилаагүй аппликейшн нэмэх"
+                            string="Хуваарилаагүй хүсэлт нэмэх"
                             type="object"
                             class="oe_highlight"
                             icon="fa-plus"/>
@@ -109,7 +109,7 @@
                                 type="object"
                                 class="oe_stat_button"
                                 icon="fa-columns">
-                            <field name="application_count" widget="statinfo" string="Аппликейшнууд"/>
+                            <field name="application_count" widget="statinfo" string="Хүсэлтүүд"/>
                         </button>
                     </div>
 
@@ -134,7 +134,7 @@
                     </group>
 
                     <notebook>
-                        <page string="Аппликейшнүүд" name="applications">
+                        <page string="Хүсэлтүүд" name="applications">
                             <field name="application_ids" readonly="1">
                                 <list>
                                     <field name="name"/>

@@ -9,7 +9,7 @@ class MngVisaPeriodMove(models.Model):
     _order = "moved_at desc, id desc"
 
     application_id = fields.Many2one(
-        "mng.visa.application", string="Аппликейшн",
+        "mng.visa.application", string="Хүсэлт",
         required=True, ondelete="cascade", index=True)
     from_period_id = fields.Many2one(
         "mng.visa.recruitment.period", string="Өмнөх элсэлтийн үе",
@@ -31,6 +31,6 @@ class MngVisaPeriodMove(models.Model):
         "res.users", string="Шилжүүлсэн", required=True,
         default=lambda self: self.env.user, readonly=True)
     new_application_id = fields.Many2one(
-        "mng.visa.application", string="Шинэ аппликейшн",
+        "mng.visa.application", string="Шинэ хүсэлт",
         ondelete="set null",
-        help="Хойшлуулж шинээр үүсгэсэн аппликейшн.")
+        help="Хойшлуулж шинээр үүсгэсэн хүсэлт.")

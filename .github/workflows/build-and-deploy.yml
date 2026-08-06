@@ -95,7 +95,6 @@ jobs:
             ADDON_PATH="/opt/odoo19/odoo19/custom-addons"
             test -f "$ADDON_PATH/mngglobal_visa/static/src/js/cohort_workspace.js"
             test -f "$ADDON_PATH/mngglobal_visa/views/visa_cohort_workspace_views.xml"
-            grep -q '"version": "2.3.0"' "$ADDON_PATH/mngglobal_visa/__manifest__.py"
 
       - name: Restart Odoo & Upgrade Module
         uses: appleboy/ssh-action@v1

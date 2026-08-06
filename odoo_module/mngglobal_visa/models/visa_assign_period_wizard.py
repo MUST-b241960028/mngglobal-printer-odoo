@@ -4,7 +4,7 @@ from odoo.exceptions import UserError
 
 class MngVisaAssignPeriodWizard(models.TransientModel):
     """
-    Олон аппликейшнийг нэгэн зэрэг элсэлтийн үед шилжүүлэх визард.
+    Олон хүсэлтийг нэгэн зэрэг элсэлтийн үед шилжүүлэх визард.
     """
     _name = "mng.visa.assign.period.wizard"
     _description = "Элсэлтийн үе бөөнөөр шилжүүлэх"
@@ -21,7 +21,7 @@ class MngVisaAssignPeriodWizard(models.TransientModel):
     )
     application_ids = fields.Many2many(
         "mng.visa.application",
-        string="Сонгосон лидүүд / аппликейшнууд"
+        string="Сонгосон лидүүд / хүсэлтүүд"
     )
     reason = fields.Text(string="Шилжүүлэх шалтгаан", required=True)
 
@@ -45,7 +45,7 @@ class MngVisaAssignPeriodWizard(models.TransientModel):
     def action_apply(self):
         self.ensure_one()
         if not self.application_ids:
-            raise UserError(_("Ямар нэгэн аппликейшн сонгогдоогүй байна!"))
+            raise UserError(_("Ямар нэгэн хүсэлт сонгогдоогүй байна!"))
         
         moved_count = 0
         for app in self.application_ids:
@@ -58,8 +58,8 @@ class MngVisaAssignPeriodWizard(models.TransientModel):
             "type": "ir.actions.client",
             "tag": "display_notification",
             "params": {
-                "title": _("Кохорт шинэчлэгдлээ"),
-                "message": _("Нийт %s аппликейшнийг '%s' элсэлтийн үед шилжүүллээ.") % (
+                "title": _("Элсэлтийн үе шинэчлэгдлээ"),
+                "message": _("Нийт %s хүсэлтийг '%s' элсэлтийн үед шилжүүллээ.") % (
                     moved_count, self.recruitment_period_id.name
                 ),
                 "type": "success",

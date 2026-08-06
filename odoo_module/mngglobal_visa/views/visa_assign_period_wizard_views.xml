@@ -9,7 +9,7 @@
             <form string="Элсэлтийн үе бөөнөөр шилжүүлэх">
                 <sheet>
                     <div class="alert alert-info" role="alert">
-                        Сонгосон аппликейшнүүдийг шинэ <b>элсэлтийн үе</b> рүү шилжүүлнэ.
+                        Сонгосон хүсэлтүүдийг шинэ <b>элсэлтийн үе</b> рүү шилжүүлнэ.
                     </div>
                     <group>
                         <field name="program_type_id" invisible="1"/>
@@ -17,7 +17,7 @@
                         <field name="reason" placeholder="Жишээ: Элсэлтийн хугацаа хойшилсон"/>
                     </group>
                     <notebook>
-                        <page string="Сонгосон аппликейшнууд" name="applications">
+                        <page string="Сонгосон хүсэлтүүд" name="applications">
                             <field name="application_ids" readonly="1">
                                 <list>
                                     <field name="name"/>

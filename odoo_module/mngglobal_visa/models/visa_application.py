@@ -50,11 +50,11 @@ class MngVisaApplication(models.Model):
     period_move_count = fields.Integer(
         compute="_compute_period_move_count", string="Шилжилт")
     previous_application_id = fields.Many2one(
-        "mng.visa.application", string="Өмнөх аппликейшн",
+        "mng.visa.application", string="Өмнөх хүсэлт",
         ondelete="set null", copy=False, readonly=True)
     deferred_application_ids = fields.One2many(
         "mng.visa.application", "previous_application_id",
-        string="Дараагийн аппликейшнүүд")
+        string="Дараагийн хүсэлтүүд")
     stage_id = fields.Many2one(
         "mng.visa.stage", string="Үе шат",
         tracking=True, group_expand="_read_group_stage_ids",
@@ -508,7 +508,7 @@ class MngVisaApplication(models.Model):
             body += "<br/><span>%s</span>" % html_escape(reason)
         if new_application:
             body += "<br/><span>%s: %s</span>" % (
-                _("Шинэ аппликейшн"), html_escape(new_application.display_name),
+                _("Шинэ хүсэлт"), html_escape(new_application.display_name),
             )
         self.message_post(body=body + "</p>")
         return move
@@ -573,7 +573,7 @@ class MngVisaApplication(models.Model):
         )
         new_application.message_post(
             body="<p><b>%s</b>: %s</p>" % (
-                _("Өмнөх аппликейшнээс үүсгэсэн"),
+                _("Өмнөх хүсэлтээс үүсгэсэн"),
                 html_escape(self.display_name),
             )
         )
