@@ -117,6 +117,9 @@ export class TopicHub extends Component {
         this.editor = null;
         useAutofocus({ refName: "pageName", selectAll: true });
         this.draggedPageId = false;
+        // Хуудас хооронд хурдан дармагц хуучин хүсэлтийн хариу шинийг дарж
+        // бичихээс сэргийлнэ.
+        this.loadToken = 0;
 
         this.state = useState({
             loading: true,
@@ -124,6 +127,7 @@ export class TopicHub extends Component {
             search: "",
             categoryId: false,
             topicId: false,
+            pageId: false,
             page: null,
             pageLoading: false,
             saveState: "idle",
@@ -160,10 +164,11 @@ export class TopicHub extends Component {
         const topic = this.visibleTopics.find((t) => t.id === wanted) || this.visibleTopics[0];
         if (!topic) {
             this.state.topicId = false;
+            this.state.pageId = false;
             this.state.page = null;
             return;
         }
-        const samePage = topic.pages.some((p) => p.id === this.state.page?.id);
+        const samePage = topic.pages.some((p) => p.id === this.state.pageId);
         this.state.topicId = topic.id;
         if (!samePage) {
             const target = topic.matches[0]?.page_id || topic.pages[0]?.id;
@@ -216,18 +221,38 @@ export class TopicHub extends Component {
 
     async openPage(pageId) {
         if (!pageId) {
+            this.state.pageId = false;
             this.state.page = null;
             return;
         }
+        if (this.state.pageId === pageId && this.state.page && !this.state.pageLoading) {
+            return;
+        }
         await this.savePage();
+        // Хуучин хуудас нь шинэ агуулга ирэх хүртэл харагдана. Ингэснээр
+        // товч дармагц бүх талбар цайж, дахин зурагдахгүй.
+        const token = ++this.loadToken;
+        this.state.pageId = pageId;
         this.state.pageLoading = true;
         this.state.renamingPage = false;
         this.state.saveState = "idle";
         this.editor = null;
         try {
-            this.state.page = await this.orm.call("mng.topic.page", "get_page", [pageId]);
+            const payload = await this.orm.call("mng.topic.page", "get_page", [pageId]);
+            if (token === this.loadToken) {
+                this.state.page = payload;
+            }
+        } catch (error) {
+            if (token === this.loadToken) {
+                this.notification.add("Хуудсыг нээж чадсангүй. Дахин оролдоно уу.", {
+                    type: "danger",
+                });
+            }
+            throw error;
         } finally {
-            this.state.pageLoading = false;
+            if (token === this.loadToken) {
+                this.state.pageLoading = false;
+            }
         }
     }
 
@@ -338,6 +363,7 @@ export class TopicHub extends Component {
             confirm: async () => {
                 await this.orm.call("mng.topic", "action_archive_topic", [[topic.id]]);
                 this.state.topicId = false;
+                this.state.pageId = false;
                 this.state.page = null;
                 await this.load();
             },
@@ -389,9 +415,9 @@ export class TopicHub extends Component {
 
     archivePage(page) {
         this.dialog.add(ConfirmationDialog, {
-            title: "Хуудсыг архивлах",
-            body: `"${page.name}" хуудсыг архивлах уу?`,
-            confirmLabel: "Архивлах",
+            title: "Хуудсыг хаах",
+            body: `"${page.name}" хуудсыг архивлах уу? Менежер буцааж сэргээх боломжтой.`,
+            confirmLabel: "Хаах",
             cancelLabel: "Болих",
             confirm: async () => {
                 try {
@@ -403,6 +429,7 @@ export class TopicHub extends Component {
                     );
                     return;
                 }
+                this.state.pageId = false;
                 this.state.page = null;
                 await this.load({ keepSelection: true });
             },

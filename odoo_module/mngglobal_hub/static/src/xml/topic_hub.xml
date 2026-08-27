@@ -158,7 +158,7 @@
                         <div class="mng_hub__tabs">
                             <div t-foreach="selectedTopic.pages" t-as="page" t-key="page.id"
                                  class="mng_hub__tab" role="button" tabindex="0"
-                                 t-att-class="{'mng_hub__tab--on': state.page and state.page.id === page.id}"
+                                 t-att-class="{'mng_hub__tab--on': state.pageId === page.id}"
                                  draggable="true"
                                  t-on-dragstart="(ev) => this.onPageDragStart(ev, page)"
                                  t-on-dragover="allowPageDrop"
@@ -167,17 +167,26 @@
                                 <t t-esc="page.name"/>
                                 <span t-if="page.is_empty" class="mng_hub__tab_flag"
                                       title="Хоосон хуудас">хоосон</span>
+                                <i t-if="state.pageLoading and state.pageId === page.id"
+                                   class="fa fa-spinner fa-spin mng_hub__tab_spinner"/>
+                                <button t-if="selectedTopic.pages.length > 1"
+                                        class="mng_hub__tab_close"
+                                        title="Хуудсыг хаах"
+                                        t-on-click.stop="() => this.archivePage(page)">
+                                    <i class="fa fa-times"/>
+                                </button>
                             </div>
                             <button class="mng_hub__tab_add" t-on-click="addPage">
                                 <i class="fa fa-plus"/> Хуудас
                             </button>
                         </div>
 
-                        <div t-if="state.pageLoading" class="mng_hub__paper_loading">
+                        <div t-if="state.pageLoading and !state.page" class="mng_hub__paper_loading">
                             <i class="fa fa-spinner fa-spin"/>
                         </div>
 
-                        <div t-if="state.page and !state.pageLoading" class="mng_hub__paper">
+                        <div t-if="state.page" class="mng_hub__paper"
+                             t-att-class="{'mng_hub__paper--loading': state.pageLoading}">
                             <div class="mng_hub__page_head">
                                 <input t-if="state.renamingPage" class="mng_hub__page_name_input"
                                        t-ref="pageName"
@@ -192,9 +201,10 @@
                                             title="Нэр солих">
                                         <i class="fa fa-pencil"/>
                                     </button>
-                                    <button class="mng_hub__icon_btn"
+                                    <button t-if="selectedTopic.pages.length > 1"
+                                            class="mng_hub__icon_btn"
                                             t-on-click="() => this.archivePage(state.page)"
-                                            title="Хуудсыг архивлах">
+                                            title="Хуудсыг хаах">
                                         <i class="fa fa-archive"/>
                                     </button>
                                 </div>

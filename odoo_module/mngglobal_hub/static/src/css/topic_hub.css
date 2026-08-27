@@ -402,6 +402,7 @@
 }
 
 .mng_hub__doc_head {
+    flex: 0 0 auto;
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
@@ -519,10 +520,15 @@
 /* ---------- pages ---------- */
 
 .mng_hub__tabs {
+    flex: 0 0 auto;
+    position: sticky;
+    top: 0;
+    z-index: 2;
     display: flex;
     align-items: center;
     gap: 4px;
     padding: 0 32px;
+    background: var(--hub-canvas);
     border-bottom: 1px solid var(--hub-line);
     overflow-x: auto;
 }
@@ -562,6 +568,37 @@
     font-weight: 600;
 }
 
+.mng_hub__tab_spinner {
+    font-size: 11px;
+    opacity: .7;
+}
+
+.mng_hub__tab_close {
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--hub-muted);
+    font-size: 10px;
+    opacity: 0;
+    cursor: pointer;
+    transition: opacity .15s ease, background .15s ease, color .15s ease;
+}
+
+.mng_hub__tab:hover .mng_hub__tab_close,
+.mng_hub__tab--on .mng_hub__tab_close {
+    opacity: 1;
+}
+
+.mng_hub__tab_close:hover {
+    background: rgba(200, 87, 60, .12);
+    color: var(--hub-coral);
+}
+
 .mng_hub__tab_add {
     display: inline-flex;
     align-items: center;
@@ -583,12 +620,13 @@
 }
 
 .mng_hub__paper_loading {
+    flex: 0 0 auto;
     padding: 40px 32px;
     color: var(--hub-muted);
 }
 
 .mng_hub__paper {
-    flex: 1 1 auto;
+    flex: 0 0 auto;
     width: 100%;
     max-width: 860px;
     margin: 22px auto 60px;
@@ -631,12 +669,11 @@
 .mng_hub__page_head_actions {
     display: flex;
     gap: 2px;
-    opacity: 0;
-    transition: opacity .15s ease;
 }
 
-.mng_hub__paper:hover .mng_hub__page_head_actions {
-    opacity: 1;
+.mng_hub__paper--loading {
+    opacity: .45;
+    pointer-events: none;
 }
 
 .mng_hub__paper_foot {
