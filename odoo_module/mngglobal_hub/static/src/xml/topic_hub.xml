@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="mngglobal_hub.TopicHub">
+        <div class="mng_hub" t-att-class="{'mng_hub--nav_open': state.navOpen}">
+
+            <header class="mng_hub__topbar">
+                <button class="mng_hub__icon_btn mng_hub__nav_toggle" t-on-click="toggleNav"
+                        title="Сэдвийн жагсаалт">
+                    <i class="fa fa-bars"/>
+                </button>
+
+                <div class="mng_hub__brand">
+                    <span class="mng_hub__kicker">MNG Global</span>
+                    <h1>Мэдээллийн сан</h1>
+                </div>
+
+                <div class="mng_hub__search">
+                    <i class="fa fa-search"/>
+                    <input type="text"
+                           placeholder="Сэдэв, хуудас, агуулгаас хайх"
+                           t-att-value="state.search"
+                           t-on-input="onSearchInput"/>
+                    <button t-if="state.search" class="mng_hub__search_clear"
+                            t-on-click="clearSearch" title="Цэвэрлэх">
+                        <i class="fa fa-times"/>
+                    </button>
+                </div>
+
+                <button class="mng_hub__primary" t-on-click="() => this.openTopicDialog(false)">
+                    <i class="fa fa-plus"/>
+                    <span>Шинэ сэдэв</span>
+                </button>
+            </header>
+
+            <div t-if="state.loading" class="mng_hub__loading">
+                <i class="fa fa-spinner fa-spin"/> Ачаалж байна...
+            </div>
+
+            <div t-if="!state.loading and state.data" class="mng_hub__body">
+
+                <aside class="mng_hub__rail">
+                    <div class="mng_hub__filters">
+                        <button class="mng_hub__chip"
+                                t-att-class="{'mng_hub__chip--on': !state.categoryId}"
+                                t-on-click="() => this.setCategory(false)">
+                            Бүгд
+                            <span class="mng_hub__chip_count" t-esc="state.data.topics.length"/>
+                        </button>
+                        <button t-foreach="state.data.categories" t-as="category" t-key="category.id"
+                                class="mng_hub__chip"
+                                t-att-class="{
+                                    'mng_hub__chip--on': state.categoryId === category.id,
+                                    ['mng_hub__chip--' + category.accent]: true,
+                                }"
+                                t-on-click="() => this.setCategory(category.id)">
+                            <t t-esc="category.name"/>
+                            <span class="mng_hub__chip_count" t-esc="category.topic_count"/>
+                        </button>
+                    </div>
+
+                    <div class="mng_hub__list">
+                        <t t-if="state.search">
+                            <div class="mng_hub__rail_heading">
+                                Хайлтын үр дүн (<t t-esc="visibleTopics.length"/>)
+                            </div>
+                        </t>
+
+                        <t t-if="pinnedTopics.length and !state.search">
+                            <div class="mng_hub__rail_heading">Тогтоосон</div>
+                        </t>
+                        <t t-foreach="pinnedTopics" t-as="topic" t-key="topic.id">
+                            <t t-call="mngglobal_hub.TopicRow"/>
+                        </t>
+
+                        <t t-if="otherTopics.length and pinnedTopics.length and !state.search">
+                            <div class="mng_hub__rail_heading">Бусад сэдэв</div>
+                        </t>
+                        <t t-foreach="otherTopics" t-as="topic" t-key="topic.id">
+                            <t t-call="mngglobal_hub.TopicRow"/>
+                        </t>
+
+                        <div t-if="!visibleTopics.length" class="mng_hub__rail_empty">
+                            <t t-if="state.search">
+                                "<t t-esc="state.search"/>" гэсэн мэдээлэл олдсонгүй.
+                            </t>
+                            <t t-else="">
+                                Энэ ангилалд сэдэв алга байна.
+                            </t>
+                        </div>
+                    </div>
+                </aside>
+
+                <main class="mng_hub__doc">
+                    <t t-if="selectedTopic">
+                        <div class="mng_hub__doc_head">
+                            <div class="mng_hub__doc_titles">
+                                <div class="mng_hub__badges">
+                                    <span t-if="selectedTopic.category_name" class="mng_hub__badge"
+                                          t-att-class="'mng_hub__badge--' + selectedTopic.accent"
+                                          t-esc="selectedTopic.category_name"/>
+                                    <span t-if="selectedTopic.program_name"
+                                          class="mng_hub__badge mng_hub__badge--plain">
+                                        <i class="fa fa-graduation-cap"/>
+                                        <t t-esc="selectedTopic.program_name"/>
+                                    </span>
+                                    <span t-if="selectedTopic.period_name"
+                                          class="mng_hub__badge mng_hub__badge--plain">
+                                        <i class="fa fa-calendar-o"/>
+                                        <t t-esc="selectedTopic.period_name"/>
+                                    </span>
+                                </div>
+                                <h2 t-esc="selectedTopic.name"/>
+                                <p t-if="selectedTopic.summary" class="mng_hub__doc_summary"
+                                   t-esc="selectedTopic.summary"/>
+                                <div class="mng_hub__doc_meta">
+                                    <span class="mng_hub__avatars">
+                                        <span t-foreach="selectedTopic.contributors.slice(0, 4)"
+                                              t-as="person" t-key="person_index"
+                                              class="mng_hub__avatar"
+                                              t-att-title="person"
+                                              t-esc="person.slice(0, 1).toUpperCase()"/>
+                                        <span t-if="selectedTopic.contributors.length > 4"
+                                              class="mng_hub__avatar mng_hub__avatar--more">
+                                            +<t t-esc="selectedTopic.contributors.length - 4"/>
+                                        </span>
+                                    </span>
+                                    <span class="mng_hub__doc_meta_text">
+                                        Сүүлд <t t-esc="selectedTopic.last_editor_name"/>
+                                        засварласан, <t t-esc="selectedTopic.edited_label"/>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="mng_hub__doc_actions">
+                                <span class="mng_hub__save"
+                                      t-att-class="'mng_hub__save--' + state.saveState"
+                                      t-esc="saveLabel"/>
+                                <button class="mng_hub__icon_btn"
+                                        t-att-class="{'mng_hub__icon_btn--on': selectedTopic.is_pinned}"
+                                        t-on-click="() => this.togglePin(selectedTopic)"
+                                        title="Тогтоох">
+                                    <i class="fa fa-thumb-tack"/>
+                                </button>
+                                <button class="mng_hub__icon_btn"
+                                        t-on-click="() => this.openTopicDialog(selectedTopic)"
+                                        title="Сэдвийн тохиргоо">
+                                    <i class="fa fa-sliders"/>
+                                </button>
+                                <button class="mng_hub__icon_btn"
+                                        t-on-click="() => this.archiveTopic(selectedTopic)"
+                                        title="Архивлах">
+                                    <i class="fa fa-archive"/>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mng_hub__tabs">
+                            <div t-foreach="selectedTopic.pages" t-as="page" t-key="page.id"
+                                 class="mng_hub__tab" role="button" tabindex="0"
+                                 t-att-class="{'mng_hub__tab--on': state.page and state.page.id === page.id}"
+                                 draggable="true"
+                                 t-on-dragstart="(ev) => this.onPageDragStart(ev, page)"
+                                 t-on-dragover="allowPageDrop"
+                                 t-on-drop="(ev) => this.onPageDrop(ev, page)"
+                                 t-on-click="() => this.openPage(page.id)">
+                                <t t-esc="page.name"/>
+                                <span t-if="page.is_empty" class="mng_hub__tab_flag"
+                                      title="Хоосон хуудас">хоосон</span>
+                            </div>
+                            <button class="mng_hub__tab_add" t-on-click="addPage">
+                                <i class="fa fa-plus"/> Хуудас
+                            </button>
+                        </div>
+
+                        <div t-if="state.pageLoading" class="mng_hub__paper_loading">
+                            <i class="fa fa-spinner fa-spin"/>
+                        </div>
+
+                        <div t-if="state.page and !state.pageLoading" class="mng_hub__paper">
+                            <div class="mng_hub__page_head">
+                                <input t-if="state.renamingPage" class="mng_hub__page_name_input"
+                                       t-ref="pageName"
+                                       t-att-value="state.page.name"
+                                       t-on-blur="commitRenamePage"
+                                       t-on-keydown="onRenameKeydown"/>
+                                <h3 t-else="" class="mng_hub__page_name"
+                                    t-on-dblclick="startRenamePage"
+                                    t-esc="state.page.name"/>
+                                <div class="mng_hub__page_head_actions">
+                                    <button class="mng_hub__icon_btn" t-on-click="startRenamePage"
+                                            title="Нэр солих">
+                                        <i class="fa fa-pencil"/>
+                                    </button>
+                                    <button class="mng_hub__icon_btn"
+                                            t-on-click="() => this.archivePage(state.page)"
+                                            title="Хуудсыг архивлах">
+                                        <i class="fa fa-archive"/>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <PageEditor t-key="state.page.id"
+                                        page="state.page"
+                                        onEditorLoad.bind="onEditorLoad"
+                                        onChange.bind="onEditorChange"/>
+
+                            <div class="mng_hub__paper_foot">
+                                Бүх ажилтан энэ хуудсыг шууд засварлана. Өөрчлөлт автоматаар
+                                хадгалагдаж, нөгөө хүнд тэр даруй харагдана.
+                            </div>
+                        </div>
+                    </t>
+
+                    <div t-else="" class="mng_hub__hero">
+                        <i class="fa fa-book"/>
+                        <h2>Сэдэв сонгоно уу</h2>
+                        <p>
+                            Дуудлагад хэрэгтэй мэдээллээ сэдэв болгон нэг дор цуглуулж,
+                            бүх ажилтан ижил хариулт өгөх боломжтой болно.
+                        </p>
+                        <button class="mng_hub__primary" t-on-click="() => this.openTopicDialog(false)">
+                            <i class="fa fa-plus"/>
+                            <span>Эхний сэдвээ үүсгэх</span>
+                        </button>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="mngglobal_hub.TopicRow">
+        <div class="mng_hub__topic_wrap">
+            <button class="mng_hub__topic"
+                    t-att-class="{'mng_hub__topic--on': state.topicId === topic.id}"
+                    t-on-click="() => this.selectTopic(topic.id)">
+                <span class="mng_hub__topic_accent"
+                      t-att-class="'mng_hub__accent--' + topic.accent"/>
+                <span class="mng_hub__topic_main">
+                    <span class="mng_hub__topic_name" t-esc="topic.name"/>
+                    <span t-if="topic.summary" class="mng_hub__topic_summary"
+                          t-esc="topic.summary"/>
+                    <span class="mng_hub__topic_meta">
+                        <t t-esc="topic.page_count"/> хуудас
+                        <span class="mng_hub__sep">/</span>
+                        <t t-esc="topic.edited_label"/>
+                    </span>
+                </span>
+                <i t-if="topic.is_pinned" class="fa fa-thumb-tack mng_hub__topic_pin"/>
+            </button>
+
+            <div t-if="topic.matches.length" class="mng_hub__hits">
+                <button t-foreach="topic.matches" t-as="hit" t-key="hit.page_id"
+                        class="mng_hub__hit"
+                        t-on-click="() => this.selectSearchHit(topic.id, hit.page_id)">
+                    <i class="fa fa-level-up fa-rotate-90"/>
+                    <span t-esc="hit.snippet"/>
+                </button>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="mngglobal_hub.PageEditor">
+        <Wysiwyg config="editorConfig"
+                 onLoad="props.onEditorLoad"
+                 contentClass="'mng_hub_editable'"/>
+    </t>
+
+    <t t-name="mngglobal_hub.TopicDialog">
+        <Dialog title="props.title" size="'md'" contentClass="'mng_hub_dialog'">
+            <div class="mng_hub_form">
+                <label class="mng_hub_form__label">Сэдвийн нэр</label>
+                <input class="mng_hub_form__input" type="text" autofocus="autofocus"
+                       t-att-value="state.name"
+                       placeholder="Жишээ нь: Филиппин өвлийн хүүхдийн зусланд"
+                       t-on-input="(ev) => this.onTextInput('name', ev)"/>
+
+                <label class="mng_hub_form__label">Товч тайлбар</label>
+                <input class="mng_hub_form__input" type="text"
+                       t-att-value="state.summary"
+                       placeholder="Дуудлага авсан хүн нэг мөрөөс ойлгох тайлбар"
+                       t-on-input="(ev) => this.onTextInput('summary', ev)"/>
+
+                <div class="mng_hub_form__row">
+                    <div class="mng_hub_form__col">
+                        <label class="mng_hub_form__label">Ангилал</label>
+                        <select class="mng_hub_form__input"
+                                t-on-change="(ev) => this.onSelectChange('category_id', ev)">
+                            <option value="">Сонгоогүй</option>
+                            <option t-foreach="props.categories" t-as="category" t-key="category.id"
+                                    t-att-value="category.id"
+                                    t-att-selected="state.category_id === category.id"
+                                    t-esc="category.name"/>
+                        </select>
+                    </div>
+                    <div class="mng_hub_form__col">
+                        <label class="mng_hub_form__label">Хөтөлбөр</label>
+                        <select class="mng_hub_form__input"
+                                t-on-change="(ev) => this.onSelectChange('program_type_id', ev)">
+                            <option value="">Сонгоогүй</option>
+                            <option t-foreach="props.programs" t-as="program" t-key="program.id"
+                                    t-att-value="program.id"
+                                    t-att-selected="state.program_type_id === program.id"
+                                    t-esc="program.name"/>
+                        </select>
+                    </div>
+                </div>
+
+                <label class="mng_hub_form__label">Элсэлтийн үе</label>
+                <select class="mng_hub_form__input"
+                        t-on-change="(ev) => this.onSelectChange('recruitment_period_id', ev)">
+                    <option value="">Сонгоогүй</option>
+                    <option t-foreach="props.periods" t-as="period" t-key="period.id"
+                            t-att-value="period.id"
+                            t-att-selected="state.recruitment_period_id === period.id"
+                            t-esc="period.name"/>
+                </select>
+
+                <div t-if="state.error" class="mng_hub_form__error" t-esc="state.error"/>
+            </div>
+
+            <t t-set-slot="footer">
+                <button class="btn btn-primary" t-on-click="confirm">Хадгалах</button>
+                <button class="btn btn-secondary" t-on-click="() => this.props.close()">Болих</button>
+            </t>
+        </Dialog>
+    </t>
+
+</templates>

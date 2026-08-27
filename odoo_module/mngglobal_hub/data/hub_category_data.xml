@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="category_philippines" model="mng.topic.category">
+            <field name="name">Филиппин</field>
+            <field name="accent">teal</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="category_japan" model="mng.topic.category">
+            <field name="name">Япон</field>
+            <field name="accent">blue</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <record id="category_korea" model="mng.topic.category">
+            <field name="name">Солонгос</field>
+            <field name="accent">violet</field>
+            <field name="sequence">30</field>
+        </record>
+
+        <record id="category_general" model="mng.topic.category">
+            <field name="name">Ерөнхий</field>
+            <field name="accent">slate</field>
+            <field name="sequence">40</field>
+        </record>
+
+    </data>
+</odoo>

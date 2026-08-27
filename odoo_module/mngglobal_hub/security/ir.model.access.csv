@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_topic_category_user,topic.category user,model_mng_topic_category,base.group_user,1,0,0,0
+access_topic_category_manager,topic.category manager,model_mng_topic_category,mngglobal_visa.group_visa_manager,1,1,1,1
+access_topic_user,topic user,model_mng_topic,base.group_user,1,1,1,0
+access_topic_manager,topic manager,model_mng_topic,mngglobal_visa.group_visa_manager,1,1,1,1
+access_topic_page_user,topic.page user,model_mng_topic_page,base.group_user,1,1,1,0
+access_topic_page_manager,topic.page manager,model_mng_topic_page,mngglobal_visa.group_visa_manager,1,1,1,1

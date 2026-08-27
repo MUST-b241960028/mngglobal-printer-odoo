@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="mng_topic_hub_root_menu"
+              name="MNG Мэдээлэл"
+              web_icon="mngglobal_hub,static/description/icon.png"
+              sequence="7"/>
+
+    <menuitem id="mng_topic_hub_menu"
+              name="Мэдээллийн сан"
+              action="mng_topic_hub_action"
+              parent="mng_topic_hub_root_menu"
+              sequence="10"/>
+
+    <menuitem id="mng_topic_hub_config_root_menu"
+              name="Тохиргоо"
+              parent="mng_topic_hub_root_menu"
+              sequence="100"
+              groups="mngglobal_visa.group_visa_manager,base.group_system"/>
+
+    <menuitem id="mng_topic_category_menu"
+              name="Ангилал"
+              action="mng_topic_category_action"
+              parent="mng_topic_hub_config_root_menu"
+              sequence="10"
+              groups="mngglobal_visa.group_visa_manager,base.group_system"/>
+
+    <menuitem id="mng_topic_archived_menu"
+              name="Архивласан сэдэв"
+              action="mng_topic_archived_action"
+              parent="mng_topic_hub_config_root_menu"
+              sequence="20"
+              groups="mngglobal_visa.group_visa_manager,base.group_system"/>
+
+    <menuitem id="mng_topic_page_archived_menu"
+              name="Архивласан хуудас"
+              action="mng_topic_page_archived_action"
+              parent="mng_topic_hub_config_root_menu"
+              sequence="30"
+              groups="mngglobal_visa.group_visa_manager,base.group_system"/>
+
+</odoo>
